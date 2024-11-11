@@ -6,5 +6,18 @@ root: home
 parts:
 - caption: "Week 1"
   chapters:
-  - file: content/intro
-  - file: content/mps
+  - file: content/week1/intro
+  - file: content/week1/problem
+  - file: content/week1/mps
+- caption: "Week 2"
+  chapters:
+  - file: content/week2/canonical
+  - file: content/week2/tebd
+
+- caption: "Week 3"
+  chapters:
+  - file: content/week3/mpo
+  - file: content/week3/dmrg
+- caption: "Week 1"
+  chapters:
+  - file: content/week4/dsf
