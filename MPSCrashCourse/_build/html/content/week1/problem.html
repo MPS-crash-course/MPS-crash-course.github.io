@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>2. The Heisenberg Antiferromagnet &#8212; My sample book</title>
+    <title>2. The Heisenberg Antiferromagnet &#8212; MPS Crash Course</title>
   
   
   
@@ -146,8 +146,8 @@
       
     
     
-    <img src="../../_static/logo.jpg" class="logo__image only-light" alt="My sample book - Home"/>
-    <img src="../../_static/logo.jpg" class="logo__image only-dark pst-js-only" alt="My sample book - Home"/>
+    <img src="../../_static/logo.jpg" class="logo__image only-light" alt="MPS Crash Course - Home"/>
+    <img src="../../_static/logo.jpg" class="logo__image only-dark pst-js-only" alt="MPS Crash Course - Home"/>
   
   
 </a></div>
@@ -351,7 +351,9 @@
 <button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
     <i class="fa-solid fa-magnifying-glass fa-lg"></i>
 </button>
-
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
 </div></div>
       
     </div>
@@ -367,6 +369,16 @@
     <div id="print-main-content">
         <div id="jb-print-toc">
             
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-heisenberg-model">2.1. The Heisenberg model</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#experimental-motivation">2.2. Experimental motivation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-dynamical-structure-factor">2.3. The dynamical structure factor</a></li>
+</ul>
+            </nav>
         </div>
     </div>
 </div>
@@ -378,7 +390,16 @@
                   
   <section class="tex2jax_ignore mathjax_ignore" id="the-heisenberg-antiferromagnet">
 <h1><span class="section-number">2. </span>The Heisenberg Antiferromagnet<a class="headerlink" href="#the-heisenberg-antiferromagnet" title="Link to this heading">#</a></h1>
-<p>Watch this space!</p>
+<p>To guide our discussion of Matrix Product States (MPS) we will keep in mind a particular task: namely computing the dynamical structure factor for the Heisenberg Antiferromagnet. This task will combine all aspects of MPS that we will cover in this course. Let us start by introducing the model, provide some experimental motivation for this task, and then provide the details of the calculation we want to perform.</p>
+<section id="the-heisenberg-model">
+<h2><span class="section-number">2.1. </span>The Heisenberg model<a class="headerlink" href="#the-heisenberg-model" title="Link to this heading">#</a></h2>
+</section>
+<section id="experimental-motivation">
+<h2><span class="section-number">2.2. </span>Experimental motivation<a class="headerlink" href="#experimental-motivation" title="Link to this heading">#</a></h2>
+</section>
+<section id="the-dynamical-structure-factor">
+<h2><span class="section-number">2.3. </span>The dynamical structure factor<a class="headerlink" href="#the-dynamical-structure-factor" title="Link to this heading">#</a></h2>
+</section>
 </section>
 
     <script type="text/x-thebe-config">
@@ -436,6 +457,24 @@
             
             
               
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-heisenberg-model">2.1. The Heisenberg model</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#experimental-motivation">2.2. Experimental motivation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-dynamical-structure-factor">2.3. The dynamical structure factor</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
             
           </div>
           <footer class="bd-footer-content">
@@ -445,7 +484,7 @@
   <div class="footer-item">
     
 <p class="component-author">
-By The Jupyter Book Community
+By Adam Gammon-Smith
 </p>
 
   </div>
