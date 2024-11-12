@@ -428,7 +428,7 @@ S^{\alpha,\beta}(q, \omega) = \sum_{j,k} e^{iq(j-k)} \int_{-\infty}^{\infty} e^{
 C^{zz}(r, t) = \langle S^z_{j+r}(t) S^z_{j}(0) \rangle = \langle \psi_0 | e^{iHt} S^z_{j+r} e^{-iHt} S^z_{j} | \psi_0 \rangle
 \]</div>
 <p>where <span class="math notranslate nohighlight">\(|\psi_0\rangle\)</span> is the ground state of the Antiferromagnetic Heisenberg model, described by the Hamiltonian <span class="math notranslate nohighlight">\(H\)</span>. This quantity is in general prohibitively costly to compute with exact numerics due to the exponential growth of the Hilbert space for quantum states, and is an ideal candidate for MPS methods.
-Our goal can then be split into two main parts:</p>
+While we will go into the details of this calculation in week 4, our goal can then be split into two main parts:</p>
 <ul class="simple">
 <li><p>computing the ground state <span class="math notranslate nohighlight">\(|\psi_0\rangle\)</span> of the Heisenberg model. We will do this using the Density Matrix Renormalization Group (DMRG) method.</p></li>
 <li><p>performing the unitary time evolution under <span class="math notranslate nohighlight">\(e^{-iHt}\)</span>, which will be achieved by using the Time-Evolving Block Decimation (TEBD) algorithm.</p></li>

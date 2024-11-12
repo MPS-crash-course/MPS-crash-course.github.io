@@ -44,7 +44,7 @@ C^{zz}(r, t) = \langle S^z_{j+r}(t) S^z_{j}(0) \rangle = \langle \psi_0 | e^{iHt
 $$ (eq:corr)
 
 where $|\psi_0\rangle$ is the ground state of the Antiferromagnetic Heisenberg model, described by the Hamiltonian $H$. This quantity is in general prohibitively costly to compute with exact numerics due to the exponential growth of the Hilbert space for quantum states, and is an ideal candidate for MPS methods.
-Our goal can then be split into two main parts: 
+While we will go into the details of this calculation in week 4, our goal can then be split into two main parts: 
 * computing the ground state $|\psi_0\rangle$ of the Heisenberg model. We will do this using the Density Matrix Renormalization Group (DMRG) method. 
 * performing the unitary time evolution under $e^{-iHt}$, which will be achieved by using the Time-Evolving Block Decimation (TEBD) algorithm.
 
