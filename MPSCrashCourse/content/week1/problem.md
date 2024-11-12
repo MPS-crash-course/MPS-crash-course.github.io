@@ -19,6 +19,8 @@ The Heisenberg model is an extremely simplified model for interacting spins, bot
 ```{figure} ../../images/AFH_experiment.png
 ---
 name: lake2013
+width: 75%
+align: center
 ---
 Data from B. Lake *et al* {cite}`Lake2013`. The left panel shows the experimental data for the dynamical structure factor of $\text{KCuF}_3$. The right panel shows the theoretical prediction for the Heisenberg model obtained using Bethe Ansatz
 ```
