@@ -405,17 +405,41 @@ H = J \sum_{i=1}^{N-1} \mathbf{S}_i \cdot \mathbf{S}_{i+1} = J \sum_{i=1}^{N-1} 
 </section>
 <section id="experimental-motivation">
 <h2><span class="section-number">2.2. </span>Experimental motivation<a class="headerlink" href="#experimental-motivation" title="Link to this heading">#</a></h2>
-<p>The Heisenberg model is an extremely simplified model for interacting spins, both because of the simplicity of the isotropic and uniform coupling, but also because it is a one-dimensional model. Remarkably, experimental measurements have shown that certain real materials are very accurately described by such a simple model. In the landmark work by B. Lake <em>et al</em> <span id="id1">[<a class="reference internal" href="#id4" title="B. Lake, D. A. Tennant, J.-S. Caux, T. Barthel, U. Schollwöck, S. E. Nagler, and C. D. Frost. Multispinon continua at zero and finite temperature in a near-ideal heisenberg chain. Phys. Rev. Lett., 111:137205, Sep 2013. URL: https://link.aps.org/doi/10.1103/PhysRevLett.111.137205, doi:10.1103/PhysRevLett.111.137205.">LTC+13</a>]</span> the team measured the compound <span class="math notranslate nohighlight">\(\text{KCuF}_3\)</span> using inelastic neutron scattering. By scattering high-energy neutrons off the sample, their deflection reveals information about the low energy excitations, as shown in Fig.~. The data is compared to the predictions of the antiferromagnetic Heisenberg model, and the agreement is remarkable.</p>
-<figure class="align-default" id="lake2013">
-<img alt="../../_images/AFH_experiment.png" src="../../_images/AFH_experiment.png" />
+<p>The Heisenberg model is an extremely simplified model for interacting spins, both because of the simplicity of the isotropic and uniform coupling, but also because it is a one-dimensional model. Remarkably, experimental measurements have shown that certain real materials are very accurately described by such a simple model. In the landmark work by B. Lake <em>et al</em> <span id="id1">[<a class="reference internal" href="#id4" title="B. Lake, D. A. Tennant, J.-S. Caux, T. Barthel, U. Schollwöck, S. E. Nagler, and C. D. Frost. Multispinon continua at zero and finite temperature in a near-ideal heisenberg chain. Phys. Rev. Lett., 111:137205, Sep 2013. URL: https://link.aps.org/doi/10.1103/PhysRevLett.111.137205, doi:10.1103/PhysRevLett.111.137205.">LTC+13</a>]</span> the team measured the compound <span class="math notranslate nohighlight">\(\text{KCuF}_3\)</span> using inelastic neutron scattering. By scattering high-energy neutrons off the sample, their deflection reveals information about the low energy excitations, as shown in <a class="reference internal" href="#fig-lake2013"><span class="std std-numref">Fig. 2.1</span></a>. The data is compared to the predictions of the antiferromagnetic Heisenberg model, and the agreement is remarkable.</p>
+<figure class="align-center" id="fig-lake2013">
+<a class="reference internal image-reference" href="../../_images/AFH_experiment.png"><img alt="../../_images/AFH_experiment.png" src="../../_images/AFH_experiment.png" style="width: 80%;" /></a>
 <figcaption>
-<p><span class="caption-number">Fig. 2.1 </span><span class="caption-text">Data from B. Lake <em>et al</em> <span id="id2">[<a class="reference internal" href="#id4" title="B. Lake, D. A. Tennant, J.-S. Caux, T. Barthel, U. Schollwöck, S. E. Nagler, and C. D. Frost. Multispinon continua at zero and finite temperature in a near-ideal heisenberg chain. Phys. Rev. Lett., 111:137205, Sep 2013. URL: https://link.aps.org/doi/10.1103/PhysRevLett.111.137205, doi:10.1103/PhysRevLett.111.137205.">LTC+13</a>]</span>. The left panel shows the experimental data for the dynamical structure factor of <span class="math notranslate nohighlight">\(\text{KCuF}_3\)</span>. The right panel shows the theoretical prediction for the Heisenberg model. The agreement is remarkable.</span><a class="headerlink" href="#lake2013" title="Link to this image">#</a></p>
+<p><span class="caption-number">Fig. 2.1 </span><span class="caption-text">Data from B. Lake <em>et al</em> <span id="id2">[<a class="reference internal" href="#id4" title="B. Lake, D. A. Tennant, J.-S. Caux, T. Barthel, U. Schollwöck, S. E. Nagler, and C. D. Frost. Multispinon continua at zero and finite temperature in a near-ideal heisenberg chain. Phys. Rev. Lett., 111:137205, Sep 2013. URL: https://link.aps.org/doi/10.1103/PhysRevLett.111.137205, doi:10.1103/PhysRevLett.111.137205.">LTC+13</a>]</span>. The left panel shows the experimental data for the dynamical structure factor of <span class="math notranslate nohighlight">\(\text{KCuF}_3\)</span>. The right panel shows the theoretical prediction for the Heisenberg model obtained using Bethe Ansatz.</span><a class="headerlink" href="#fig-lake2013" title="Link to this image">#</a></p>
 </figcaption>
 </figure>
 <p>This data reveals that the model is gapless, and has a very distinct dispersion relation. There is a single magnon (spin wave excitation) that has a dispersion that touches at <span class="math notranslate nohighlight">\(k=0, \pi\)</span>. Above this there is a continuum of mult-magnon excitations. The end goal of this course is to provide the theory predictions for this experiments using MPS methods.</p>
 </section>
 <section id="the-dynamical-structure-factor">
 <h2><span class="section-number">2.3. </span>The dynamical structure factor<a class="headerlink" href="#the-dynamical-structure-factor" title="Link to this heading">#</a></h2>
+<p>The specific quantity that we want to compute is called the <em>dynamical spin structure factor (DSSF)</em>. This is the quantity that can be measured in inelastic neutron scattering experiments. The components of the DSSF are given by</p>
+<div class="math notranslate nohighlight" id="equation-eq-dsf">
+<span class="eqno">(2.2)<a class="headerlink" href="#equation-eq-dsf" title="Link to this equation">#</a></span>\[
+S^{\alpha,\beta}(q, \omega) = \sum_{j,k} e^{iq(j-k)} \int_{-\infty}^{\infty} e^{i\omega t} \langle S^\alpha_j(t) S^\beta_k(0) \rangle dt.
+\]</div>
+<p>The actual quantity that is measured in experiments is the cross-section for the outgoing neutrons, which is related to the dynamical structure factor by the following by simple momentum polarization and magnetic form factors. These details go beyond the scope of this course. In fact, due to symmetries of the model, we will only be concerned with the <span class="math notranslate nohighlight">\(S^{zz}(q, \omega)\)</span> component.</p>
+<p>The DSSF is the Fourier transform of a two-point unequal time spin correlation function,</p>
+<div class="math notranslate nohighlight" id="equation-eq-corr">
+<span class="eqno">(2.3)<a class="headerlink" href="#equation-eq-corr" title="Link to this equation">#</a></span>\[
+C^{zz}(r, t) = \langle S^z_{j+r}(t) S^z_{j}(0) \rangle = \langle \psi_0 | e^{iHt} S^z_{j+r} e^{-iHt} S^z_{j} | \psi_0 \rangle
+\]</div>
+<p>where <span class="math notranslate nohighlight">\(|\psi_0\rangle\)</span> is the ground state of the Antiferromagnetic Heisenberg model, described by the Hamiltonian <span class="math notranslate nohighlight">\(H\)</span>. This quantity is in general prohibitively costly to compute with exact numerics due to the exponential growth of the Hilbert space for quantum states, and is an ideal candidate for MPS methods.
+Our goal can then be split into two main parts:</p>
+<ul class="simple">
+<li><p>computing the ground state <span class="math notranslate nohighlight">\(|\psi_0\rangle\)</span> of the Heisenberg model. We will do this using the Density Matrix Renormalization Group (DMRG) method.</p></li>
+<li><p>performing the unitary time evolution under <span class="math notranslate nohighlight">\(e^{-iHt}\)</span>, which will be achieved by using the Time-Evolving Block Decimation (TEBD) algorithm.</p></li>
+</ul>
+<p>By the end of the course you should be able to produce data similar to that shown in <a class="reference internal" href="#fig-mpsfinal"><span class="std std-numref">Fig. 2.2</span></a> using your own code:</p>
+<figure class="align-center" id="fig-mpsfinal">
+<a class="reference internal image-reference" href="../../_images/AFH_MPS_final.png"><img alt="../../_images/AFH_MPS_final.png" src="../../_images/AFH_MPS_final.png" style="width: 66%;" /></a>
+<figcaption>
+<p><span class="caption-number">Fig. 2.2 </span><span class="caption-text">Data for the dynamical spin structure factor of the Heisenberg Antiferromagnet obtained using MPS methods you will learn in this course.</span><a class="headerlink" href="#fig-mpsfinal" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
 </section>
 <hr class="docutils" />
 <section id="references">

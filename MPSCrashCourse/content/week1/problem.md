@@ -14,21 +14,51 @@ where $S^\alpha_i = \frac{1}{2} \sigma^\alpha_i$ are the spin operators at site 
 
 ## Experimental motivation
 
-The Heisenberg model is an extremely simplified model for interacting spins, both because of the simplicity of the isotropic and uniform coupling, but also because it is a one-dimensional model. Remarkably, experimental measurements have shown that certain real materials are very accurately described by such a simple model. In the landmark work by B. Lake *et al* {cite}`Lake2013` the team measured the compound $\text{KCuF}_3$ using inelastic neutron scattering. By scattering high-energy neutrons off the sample, their deflection reveals information about the low energy excitations, as shown in Fig.~. The data is compared to the predictions of the antiferromagnetic Heisenberg model, and the agreement is remarkable. 
+The Heisenberg model is an extremely simplified model for interacting spins, both because of the simplicity of the isotropic and uniform coupling, but also because it is a one-dimensional model. Remarkably, experimental measurements have shown that certain real materials are very accurately described by such a simple model. In the landmark work by B. Lake *et al* {cite}`Lake2013` the team measured the compound $\text{KCuF}_3$ using inelastic neutron scattering. By scattering high-energy neutrons off the sample, their deflection reveals information about the low energy excitations, as shown in {numref}`fig:lake2013`. The data is compared to the predictions of the antiferromagnetic Heisenberg model, and the agreement is remarkable. 
 
 ```{figure} ../../images/AFH_experiment.png
 ---
-name: lake2013
-width: 75%
+name: fig:lake2013
+width: 80%
 align: center
 ---
-Data from B. Lake *et al* {cite}`Lake2013`. The left panel shows the experimental data for the dynamical structure factor of $\text{KCuF}_3$. The right panel shows the theoretical prediction for the Heisenberg model obtained using Bethe Ansatz
+Data from B. Lake *et al* {cite}`Lake2013`. The left panel shows the experimental data for the dynamical structure factor of $\text{KCuF}_3$. The right panel shows the theoretical prediction for the Heisenberg model obtained using Bethe Ansatz.
 ```
 
 This data reveals that the model is gapless, and has a very distinct dispersion relation. There is a single magnon (spin wave excitation) that has a dispersion that touches at $k=0, \pi$. Above this there is a continuum of mult-magnon excitations. The end goal of this course is to provide the theory predictions for this experiments using MPS methods.
 
 ## The dynamical structure factor
 
+The specific quantity that we want to compute is called the *dynamical spin structure factor (DSSF)*. This is the quantity that can be measured in inelastic neutron scattering experiments. The components of the DSSF are given by
+
+$$
+S^{\alpha,\beta}(q, \omega) = \sum_{j,k} e^{iq(j-k)} \int_{-\infty}^{\infty} e^{i\omega t} \langle S^\alpha_j(t) S^\beta_k(0) \rangle dt.
+$$ (eq:dsf)
+
+The actual quantity that is measured in experiments is the cross-section for the outgoing neutrons, which is related to the dynamical structure factor by the following by simple momentum polarization and magnetic form factors. These details go beyond the scope of this course. In fact, due to symmetries of the model, we will only be concerned with the $S^{zz}(q, \omega)$ component.
+
+The DSSF is the Fourier transform of a two-point unequal time spin correlation function,
+
+$$
+C^{zz}(r, t) = \langle S^z_{j+r}(t) S^z_{j}(0) \rangle = \langle \psi_0 | e^{iHt} S^z_{j+r} e^{-iHt} S^z_{j} | \psi_0 \rangle
+$$ (eq:corr)
+
+where $|\psi_0\rangle$ is the ground state of the Antiferromagnetic Heisenberg model, described by the Hamiltonian $H$. This quantity is in general prohibitively costly to compute with exact numerics due to the exponential growth of the Hilbert space for quantum states, and is an ideal candidate for MPS methods.
+While we will go into the details of this calculation in week 4, our goal can then be split into two main parts: 
+* computing the ground state $|\psi_0\rangle$ of the Heisenberg model. We will do this using the Density Matrix Renormalization Group (DMRG) method. 
+* performing the unitary time evolution under $e^{-iHt}$, which will be achieved by using the Time-Evolving Block Decimation (TEBD) algorithm.
+
+
+By the end of the course you should be able to produce data similar to that shown in {numref}`fig:mpsfinal` using your own code:
+
+```{figure} ../../images/AFH_MPS_final.png
+---
+name: fig:mpsfinal
+width: 66%
+align: center
+---
+Data for the dynamical spin structure factor of the Heisenberg Antiferromagnet obtained using MPS methods you will learn in this course.
+```
 
 
 ---
