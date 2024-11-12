@@ -34,7 +34,7 @@
     <link rel="stylesheet" type="text/css" href="../../_static/styles/sphinx-book-theme.css?v=a3416100" />
     <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css?v=13237357" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css?v=be8a1c11" />
     <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css?v=4fa983c6" />
     <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
   
@@ -60,6 +60,8 @@
     <script async="async" src="../../_static/sphinx-thebe.js?v=c100c467"></script>
     <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
     <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'content/week1/problem';</script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
@@ -241,7 +243,7 @@
       
       
       
-      <li><a href="https://github.com/executablebooks/jupyter-book" target="_blank"
+      <li><a href="https://github.com/MPS-crash-course/MPS-crash-course.github.io" target="_blank"
    class="btn btn-sm btn-source-repository-button dropdown-item"
    title="Source repository"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -258,7 +260,7 @@
       
       
       
-      <li><a href="https://github.com/executablebooks/jupyter-book/issues/new?title=Issue%20on%20page%20%2Fcontent/week1/problem.html&body=Your%20issue%20content%20here." target="_blank"
+      <li><a href="https://github.com/MPS-crash-course/MPS-crash-course.github.io/issues/new?title=Issue%20on%20page%20%2Fcontent/week1/problem.html&body=Your%20issue%20content%20here." target="_blank"
    class="btn btn-sm btn-source-issues-button dropdown-item"
    title="Open an issue"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -377,6 +379,7 @@
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-heisenberg-model">2.1. The Heisenberg model</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#experimental-motivation">2.2. Experimental motivation</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-dynamical-structure-factor">2.3. The dynamical structure factor</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#references">2.4. References</a></li>
 </ul>
             </nav>
         </div>
@@ -393,12 +396,39 @@
 <p>To guide our discussion of Matrix Product States (MPS) we will keep in mind a particular task: namely computing the dynamical structure factor for the Heisenberg Antiferromagnet. This task will combine all aspects of MPS that we will cover in this course. Let us start by introducing the model, provide some experimental motivation for this task, and then provide the details of the calculation we want to perform.</p>
 <section id="the-heisenberg-model">
 <h2><span class="section-number">2.1. </span>The Heisenberg model<a class="headerlink" href="#the-heisenberg-model" title="Link to this heading">#</a></h2>
+<p>We will consider the one-dimensional Heisenberg model. This is a model of spin-1/2 particles (two-level quantum systems) on a one-dimensional chain. The spins are coupled to their nearest neighbours. The Hamiltonian for this model is given by</p>
+<div class="math notranslate nohighlight" id="equation-eq-heisenberg">
+<span class="eqno">(2.1)<a class="headerlink" href="#equation-eq-heisenberg" title="Link to this equation">#</a></span>\[
+H = J \sum_{i=1}^{N-1} \mathbf{S}_i \cdot \mathbf{S}_{i+1} = J \sum_{i=1}^{N-1} (S_i^x S_{i+1}^x + S_i^y S_{i+1}^y + S_i^z S_{i+1}^z)
+\]</div>
+<p>where <span class="math notranslate nohighlight">\(S^\alpha_i = \frac{1}{2} \sigma^\alpha_i\)</span> are the spin operators at site <span class="math notranslate nohighlight">\(i\)</span>, and <span class="math notranslate nohighlight">\(\sigma^\alpha_i\)</span> are the Pauli matrices. <span class="math notranslate nohighlight">\(J\)</span> is the coupling constant, and we will consider the case where <span class="math notranslate nohighlight">\(J=1\)</span>. In this case, the model is said to be antiferromagnetic since the spins prefer to be anti-aligned with their neighbours. The Heisenberg model is a paradigmatic model for quantum magnetism, which can be solved exactly in one dimension using Bethe ansatz. However, in this course we will use MPS to study the model. Crucially, the solvability can easily be broken by local perturbations, whereas the MPS techniques we will learn can be applied more generally.</p>
 </section>
 <section id="experimental-motivation">
 <h2><span class="section-number">2.2. </span>Experimental motivation<a class="headerlink" href="#experimental-motivation" title="Link to this heading">#</a></h2>
+<p>The Heisenberg model is an extremely simplified model for interacting spins, both because of the simplicity of the isotropic and uniform coupling, but also because it is a one-dimensional model. Remarkably, experimental measurements have shown that certain real materials are very accurately described by such a simple model. In the landmark work by B. Lake <em>et al</em> <span id="id1">[<a class="reference internal" href="#id4" title="B. Lake, D. A. Tennant, J.-S. Caux, T. Barthel, U. Schollwöck, S. E. Nagler, and C. D. Frost. Multispinon continua at zero and finite temperature in a near-ideal heisenberg chain. Phys. Rev. Lett., 111:137205, Sep 2013. URL: https://link.aps.org/doi/10.1103/PhysRevLett.111.137205, doi:10.1103/PhysRevLett.111.137205.">LTC+13</a>]</span> the team measured the compound <span class="math notranslate nohighlight">\(\text{KCuF}_3\)</span> using inelastic neutron scattering. By scattering high-energy neutrons off the sample, their deflection reveals information about the low energy excitations, as shown in Fig.~. The data is compared to the predictions of the antiferromagnetic Heisenberg model, and the agreement is remarkable.</p>
+<figure class="align-default" id="lake2013">
+<img alt="../../_images/AFH_experiment.png" src="../../_images/AFH_experiment.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 2.1 </span><span class="caption-text">Data from B. Lake <em>et al</em> <span id="id2">[<a class="reference internal" href="#id4" title="B. Lake, D. A. Tennant, J.-S. Caux, T. Barthel, U. Schollwöck, S. E. Nagler, and C. D. Frost. Multispinon continua at zero and finite temperature in a near-ideal heisenberg chain. Phys. Rev. Lett., 111:137205, Sep 2013. URL: https://link.aps.org/doi/10.1103/PhysRevLett.111.137205, doi:10.1103/PhysRevLett.111.137205.">LTC+13</a>]</span>. The left panel shows the experimental data for the dynamical structure factor of <span class="math notranslate nohighlight">\(\text{KCuF}_3\)</span>. The right panel shows the theoretical prediction for the Heisenberg model. The agreement is remarkable.</span><a class="headerlink" href="#lake2013" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+<p>This data reveals that the model is gapless, and has a very distinct dispersion relation. There is a single magnon (spin wave excitation) that has a dispersion that touches at <span class="math notranslate nohighlight">\(k=0, \pi\)</span>. Above this there is a continuum of mult-magnon excitations. The end goal of this course is to provide the theory predictions for this experiments using MPS methods.</p>
 </section>
 <section id="the-dynamical-structure-factor">
 <h2><span class="section-number">2.3. </span>The dynamical structure factor<a class="headerlink" href="#the-dynamical-structure-factor" title="Link to this heading">#</a></h2>
+</section>
+<hr class="docutils" />
+<section id="references">
+<h2><span class="section-number">2.4. </span>References<a class="headerlink" href="#references" title="Link to this heading">#</a></h2>
+<div class="docutils container" id="id3">
+<div role="list" class="citation-list">
+<div class="citation" id="id4" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>LTC+13<span class="fn-bracket">]</span></span>
+<span class="backrefs">(<a role="doc-backlink" href="#id1">1</a>,<a role="doc-backlink" href="#id2">2</a>)</span>
+<p>B. Lake, D. A. Tennant, J.-S. Caux, T. Barthel, U. Schollwöck, S. E. Nagler, and C. D. Frost. Multispinon continua at zero and finite temperature in a near-ideal heisenberg chain. <em>Phys. Rev. Lett.</em>, 111:137205, Sep 2013. URL: <a class="reference external" href="https://link.aps.org/doi/10.1103/PhysRevLett.111.137205">https://link.aps.org/doi/10.1103/PhysRevLett.111.137205</a>, <a class="reference external" href="https://doi.org/10.1103/PhysRevLett.111.137205">doi:10.1103/PhysRevLett.111.137205</a>.</p>
+</div>
+</div>
+</div>
 </section>
 </section>
 
@@ -470,6 +500,7 @@
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-heisenberg-model">2.1. The Heisenberg model</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#experimental-motivation">2.2. Experimental motivation</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-dynamical-structure-factor">2.3. The dynamical structure factor</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#references">2.4. References</a></li>
 </ul>
   </nav></div>
 
