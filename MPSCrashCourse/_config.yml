@@ -10,6 +10,11 @@ logo: logo.jpg
 execute:
   execute_notebooks: force
 
+# Force light mode by default
+sphinx:
+  html_context:
+    default_mode: light
+
 # Define the name of the latex output file for PDF builds
 latex:
   latex_documents:

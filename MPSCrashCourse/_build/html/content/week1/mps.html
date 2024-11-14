@@ -379,6 +379,8 @@
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#quantum-states-of-many-spins">3.1. Quantum states of many spins</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">3.2. Matrix Product States</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#tensor-network-diagrams">3.3. Tensor network diagrams</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#numpy-tensordot-and-transpose">3.4. Numpy tensordot and transpose</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mps-from-a-state-vector">3.5. MPS from a state vector</a></li>
 </ul>
             </nav>
         </div>
@@ -426,14 +428,156 @@
 \]</div>
 <p>where each <span class="math notranslate nohighlight">\(M^{[n] i_n}\)</span> is a <span class="math notranslate nohighlight">\(\chi_n \times \chi_{n+1}\)</span> matrix. We include the <span class="math notranslate nohighlight">\([n]\)</span> superscript to indicate that the matrix matrix is associated with the <span class="math notranslate nohighlight">\(n^{\text{th}}\)</span> spin. The superscript <span class="math notranslate nohighlight">\(i_n\)</span> indicates the state of the <span class="math notranslate nohighlight">\(n^{\text{th}}\)</span> spin. That the probability amplitude (and hence the state) can be written in this way is perhaps not immediately obvious, but we will soon discuss how to find the matrices <span class="math notranslate nohighlight">\(M^{[n] i_n}\)</span>, and convert from a state vector to a MPS.</p>
 <p>Instead of dealing with an MPS as a product of matrices, it is instead more useful to expose the matrix indices explicitly. That is <span class="math notranslate nohighlight">\([M^{[n] i_n}]_{\alpha_n, \alpha_{n+1}} = M^{[n] i_n}_{\alpha_n, \alpha_{n+1}}\)</span> where <span class="math notranslate nohighlight">\(\alpha_n\)</span> and <span class="math notranslate nohighlight">\(\alpha_{n+1}\)</span> are the indices of the matrix. The state of the system can then be written as</p>
-<div class="math notranslate nohighlight">
-\[
+<div class="math notranslate nohighlight" id="equation-eq-mps">
+<span class="eqno">(3.2)<a class="headerlink" href="#equation-eq-mps" title="Link to this equation">#</a></span>\[
 \psi_{i_1 i_2 \ldots i_N} = \sum_{\alpha_1, \alpha_2, \ldots, \alpha_N} M^{[1]i_1}_{\alpha_0,\alpha_1} M^{[2]i_2}_{\alpha_2, \alpha_3}M^{[3]i_3}_{\alpha_3, \alpha_4} \cdots M^{[N]i_N}_{\alpha_{N},\alpha_{N+1}}.
 \]</div>
 <p>It is then more useful to treat the matrices <span class="math notranslate nohighlight">\(M^{[n]i_n}_{\alpha_n,\alpha_{n+1}}\)</span>, as rank-3 tensors, with indices <span class="math notranslate nohighlight">\(i_n, \alpha_n, \alpha_n\)</span>. Since these expressions can become cumbersome, we will also introduce a graphical notation to represent these tensors. This graphical notation is known as the tensor network diagram, and is a powerful tool for understanding and manipulating tensor networks. Let us introduce this notation before returning to this expression for the matrix product state.</p>
+<div class="admonition-code-mps-class admonition">
+<p class="admonition-title">Code: MPS Class</p>
+<p>Since we know what the MPS representation of a state is, i.e., a collection of rank-3 tensors, one for each site, we can write a class that represents an MPS. We will start this class as follows:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">MPS</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Matrix Product State class for 1D quantum systems of spin-1/2 particles.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    L : Int </span>
+<span class="sd">        number of sites</span>
+<span class="sd">    tensors : list of np.Array[ndim=3]</span>
+<span class="sd">        list of tensors. Indices are (left, physical, right)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">tensors</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">L</span> <span class="o">=</span> <span class="n">L</span>  <span class="c1"># number of sites</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tensors</span> <span class="o">=</span> <span class="n">tensors</span>  <span class="c1"># list of tensors. Indices are (left, physical, right)</span>
+        
+
+    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">MPS</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">L</span><span class="p">,</span> <span class="p">[</span><span class="n">tensor</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span> <span class="k">for</span> <span class="n">tensor</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">tensors</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>The class consists of two attributes: <code class="docutils literal notranslate"><span class="pre">L</span></code> which is the number of sites in the system, and <code class="docutils literal notranslate"><span class="pre">tensors</span></code> which is a list of rank-3 tensors. These tensors are numpy arrays. The <code class="docutils literal notranslate"><span class="pre">copy</span></code> method is a useful method to have, as we will often want to make a copy of an MPS.</p>
+</div>
 </section>
 <section id="tensor-network-diagrams">
 <h2><span class="section-number">3.3. </span>Tensor network diagrams<a class="headerlink" href="#tensor-network-diagrams" title="Link to this heading">#</a></h2>
+<p>Rather than constantly writing out tensors, their many indices, and the sums over these indices, we can introduce a simple diagramatic approach to represent these expressions, as shown in <a class="reference internal" href="#fig-simple-diagrams"><span class="std std-numref">Fig. 3.1</span></a>. In this notation, the tensor is represented by a shape (in this case a circle), and the outcoming lines (referred to as legs) represent the indices of the tensor. The number of legs is equal to the rank of the tensor. For example, the vector <span class="math notranslate nohighlight">\(v_i\)</span> is represented by a circle with a single leg, the matrix <span class="math notranslate nohighlight">\(M_{ij}\)</span> by two legs, and the rank-3 tensor <span class="math notranslate nohighlight">\(A_{ijk}\)</span> by three legs.</p>
+<figure class="align-center" id="fig-simple-diagrams">
+<a class="reference internal image-reference" href="../../_images/simple_tensor_diagrams.jpeg"><img alt="../../_images/simple_tensor_diagrams.jpeg" src="../../_images/simple_tensor_diagrams.jpeg" style="width: 50%;" /></a>
+<figcaption>
+<p><span class="caption-number">Fig. 3.1 </span><span class="caption-text">Some simple objects as tensor network diagrams. (Left) A vector <span class="math notranslate nohighlight">\(v_i\)</span>. (Middle) A matrix <span class="math notranslate nohighlight">\(M_{ij}\)</span>. (Right) A rank-3 tensor <span class="math notranslate nohighlight">\(A_{ijk}\)</span>.</span><a class="headerlink" href="#fig-simple-diagrams" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+<p>We can also represent a type of product between these tensors, which we call <em>contraction</em>. This is done diagramatically by connecting the legs of the two tensors. This corresponds to taking the product of the tensor elements and summing over the repeated index. For example, in <a class="reference internal" href="#fig-contraction"><span class="std std-numref">Fig. 3.2</span></a> we show the contraction of a matrix acting on a vector, and the contraction of two matrices, both in terms of matrix elements and as tensor network diagrams.</p>
+<figure class="align-center" id="fig-contraction">
+<a class="reference internal image-reference" href="../../_images/matrix_product_diagrams.jpeg"><img alt="../../_images/matrix_product_diagrams.jpeg" src="../../_images/matrix_product_diagrams.jpeg" style="width: 80%;" /></a>
+<figcaption>
+<p><span class="caption-number">Fig. 3.2 </span><span class="caption-text">(Left) A matrix acting on a vector written as a sum over indices and drawn as a tensor network diagram. (Right) Similar for the product of two matrices.</span><a class="headerlink" href="#fig-contraction" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+<p>These kind of tensor contractions are the core part of the code we will write to manipulate MPS.</p>
+<p>We are then able to draw our MPS from Eq.<a class="reference internal" href="#equation-eq-mps">(3.2)</a> as a tensor network diagram, as shown in <a class="reference internal" href="#fig-mps-diagram"><span class="std std-numref">Fig. 3.3</span></a>. It consists of a line of rank-3 tensors. The legs that are not contracted are referred to as physical legs, and those that are contracted are virtual legs. The physical legs correspond to the indices of the tensor that are associated with the physical degrees of freedom of the system, in this case the spin states. The virtual legs correspond to the indices that are summed over in the contraction.</p>
+<figure class="align-center" id="fig-mps-diagram">
+<a class="reference internal image-reference" href="../../_images/mps_diagram.jpeg"><img alt="../../_images/mps_diagram.jpeg" src="../../_images/mps_diagram.jpeg" style="width: 50%;" /></a>
+<figcaption>
+<p><span class="caption-number">Fig. 3.3 </span><span class="caption-text">A matrix product state on 5 sites as a tensor network diagram. The physical legs are the dangling vertical lines that are labelled, and the virtual legs are the horizontal lines. The end tensors are shown with a dashed line to indicate that there free indices are dimension 1. This allows us to write each tensor as a rank-3 numpy array, simplifying our code. Strictly speaking, the results of the contraction of this diagram is a <span class="math notranslate nohighlight">\(1\times 1\)</span> matrix (which is equivalent to a scalar).</span><a class="headerlink" href="#fig-mps-diagram" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</section>
+<section id="numpy-tensordot-and-transpose">
+<h2><span class="section-number">3.4. </span>Numpy tensordot and transpose<a class="headerlink" href="#numpy-tensordot-and-transpose" title="Link to this heading">#</a></h2>
+<p>In our MPS class, the tensors are given by rank-3 numpy arrays. In order to perform the contraction and keep track of the indices, we will use the numpy <code class="docutils literal notranslate"><span class="pre">tensordot</span></code> and <code class="docutils literal notranslate"><span class="pre">transpose</span></code> functions. The <code class="docutils literal notranslate"><span class="pre">tensordot</span></code> function is used to contract two tensors along specified axes. The <code class="docutils literal notranslate"><span class="pre">transpose</span></code> function is used to permute the axes of a tensor.</p>
+<p>It is easiest to work through examples to understand how these functions work. Let use consider the examples in <a class="reference internal" href="#fig-contraction"><span class="std std-numref">Fig. 3.2</span></a>. Starting with the matrix acting on a vector, we can write the contraction as</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="c1"># Define the tensors</span>
+<span class="n">v</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>  <span class="c1"># vector</span>
+<span class="n">M</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">]])</span>  <span class="c1"># matrix</span>
+
+<span class="c1"># Contract the matrix with the vector</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">tensordot</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="p">([</span><span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+
+<span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">M</span> <span class="o">@</span> <span class="n">v</span><span class="p">)</span>  <span class="c1"># check that the result matches</span>
+
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">tensordot</span></code> function takes three arguments. The first two are the arrays that we are contracting. The third argument specifies the axes that we are contracting over (specified as a tuple of lists). In this case we are contracting over the 1st of the matrix and 0th of the vector.</p>
+<p>For the product of two matrices, let us do the contraction in two different ways by putting the matrices into <code class="docutils literal notranslate"><span class="pre">tensordot</span></code> in different orders.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>
+<span class="c1"># Define the tensors</span>
+<span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">]])</span>  <span class="c1"># matrix</span>
+<span class="n">B</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">],</span> <span class="p">[</span><span class="mi">7</span><span class="p">,</span> <span class="mi">8</span><span class="p">]])</span>  <span class="c1"># matrix</span>
+
+<span class="c1"># Contract the matrices</span>
+<span class="n">result1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">tensordot</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="p">([</span><span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+
+<span class="c1"># Contract the matrices in the opposite order</span>
+<span class="n">result2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">tensordot</span><span class="p">(</span><span class="n">B</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="p">([</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+<span class="n">result2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">result2</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>  <span class="c1"># transpose the result to match the order of the indices</span>
+
+<span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">result1</span><span class="p">,</span> <span class="n">A</span> <span class="o">@</span> <span class="n">B</span><span class="p">)</span>  <span class="c1"># check that the result matches</span>
+<span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">result2</span><span class="p">,</span> <span class="n">A</span> <span class="o">@</span> <span class="n">B</span><span class="p">)</span>  <span class="c1"># check that the result matches</span>
+
+</pre></div>
+</div>
+<p>When contracting using <code class="docutils literal notranslate"><span class="pre">tensordot</span></code>, order of indices will be a list of those remaining from the first array, followed by the remaining indices from the second. The two ways of contracting are equivalent to the following equations</p>
+<div class="math notranslate nohighlight">
+\[
+C_{ij} = \sum_k A_{ik} B_{kj}, \quad \text{and} \quad
+\widetilde{C}_{ji} = \sum_k B_{kj} A_{ik}.
+\]</div>
+<p>In the second case we need to transpose the result to match the order of the indices. The <code class="docutils literal notranslate"><span class="pre">transpose</span></code> function allows us to perform a generalised transpose of tensors. The arguments are the array to transpose, followed by the new order of the axes.</p>
+<p>Let us consider a final example using rank-3 tensors, which will be very similar to the type of contractions we will be performing in our MPS code.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>
+<span class="c1"># Define the tensors</span>
+<span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>  <span class="c1"># (left, physical, right)</span>
+<span class="n">B</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>  <span class="c1"># (left, physical, right)</span>
+
+<span class="c1"># Contract the tensors along the physical indices</span>
+<span class="n">theta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">tensordot</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="p">([</span><span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">]))</span>  <span class="c1"># (l1,p,r1) * (l2,p,r2) -&gt; (l1,r1,l2,r2)</span>
+<span class="n">theta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>  <span class="c1"># (l1,r1,l2,r2) -&gt; (l1,l2,r1,r2)</span>
+
+</pre></div>
+</div>
+<p>Here we are computing the object</p>
+<div class="math notranslate nohighlight">
+\[
+\Theta_{ijkl} = \sum_p A_{i p k} B_{j p l},
+\]</div>
+<p>which we also show diagramatically in <a class="reference internal" href="#fig-theta-example"><span class="std std-numref">Fig. 3.4</span></a>. For more complex contractions it is good practice to add comments to your code keeping track of the indices. Here at the end we have transposed the result so that those on the left in <a class="reference internal" href="#fig-theta-example"><span class="std std-numref">Fig. 3.4</span></a> come before those on the right.</p>
+<figure class="align-center" id="fig-theta-example">
+<a class="reference internal image-reference" href="../../_images/theta_example.jpeg"><img alt="../../_images/theta_example.jpeg" src="../../_images/theta_example.jpeg" style="width: 50%;" /></a>
+<figcaption>
+<p><span class="caption-number">Fig. 3.4 </span><span class="caption-text">The contraction of two rank-3 tensors <span class="math notranslate nohighlight">\(A\)</span> and <span class="math notranslate nohighlight">\(B\)</span> along the physical indices. The result is a rank-4 tensor <span class="math notranslate nohighlight">\(\Theta\)</span>. I have included coloured numbers showing the order of the indices as stored in the numpy arrays. To arrive at the final ordering for <span class="math notranslate nohighlight">\(\Theta\)</span> we need to transpose the result.</span><a class="headerlink" href="#fig-theta-example" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+<div class="admonition-exercise-contracting-tensors admonition">
+<p class="admonition-title">Exercise: Contracting tensors</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">tensordot</span></code> and <code class="docutils literal notranslate"><span class="pre">transpose</span></code> functions can be quite confusing if you haven’t dealt with tensors before, but are the main functions we will need throughout this course. I would therefore encourage you to play around with these to get a better feeling of how they work. The easiest way to do this is to work with matrices, where you can easily check the reaults by hand, or by printing the arrays.</p>
+<p>Try the following exercises (all using square matrices complex matrices <span class="math notranslate nohighlight">\(A\)</span> and <span class="math notranslate nohighlight">\(B\)</span>):</p>
+<ol class="arabic simple">
+<li><p>Compute <span class="math notranslate nohighlight">\(\text{Tr}(A B) = \sum_{ij} A_{ij} B_{ji}\)</span> with <span class="math notranslate nohighlight">\(A\)</span> in the first position and <span class="math notranslate nohighlight">\(B\)</span> in the second.</p></li>
+<li><p>Same as 1. but with the matrices appearing in the opposite order in <code class="docutils literal notranslate"><span class="pre">tensordot</span></code>.</p></li>
+<li><p>Compute <span class="math notranslate nohighlight">\(A^\dagger B\)</span> where <span class="math notranslate nohighlight">\(A^\dagger\)</span> is the complex conjugate transpose of <span class="math notranslate nohighlight">\(A\)</span>. Compute this with <span class="math notranslate nohighlight">\(A^\dagger\)</span> in the first position and <span class="math notranslate nohighlight">\(B\)</span> in the second.</p></li>
+<li><p>Compute <span class="math notranslate nohighlight">\(A^\dagger B\)</span>, but with <span class="math notranslate nohighlight">\(A^*\)</span> (complex conjugate) in the second position and <span class="math notranslate nohighlight">\(B\)</span> in the first.</p></li>
+</ol>
+</div>
+</section>
+<section id="mps-from-a-state-vector">
+<h2><span class="section-number">3.5. </span>MPS from a state vector<a class="headerlink" href="#mps-from-a-state-vector" title="Link to this heading">#</a></h2>
+<p>Now we have the diagramatic notation and the corresponding python functions at our disposal, let us return to the MPS representation. In particular, we want to explicitly relate the matrices in the MPS to the vector of probability amplitudes. The MPS can be drawn as the tensor network diagram shown in ???. Note the dashed virtual indices that are dangling on the end tensors. These are 1 dimensional indices and are simply included to make our code simpler (we only have to treat one shape of array). The result of this diagram when we specify all the physical indices is then not technically a number, but a <span class="math notranslate nohighlight">\(1\times 1\)</span> matrix.</p>
+<p>We will now show how to convert a state vector into this MPS form. This will involve the use of numpy <code class="docutils literal notranslate"><span class="pre">reshape</span></code>, as well as singular value decomposition (SVD).</p>
+<p>Let us start by thinking what we mean by treating <span class="math notranslate nohighlight">\(\psi_{i_1, i_2, \ldots, i_N}\)</span> as a vector. One way to think of this is that <span class="math notranslate nohighlight">\((i_1, i_2, \ldots, i_N)\)</span> is a binary representation of the index of the vector. That is the probability amplitude corresponding to <span class="math notranslate nohighlight">\(|000\rangle\)</span> is in the 0th position, <span class="math notranslate nohighlight">\(|001\rangle\)</span> in the 1st position, and so on. Instead, we will no choose to separate out the first spin, and instead write the state as the matrix <span class="math notranslate nohighlight">\(\psi_{(i_1),(i_2 \ldots i_N)}\)</span>. That is, <span class="math notranslate nohighlight">\(|000\rangle\)</span> corresponds to <span class="math notranslate nohighlight">\(\psi_{0, 0}\)</span>, <span class="math notranslate nohighlight">\(|001\rangle\)</span> to <span class="math notranslate nohighlight">\(\psi_{0, 1}\)</span>, and <span class="math notranslate nohighlight">\(|100\rangle\)</span> to <span class="math notranslate nohighlight">\(\psi_{1,0}\)</span>, and so on. This is a simple reshaping of the vector into a matrix, and can be done using <code class="docutils literal notranslate"><span class="pre">reshape</span></code> as follows in python:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>
+<span class="n">psi</span>  <span class="c1"># the vector of probability amplitudes</span>
+
+<span class="c1"># Reshape the vector into a matrix</span>
+<span class="n">psi</span> <span class="o">=</span> <span class="n">psi</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
+</pre></div>
+</div>
+<p>We specify that the matrix should have 2 rows, and then let python figure out how many columns are needed. Diagramatically this is shown in ???.</p>
 </section>
 </section>
 
@@ -505,6 +649,8 @@
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#quantum-states-of-many-spins">3.1. Quantum states of many spins</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">3.2. Matrix Product States</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#tensor-network-diagrams">3.3. Tensor network diagrams</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#numpy-tensordot-and-transpose">3.4. Numpy tensordot and transpose</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mps-from-a-state-vector">3.5. MPS from a state vector</a></li>
 </ul>
   </nav></div>
 
