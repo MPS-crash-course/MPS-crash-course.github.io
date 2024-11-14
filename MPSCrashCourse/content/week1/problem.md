@@ -16,7 +16,7 @@ where $S^\alpha_i = \frac{1}{2} \sigma^\alpha_i$ are the spin operators at site 
 
 The Heisenberg model is an extremely simplified model for interacting spins, both because of the simplicity of the isotropic and uniform coupling, but also because it is a one-dimensional model. Remarkably, experimental measurements have shown that certain real materials are very accurately described by such a simple model. In the landmark work by B. Lake *et al* {cite}`Lake2013` the team measured the compound $\text{KCuF}_3$ using inelastic neutron scattering. By scattering high-energy neutrons off the sample, their deflection reveals information about the low energy excitations, as shown in {numref}`fig:lake2013`. The data is compared to the predictions of the antiferromagnetic Heisenberg model, and the agreement is remarkable. 
 
-```{figure} ../../images/AFH_experiment.png
+```{figure} images/AFH_experiment.png
 ---
 name: fig:lake2013
 width: 80%
@@ -51,7 +51,7 @@ While we will go into the details of this calculation in week 4, our goal can th
 
 By the end of the course you should be able to produce data similar to that shown in {numref}`fig:mpsfinal` using your own code:
 
-```{figure} ../../images/AFH_MPS_final.png
+```{figure} images/AFH_MPS_final.png
 ---
 name: fig:mpsfinal
 width: 66%

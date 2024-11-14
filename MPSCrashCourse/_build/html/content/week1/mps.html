@@ -381,6 +381,8 @@
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#tensor-network-diagrams">3.3. Tensor network diagrams</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#numpy-tensordot-and-transpose">3.4. Numpy tensordot and transpose</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mps-from-a-state-vector">3.5. MPS from a state vector</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mps-to-vector">3.6. MPS to vector</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#summary">3.7. Summary</a></li>
 </ul>
             </nav>
         </div>
@@ -436,7 +438,9 @@
 <div class="admonition-code-mps-class admonition">
 <p class="admonition-title">Code: MPS Class</p>
 <p>Since we know what the MPS representation of a state is, i.e., a collection of rank-3 tensors, one for each site, we can write a class that represents an MPS. We will start this class as follows:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">MPS</span><span class="p">:</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1">## file: src/mps.py</span>
+
+<span class="k">class</span> <span class="nc">MPS</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Matrix Product State class for 1D quantum systems of spin-1/2 particles.</span>
 
@@ -547,7 +551,7 @@ C_{ij} = \sum_k A_{ik} B_{kj}, \quad \text{and} \quad
 \]</div>
 <p>which we also show diagramatically in <a class="reference internal" href="#fig-theta-example"><span class="std std-numref">Fig. 3.4</span></a>. For more complex contractions it is good practice to add comments to your code keeping track of the indices. Here at the end we have transposed the result so that those on the left in <a class="reference internal" href="#fig-theta-example"><span class="std std-numref">Fig. 3.4</span></a> come before those on the right.</p>
 <figure class="align-center" id="fig-theta-example">
-<a class="reference internal image-reference" href="../../_images/theta_example.jpeg"><img alt="../../_images/theta_example.jpeg" src="../../_images/theta_example.jpeg" style="width: 50%;" /></a>
+<a class="reference internal image-reference" href="../../_images/theta_example.jpeg"><img alt="../../_images/theta_example.jpeg" src="../../_images/theta_example.jpeg" style="width: 60%;" /></a>
 <figcaption>
 <p><span class="caption-number">Fig. 3.4 </span><span class="caption-text">The contraction of two rank-3 tensors <span class="math notranslate nohighlight">\(A\)</span> and <span class="math notranslate nohighlight">\(B\)</span> along the physical indices. The result is a rank-4 tensor <span class="math notranslate nohighlight">\(\Theta\)</span>. I have included coloured numbers showing the order of the indices as stored in the numpy arrays. To arrive at the final ordering for <span class="math notranslate nohighlight">\(\Theta\)</span> we need to transpose the result.</span><a class="headerlink" href="#fig-theta-example" title="Link to this image">#</a></p>
 </figcaption>
@@ -578,6 +582,51 @@ C_{ij} = \sum_k A_{ik} B_{kj}, \quad \text{and} \quad
 </pre></div>
 </div>
 <p>We specify that the matrix should have 2 rows, and then let python figure out how many columns are needed. Diagramatically this is shown in ???.</p>
+<figure class="align-center" id="fig-split-first-site">
+<a class="reference internal image-reference" href="../../_images/split_first_site.jpeg"><img alt="../../_images/split_first_site.jpeg" src="../../_images/split_first_site.jpeg" style="width: 60%;" /></a>
+<figcaption>
+<p><span class="caption-number">Fig. 3.5 </span><span class="caption-text">????</span><a class="headerlink" href="#fig-split-first-site" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+<figure class="align-center" id="fig-split-general-site">
+<a class="reference internal image-reference" href="../../_images/split_general_site.jpeg"><img alt="../../_images/split_general_site.jpeg" src="../../_images/split_general_site.jpeg" style="width: 70%;" /></a>
+<figcaption>
+<p><span class="caption-number">Fig. 3.6 </span><span class="caption-text">????</span><a class="headerlink" href="#fig-split-general-site" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+<figure class="align-center" id="fig-state-to-mps">
+<a class="reference internal image-reference" href="../../_images/state_to_mps.jpeg"><img alt="../../_images/state_to_mps.jpeg" src="../../_images/state_to_mps.jpeg" style="width: 100%;" /></a>
+<figcaption>
+<p><span class="caption-number">Fig. 3.7 </span><span class="caption-text">????</span><a class="headerlink" href="#fig-state-to-mps" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+<div class="admonition-code-extend-the-mps-class admonition">
+<p class="admonition-title">Code: Extend the MPS Class</p>
+<p>Add TEXT!!!</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1">## file: src/mps.py</span>
+
+<span class="k">class</span> <span class="nc">MPS</span><span class="p">:</span>
+    
+    <span class="c1">## PREVIOUS CODE EXCLUDED ##</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">fromVector</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">vector</span><span class="p">):</span>
+
+        <span class="n">L</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log2</span><span class="p">(</span><span class="n">vector</span><span class="o">.</span><span class="n">size</span><span class="p">))</span>  <span class="c1"># number of sites</span>
+
+        <span class="c1">## YOUR CODE HERE ##</span>
+
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="n">tensors</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Add TEXT!!!</p>
+</div>
+</section>
+<section id="mps-to-vector">
+<h2><span class="section-number">3.6. </span>MPS to vector<a class="headerlink" href="#mps-to-vector" title="Link to this heading">#</a></h2>
+</section>
+<section id="summary">
+<h2><span class="section-number">3.7. </span>Summary<a class="headerlink" href="#summary" title="Link to this heading">#</a></h2>
 </section>
 </section>
 
@@ -651,6 +700,8 @@ C_{ij} = \sum_k A_{ik} B_{kj}, \quad \text{and} \quad
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#tensor-network-diagrams">3.3. Tensor network diagrams</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#numpy-tensordot-and-transpose">3.4. Numpy tensordot and transpose</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mps-from-a-state-vector">3.5. MPS from a state vector</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mps-to-vector">3.6. MPS to vector</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#summary">3.7. Summary</a></li>
 </ul>
   </nav></div>
 

@@ -53,6 +53,8 @@ It is then more useful to treat the matrices $M^{[n]i_n}_{\alpha_n,\alpha_{n+1}}
 Since we know what the MPS representation of a state is, i.e., a collection of rank-3 tensors, one for each site, we can write a class that represents an MPS. We will start this class as follows:
 
 ```python
+## file: src/mps.py
+
 class MPS:
     """
     Matrix Product State class for 1D quantum systems of spin-1/2 particles.
@@ -83,7 +85,7 @@ The class consists of two attributes: `L` which is the number of sites in the sy
 
 Rather than constantly writing out tensors, their many indices, and the sums over these indices, we can introduce a simple diagramatic approach to represent these expressions, as shown in {numref}`fig:simple_diagrams`. In this notation, the tensor is represented by a shape (in this case a circle), and the outcoming lines (referred to as legs) represent the indices of the tensor. The number of legs is equal to the rank of the tensor. For example, the vector $v_i$ is represented by a circle with a single leg, the matrix $M_{ij}$ by two legs, and the rank-3 tensor $A_{ijk}$ by three legs. 
 
-```{figure} ../../images/simple_tensor_diagrams.jpeg
+```{figure} images/simple_tensor_diagrams.jpeg
 ---
 name: fig:simple_diagrams
 width: 50%
@@ -95,7 +97,7 @@ Some simple objects as tensor network diagrams. (Left) A vector $v_i$. (Middle) 
 We can also represent a type of product between these tensors, which we call *contraction*. This is done diagramatically by connecting the legs of the two tensors. This corresponds to taking the product of the tensor elements and summing over the repeated index. For example, in {numref}`fig:contraction` we show the contraction of a matrix acting on a vector, and the contraction of two matrices, both in terms of matrix elements and as tensor network diagrams.
 
 
-```{figure} ../../images/matrix_product_diagrams.jpeg
+```{figure} images/matrix_product_diagrams.jpeg
 ---
 name: fig:contraction
 width: 80%
@@ -108,7 +110,7 @@ These kind of tensor contractions are the core part of the code we will write to
 
 We are then able to draw our MPS from Eq.{eq}`eq:mps` as a tensor network diagram, as shown in {numref}`fig:mps_diagram`. It consists of a line of rank-3 tensors. The legs that are not contracted are referred to as physical legs, and those that are contracted are virtual legs. The physical legs correspond to the indices of the tensor that are associated with the physical degrees of freedom of the system, in this case the spin states. The virtual legs correspond to the indices that are summed over in the contraction. 
 
-```{figure} ../../images/mps_diagram.jpeg
+```{figure} images/mps_diagram.jpeg
 ---
 name: fig:mps_diagram
 width: 50%
@@ -192,10 +194,10 @@ $$
 
 which we also show diagramatically in {numref}`fig:theta_example`. For more complex contractions it is good practice to add comments to your code keeping track of the indices. Here at the end we have transposed the result so that those on the left in {numref}`fig:theta_example` come before those on the right.
 
-```{figure} ../../images/theta_example.jpeg
+```{figure} images/theta_example.jpeg
 ---
 name: fig:theta_example
-width: 50%
+width: 60%
 align: center
 ---
 The contraction of two rank-3 tensors $A$ and $B$ along the physical indices. The result is a rank-4 tensor $\Theta$. I have included coloured numbers showing the order of the indices as stored in the numpy arrays. To arrive at the final ordering for $\Theta$ we need to transpose the result.
@@ -239,4 +241,62 @@ psi = psi.reshape(2, -1)
 We specify that the matrix should have 2 rows, and then let python figure out how many columns are needed. Diagramatically this is shown in ???.
 
 
+```{figure} images/split_first_site.jpeg
+---
+name: fig:split_first_site
+width: 60%
+align: center
+---
+????
+```
 
+
+```{figure} images/split_general_site.jpeg
+---
+name: fig:split_general_site
+width: 70%
+align: center
+---
+????
+```
+
+```{figure} images/state_to_mps.jpeg
+---
+name: fig:state_to_mps
+width: 100%
+align: center
+---
+????
+```
+
+
+````{admonition} Code: Extend the MPS Class
+
+Add TEXT!!!
+
+```python
+## file: src/mps.py
+
+class MPS:
+    
+    ## PREVIOUS CODE EXCLUDED ##
+
+    @classmethod
+    def fromVector(cls, vector):
+
+        L = int(np.log2(vector.size))  # number of sites
+
+        ## YOUR CODE HERE ##
+
+        return cls(L, tensors)
+```
+
+Add TEXT!!!
+
+````
+
+
+## MPS to vector
+
+
+## Summary
