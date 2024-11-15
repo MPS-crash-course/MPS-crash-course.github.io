@@ -382,7 +382,8 @@
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#numpy-tensordot-and-transpose">3.4. Numpy tensordot and transpose</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mps-from-a-state-vector">3.5. MPS from a state vector</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mps-to-vector">3.6. MPS to vector</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#summary">3.7. Summary</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#product-states">3.7. Product states</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#summary">3.8. Summary</a></li>
 </ul>
             </nav>
         </div>
@@ -490,7 +491,7 @@
 </figure>
 </section>
 <section id="numpy-tensordot-and-transpose">
-<h2><span class="section-number">3.4. </span>Numpy tensordot and transpose<a class="headerlink" href="#numpy-tensordot-and-transpose" title="Link to this heading">#</a></h2>
+<span id="tensordot"></span><h2><span class="section-number">3.4. </span>Numpy tensordot and transpose<a class="headerlink" href="#numpy-tensordot-and-transpose" title="Link to this heading">#</a></h2>
 <p>In our MPS class, the tensors are given by rank-3 numpy arrays. In order to perform the contraction and keep track of the indices, we will use the numpy <code class="docutils literal notranslate"><span class="pre">tensordot</span></code> and <code class="docutils literal notranslate"><span class="pre">transpose</span></code> functions. The <code class="docutils literal notranslate"><span class="pre">tensordot</span></code> function is used to contract two tensors along specified axes. The <code class="docutils literal notranslate"><span class="pre">transpose</span></code> function is used to permute the axes of a tensor.</p>
 <p>It is easiest to work through examples to understand how these functions work. Let use consider the examples in <a class="reference internal" href="#fig-contraction"><span class="std std-numref">Fig. 3.2</span></a>. Starting with the matrix acting on a vector, we can write the contraction as</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -566,6 +567,7 @@ C_{ij} = \sum_k A_{ik} B_{kj}, \quad \text{and} \quad
 <li><p>Compute <span class="math notranslate nohighlight">\(A^\dagger B\)</span> where <span class="math notranslate nohighlight">\(A^\dagger\)</span> is the complex conjugate transpose of <span class="math notranslate nohighlight">\(A\)</span>. Compute this with <span class="math notranslate nohighlight">\(A^\dagger\)</span> in the first position and <span class="math notranslate nohighlight">\(B\)</span> in the second.</p></li>
 <li><p>Compute <span class="math notranslate nohighlight">\(A^\dagger B\)</span>, but with <span class="math notranslate nohighlight">\(A^*\)</span> (complex conjugate) in the second position and <span class="math notranslate nohighlight">\(B\)</span> in the first.</p></li>
 </ol>
+<p>I would recommend adding a file <code class="docutils literal notranslate"><span class="pre">tensordot.py</span></code> to your <code class="docutils literal notranslate"><span class="pre">exercises</span></code> directory and working through these exercises there. Make sure to add the line <code class="docutils literal notranslate"><span class="pre">from</span> <span class="pre">fix_pathing</span> <span class="pre">import</span> <span class="pre">root_dir</span></code>. You can then import your MPS class using <code class="docutils literal notranslate"><span class="pre">from</span> <span class="pre">src.mps</span> <span class="pre">import</span> <span class="pre">MPS</span></code>.</p>
 </div>
 </section>
 <section id="mps-from-a-state-vector">
@@ -581,28 +583,42 @@ C_{ij} = \sum_k A_{ik} B_{kj}, \quad \text{and} \quad
 
 </pre></div>
 </div>
-<p>We specify that the matrix should have 2 rows, and then let python figure out how many columns are needed. Diagramatically this is shown in ???.</p>
+<p>We specify that the matrix should have 2 rows, and then let python figure out how many columns are needed. Diagramatically this is shown in the first step of <a class="reference internal" href="#fig-split-first-site"><span class="std std-numref">Fig. 3.5</span></a>. We can then decompose this matrix using Singular Value Decomposition (SVD). The SVD of a matrix <span class="math notranslate nohighlight">\(A\)</span> is given by</p>
+<div class="math notranslate nohighlight">
+\[
+A = U S V^\dagger,
+\]</div>
+<p>where <span class="math notranslate nohighlight">\(U\)</span> and <span class="math notranslate nohighlight">\(V\)</span> are unitary matrices, and <span class="math notranslate nohighlight">\(S\)</span> is a diagonal matrix. The diagonal elements of <span class="math notranslate nohighlight">\(S\)</span>, typically labelled <span class="math notranslate nohighlight">\(\lambda_i\)</span>, are the singular values, which are non-negative, and are ordered from largest to smallest. In this context, the singular value decomposition is the same as the Schmidt decomposition, and the singular values are the Schmidt coefficients. Since the state we start from is pure and normalized, we have that <span class="math notranslate nohighlight">\(\sum_i \lambda_i^2 = 1\)</span>. These Schmidt values have an important physical meaning, which we will return to when we discuss truncation of the MPS next week. The SVD is shown diagramatically in <a class="reference internal" href="#fig-split-first-site"><span class="std std-numref">Fig. 3.5</span></a>, and can be computed in python as using <code class="docutils literal notranslate"><span class="pre">numpy.linalg</span></code> (or <code class="docutils literal notranslate"><span class="pre">scipy.linalg</span></code>) by</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy.linalg</span> <span class="k">as</span> <span class="nn">la</span>
+
+<span class="n">U</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">Vdg</span> <span class="o">=</span> <span class="n">la</span><span class="o">.</span><span class="n">svd</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">full_matrices</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
+</pre></div>
+</div>
+<p>where we specify <code class="docutils literal notranslate"><span class="pre">full_matrices=False</span></code> since we are working with a rectangular matrix. If we have a <span class="math notranslate nohighlight">\(m \times n\)</span> matrix, then this reduced SVD returns <span class="math notranslate nohighlight">\(U\)</span> as <span class="math notranslate nohighlight">\(m \times k\)</span>, <span class="math notranslate nohighlight">\(S\)</span> a length <span class="math notranslate nohighlight">\(k\)</span> vector, and <span class="math notranslate nohighlight">\(V^\dagger\)</span> as <span class="math notranslate nohighlight">\(k \times n\)</span> matrix, where <span class="math notranslate nohighlight">\(k = \min(m,n)\)</span>.</p>
 <figure class="align-center" id="fig-split-first-site">
 <a class="reference internal image-reference" href="../../_images/split_first_site.jpeg"><img alt="../../_images/split_first_site.jpeg" src="../../_images/split_first_site.jpeg" style="width: 60%;" /></a>
 <figcaption>
 <p><span class="caption-number">Fig. 3.5 </span><span class="caption-text">????</span><a class="headerlink" href="#fig-split-first-site" title="Link to this image">#</a></p>
 </figcaption>
 </figure>
+<p>The matrix <span class="math notranslate nohighlight">\(U\)</span> is then the first tensor in our MPS, i.e. <span class="math notranslate nohighlight">\(M^{[1]}\)</span>. For practical reasons, we want this tensor to be rank-3, so that we can deal with the tensors from each site in the same way. Therefore, we reshape this tensor again using <code class="docutils literal notranslate"><span class="pre">np.reshape(U,</span> <span class="pre">(1,</span> <span class="pre">2,</span> <span class="pre">-1))</span></code>. The first index has dimension 1, and we represent this using a dashed line, as shown in <a class="reference internal" href="#fig-split-first-site"><span class="std std-numref">Fig. 3.5</span></a>. The second index has dimension 2 and this is the physical index, and the third index connects to the rest of the sites and is the virtual index. For the first site it will also be dimension 2. We then combine <span class="math notranslate nohighlight">\(S\)</span> and <span class="math notranslate nohighlight">\(V^\dagger\)</span> to form a tensor which we call <span class="math notranslate nohighlight">\(R\)</span>.</p>
 <figure class="align-center" id="fig-split-general-site">
 <a class="reference internal image-reference" href="../../_images/split_general_site.jpeg"><img alt="../../_images/split_general_site.jpeg" src="../../_images/split_general_site.jpeg" style="width: 70%;" /></a>
 <figcaption>
 <p><span class="caption-number">Fig. 3.6 </span><span class="caption-text">????</span><a class="headerlink" href="#fig-split-general-site" title="Link to this image">#</a></p>
 </figcaption>
 </figure>
+<p>We then repeat this process down the chain, as shown in <a class="reference internal" href="#fig-split-general-site"><span class="std std-numref">Fig. 3.6</span></a>. We start by taking the tensor <span class="math notranslate nohighlight">\(R\)</span>, which should be a <span class="math notranslate nohighlight">\(\chi \times 2^m\)</span> matrix, where <span class="math notranslate nohighlight">\(\chi\)</span> is the number of Schmidt values from the previous step. We reshape this into a <span class="math notranslate nohighlight">\(2\chi \times 2^{m-1}\)</span> tensor, and then perform the SVD. Effectively, this groups the left virtual index with the next physical site, and then the other dimension corresponds to the rest of the sites. We then perform the SVD, reshape <span class="math notranslate nohighlight">\(U\)</span> to be <span class="math notranslate nohighlight">\(\chi \times 2 \times 2^{m-1}\)</span>, and multiply <span class="math notranslate nohighlight">\(S\)</span> into <span class="math notranslate nohighlight">\(V^\dagger\)</span> to form the next <span class="math notranslate nohighlight">\(R\)</span>. We repeat this process until we have tensors for all sites, as shown in <a class="reference internal" href="#fig-state-to-mps"><span class="std std-numref">Fig. 3.7</span></a>. When we get to the end of the chain, we reshape <span class="math notranslate nohighlight">\(R\)</span> into a rank-3 tensor, and this is the final tensor in the MPS.</p>
 <figure class="align-center" id="fig-state-to-mps">
 <a class="reference internal image-reference" href="../../_images/state_to_mps.jpeg"><img alt="../../_images/state_to_mps.jpeg" src="../../_images/state_to_mps.jpeg" style="width: 100%;" /></a>
 <figcaption>
 <p><span class="caption-number">Fig. 3.7 </span><span class="caption-text">????</span><a class="headerlink" href="#fig-state-to-mps" title="Link to this image">#</a></p>
 </figcaption>
 </figure>
+<p>This process of successively splitting the vector into tensors using SVD provides a proof-by-construction, that our MPS representation is equivalent to the original state vector. However, this process leads to a chain of tensor where the dimension of the virtual indices, known as the <em>bond dimension</em>, grows exponentially towards the centre of the chain. Hence, we have not actually gained anything. In practice, the power of MPS comes from truncating these tensors, restricting the bond dimension, and hence providing an approximation to the state vector. We will discuss this truncation process in more detail in the coming weeks.</p>
 <div class="admonition-code-extend-the-mps-class admonition">
 <p class="admonition-title">Code: Extend the MPS Class</p>
-<p>Add TEXT!!!</p>
+<p>Since we have an algorithm to convert a state vector to an MPS, let us extend our MPS class to include this method. You should attempt this yourself, by following the structure below. A model solution can be found in the GitHub repository.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1">## file: src/mps.py</span>
 
 <span class="k">class</span> <span class="nc">MPS</span><span class="p">:</span>
@@ -619,14 +635,102 @@ C_{ij} = \sum_k A_{ik} B_{kj}, \quad \text{and} \quad
         <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="n">tensors</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Add TEXT!!!</p>
+<p>We can add this as a <code class="docutils literal notranslate"><span class="pre">classmethod</span></code> to our MPS class. If you are not familiar with class methods, they are methods associated with the class type itself, not with an instance of the class. We would use this as follows: <code class="docutils literal notranslate"><span class="pre">psi</span> <span class="pre">=</span> <span class="pre">MPS.fromVector(vector)</span></code>. Here we are calling the method <code class="docutils literal notranslate"><span class="pre">fromVector</span></code>, on the abstract class type <code class="docutils literal notranslate"><span class="pre">MPS</span></code>, and it will return an instance of the class, which we call <code class="docutils literal notranslate"><span class="pre">psi</span></code>. Just like regular methods require <code class="docutils literal notranslate"><span class="pre">self</span></code> as the first argument, class methods require <code class="docutils literal notranslate"><span class="pre">cls</span></code>.</p>
 </div>
 </section>
 <section id="mps-to-vector">
 <h2><span class="section-number">3.6. </span>MPS to vector<a class="headerlink" href="#mps-to-vector" title="Link to this heading">#</a></h2>
+<p>We can also convert back from an MPS to a state vector. This is a simple process of contracting the tensors in the MPS, and then reshaping the result into a vector. We can do this by contracting the tensors from left to right, as shown in <a class="reference internal" href="#fig-mps-to-state"><span class="std std-numref">Fig. 3.8</span></a>. We start by contracting the first two tensors, then contract the result with the next tensor. Each time, we reshape the resulting rank-4 tensor into a rank-3 tensor by grouping the physical legs. We continue this process until we have contracted all the tensors, and then take the <span class="math notranslate nohighlight">\((0,0)\)</span> element of the resulting <span class="math notranslate nohighlight">\(1\times 1\)</span> matrix.</p>
+<figure class="align-center" id="fig-mps-to-state">
+<a class="reference internal image-reference" href="../../_images/mps_to_state.jpeg"><img alt="../../_images/mps_to_state.jpeg" src="../../_images/mps_to_state.jpeg" style="width: 100%;" /></a>
+<figcaption>
+<p><span class="caption-number">Fig. 3.8 </span><span class="caption-text">????</span><a class="headerlink" href="#fig-mps-to-state" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+<div class="admonition-code-extend-the-mps-class admonition">
+<p class="admonition-title">Code: Extend the MPS Class</p>
+<p>Let us also add the method to convert an MPS to a state vector.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1">## file: src/mps.py</span>
+
+<span class="k">class</span> <span class="nc">MPS</span><span class="p">:</span>
+    
+    <span class="c1">## PREVIOUS CODE EXCLUDED ##</span>
+
+    <span class="k">def</span> <span class="nf">toVector</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="c1">## YOUR CODE HERE ##</span>
+
+        <span class="k">return</span> <span class="n">vector</span>
+</pre></div>
+</div>
+<p>We add this as a regular method to the MPS class. We can then call this method on an instance of the class, e.g. <code class="docutils literal notranslate"><span class="pre">vector</span> <span class="pre">=</span> <span class="pre">psi.toVector()</span></code>.</p>
+</div>
+</section>
+<section id="product-states">
+<h2><span class="section-number">3.7. </span>Product states<a class="headerlink" href="#product-states" title="Link to this heading">#</a></h2>
+<p>As we mentioned above, creating an MPS from a state vector is not very useful (except for testing our code, as we will below). The power of MPS comes from representing quantum states with a low, finite bond dimension. A simple example of states that can be exactly represented with minimal bond dimension are product states. We will use these both as a starting point for time evolution to simulate a quantum quench (week 2), but also as a starting point for the DMRG algorithm to find the ground state of the Heisenberg model (week 3).</p>
+<p>A product state is a state which factorizes into a product of single site states. That is, the state of <span class="math notranslate nohighlight">\(N\)</span> spins is given by</p>
+<div class="math notranslate nohighlight">
+\[
+|\psi\rangle = |\psi_1\rangle \otimes |\psi_2\rangle \otimes \cdots \otimes |\psi_N\rangle,
+\]</div>
+<p>where <span class="math notranslate nohighlight">\(|\psi_i\rangle\)</span> is the state of the <span class="math notranslate nohighlight">\(i^{\text{th}}\)</span> spin. The probability amplitudes for the many-body state <span class="math notranslate nohighlight">\(\psi_{i_1 i_2 \ldots i_N}\)</span>, can then be written as a product of the probability amplitudes for the single site states, i.e.,</p>
+<div class="math notranslate nohighlight">
+\[
+\psi_{i_1 i_2 \ldots i_N} = \psi_{i_1}^{[1]} \psi_{i_2}^{[2]} \cdots \psi_{i_N}^{[N]}.
+\]</div>
+<p>This product is actually already in the form of an MPS, with bond dimension 1. We simply need to take the two-dimensional vectors <span class="math notranslate nohighlight">\(\psi^{[i]}\)</span> and reshape them into rank-3 tensors with dimensions <span class="math notranslate nohighlight">\((1, 2, 1)\)</span>. We could easily add this to our MPS class (good exercise), but for now we will add a simplified version that creates a basis state, i.e., where each site is in a definite state, <span class="math notranslate nohighlight">\(\uparrow\)</span> or <span class="math notranslate nohighlight">\(\downarrow\)</span> (<span class="math notranslate nohighlight">\(0\)</span> or <span class="math notranslate nohighlight">\(1\)</span>).</p>
+<div class="admonition-code-product-state admonition">
+<p class="admonition-title">Code: Product State</p>
+<p>Let’s add a method to the MPS class that creates a product state. We can specify the state as a list of <span class="math notranslate nohighlight">\(0\)</span>’s and <span class="math notranslate nohighlight">\(1\)</span>’s, where <span class="math notranslate nohighlight">\(0\)</span> corresponds to <span class="math notranslate nohighlight">\(\uparrow\)</span> and <span class="math notranslate nohighlight">\(1\)</span> to <span class="math notranslate nohighlight">\(\downarrow\)</span>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1">## file: src/mps.py</span>
+
+<span class="k">class</span> <span class="nc">MPS</span><span class="p">:</span>
+    
+    <span class="c1">## PREVIOUS CODE EXCLUDED ##</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">productState</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create a product state MPS on L sites in a given basis state on each site.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        L : int</span>
+<span class="sd">            Number of sites.</span>
+<span class="sd">        state : list of ints</span>
+<span class="sd">            List of basis states for each site. E.g. [0, 1, 0, 1] for a 4-site system.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">tensors</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">state</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="n">s</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="s2">&quot;Basis states must be 0 or 1.&quot;</span>
+
+            <span class="k">if</span> <span class="n">s</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">tensors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">)))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">tensors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">)))</span>
+
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="n">tensors</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
 </section>
 <section id="summary">
-<h2><span class="section-number">3.7. </span>Summary<a class="headerlink" href="#summary" title="Link to this heading">#</a></h2>
+<h2><span class="section-number">3.8. </span>Summary<a class="headerlink" href="#summary" title="Link to this heading">#</a></h2>
+<p>This week we have introduced the problem we want to solve and presented Matrix Product State methods as a way to solve it. We have introduced the basic structure of the MPS, and shown how to convert a state vector into an MPS and back again. In the process we introduced tensor network diagrams and the numpy functions <code class="docutils literal notranslate"><span class="pre">tensordot</span></code>, <code class="docutils literal notranslate"><span class="pre">transpose</span></code>, and <code class="docutils literal notranslate"><span class="pre">reshape</span></code>, which will central to all the code we write in this course. It is important to understand these functions well, so I recommend playing about with these, and attempt the simple exercises in the Section <a class="reference internal" href="#tensordot"><span class="std std-ref">Numpy tensordot and transpose</span></a>.</p>
+<div class="admonition-tests-mps-basics admonition">
+<p class="admonition-title">Tests: MPS basics</p>
+<p>It is also important that you test the MPS class and it’s methods that you have written. Write the following tests.</p>
+<ol class="arabic simple">
+<li><p>Create a random complex vector of length <span class="math notranslate nohighlight">\(2^N\)</span> (for <span class="math notranslate nohighlight">\(N&lt;10\)</span>). Normalise this vector then convert it to an MPS and back to a vector. Check that the original vector and the final vector are the same.</p></li>
+<li><p>Use the ED code (import using <code class="docutils literal notranslate"><span class="pre">from</span> <span class="pre">src.ed</span> <span class="pre">import</span> <span class="pre">*</span></code>) to compute the ground state of the Heisenberg model for <span class="math notranslate nohighlight">\(N&lt;10\)</span>. Convert this state to an MPS and back to a vector. Check that the original vector and the final vector are the same.</p></li>
+<li><p>Create the product state <span class="math notranslate nohighlight">\(|0000\rangle\)</span> and convert this to a vector. Check that the vector is the same as the basis state <span class="math notranslate nohighlight">\(|0000\rangle\)</span>, it should have a 1 in the first element.</p></li>
+<li><p>Create a basis state of your choice and convert to a vector. Check that the vector is the same as the basis state. The vector should have all zero elements except for a 1 in the position corresponding to the basis state. The binary representation of the basis state is the index of the 1 in the vector. e.g. <span class="math notranslate nohighlight">\(|0101\rangle\)</span> should have a 1 in the 5th element of the vector.</p></li>
+</ol>
+<p>I would recommend adding a file <code class="docutils literal notranslate"><span class="pre">mps_basics.py</span></code> to your <code class="docutils literal notranslate"><span class="pre">test</span></code> directory and working through these exercises there. Using <span class="math notranslate nohighlight">\(N&lt;10\)</span> should make this quick on most laptops. Make sure to add the line <code class="docutils literal notranslate"><span class="pre">from</span> <span class="pre">fix_pathing</span> <span class="pre">import</span> <span class="pre">root_dir</span></code>. You can then import your MPS class using <code class="docutils literal notranslate"><span class="pre">from</span> <span class="pre">src.mps</span> <span class="pre">import</span> <span class="pre">MPS</span></code>.</p>
+</div>
+<p>Next week we will start by introducing a specific form of the MPS tensors called canonical form, which will allow us to perform more efficient calculations, and is important for correctly truncation our tensors. We will then introduce the Time Evolving Block Decimation (TEBD) algorithm, which is a way to simulate the time evolution of a quantum system using MPS.</p>
 </section>
 </section>
 
@@ -701,7 +805,8 @@ C_{ij} = \sum_k A_{ik} B_{kj}, \quad \text{and} \quad
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#numpy-tensordot-and-transpose">3.4. Numpy tensordot and transpose</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mps-from-a-state-vector">3.5. MPS from a state vector</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mps-to-vector">3.6. MPS to vector</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#summary">3.7. Summary</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#product-states">3.7. Product states</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#summary">3.8. Summary</a></li>
 </ul>
   </nav></div>
 

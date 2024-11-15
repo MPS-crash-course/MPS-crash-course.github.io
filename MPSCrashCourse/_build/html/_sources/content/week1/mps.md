@@ -120,7 +120,7 @@ A matrix product state on 5 sites as a tensor network diagram. The physical legs
 ```
 
 
-
+(tensordot)=
 ## Numpy tensordot and transpose
 
 In our MPS class, the tensors are given by rank-3 numpy arrays. In order to perform the contraction and keep track of the indices, we will use the numpy `tensordot` and `transpose` functions. The `tensordot` function is used to contract two tensors along specified axes. The `transpose` function is used to permute the axes of a tensor.
@@ -204,7 +204,6 @@ The contraction of two rank-3 tensors $A$ and $B$ along the physical indices. Th
 ```
 
 
-
 ````{admonition} Exercise: Contracting tensors
 
 The `tensordot` and `transpose` functions can be quite confusing if you haven't dealt with tensors before, but are the main functions we will need throughout this course. I would therefore encourage you to play around with these to get a better feeling of how they work. The easiest way to do this is to work with matrices, where you can easily check the reaults by hand, or by printing the arrays.
@@ -218,6 +217,9 @@ Try the following exercises (all using square matrices complex matrices $A$ and 
 3) Compute $A^\dagger B$ where $A^\dagger$ is the complex conjugate transpose of $A$. Compute this with $A^\dagger$ in the first position and $B$ in the second.
 
 4) Compute $A^\dagger B$, but with $A^*$ (complex conjugate) in the second position and $B$ in the first.
+
+I would recommend adding a file `tensordot.py` to your `exercises` directory and working through these exercises there. Make sure to add the line `from fix_pathing import root_dir`. You can then import your MPS class using `from src.mps import MPS`. 
+
 
 ````
 
@@ -238,7 +240,20 @@ psi = psi.reshape(2, -1)
 
 ```
 
-We specify that the matrix should have 2 rows, and then let python figure out how many columns are needed. Diagramatically this is shown in ???.
+We specify that the matrix should have 2 rows, and then let python figure out how many columns are needed. Diagramatically this is shown in the first step of {numref}`fig:split_first_site`. We can then decompose this matrix using Singular Value Decomposition (SVD). The SVD of a matrix $A$ is given by
+
+$$
+A = U S V^\dagger,
+$$
+
+where $U$ and $V$ are unitary matrices, and $S$ is a diagonal matrix. The diagonal elements of $S$, typically labelled $\lambda_i$, are the singular values, which are non-negative, and are ordered from largest to smallest. In this context, the singular value decomposition is the same as the Schmidt decomposition, and the singular values are the Schmidt coefficients. Since the state we start from is pure and normalized, we have that $\sum_i \lambda_i^2 = 1$. These Schmidt values have an important physical meaning, which we will return to when we discuss truncation of the MPS next week. The SVD is shown diagramatically in {numref}`fig:split_first_site`, and can be computed in python as using `numpy.linalg` (or `scipy.linalg`) by
+
+```python
+import numpy.linalg as la
+
+U, S, Vdg = la.svd(theta, full_matrices=False),
+```
+where we specify `full_matrices=False` since we are working with a rectangular matrix. If we have a $m \times n$ matrix, then this reduced SVD returns $U$ as $m \times k$, $S$ a length $k$ vector, and $V^\dagger$ as $k \times n$ matrix, where $k = \min(m,n)$.
 
 
 ```{figure} images/split_first_site.jpeg
@@ -250,6 +265,7 @@ align: center
 ????
 ```
 
+The matrix $U$ is then the first tensor in our MPS, i.e. $M^{[1]}$. For practical reasons, we want this tensor to be rank-3, so that we can deal with the tensors from each site in the same way. Therefore, we reshape this tensor again using `np.reshape(U, (1, 2, -1))`. The first index has dimension 1, and we represent this using a dashed line, as shown in {numref}`fig:split_first_site`. The second index has dimension 2 and this is the physical index, and the third index connects to the rest of the sites and is the virtual index. For the first site it will also be dimension 2. We then combine $S$ and $V^\dagger$ to form a tensor which we call $R$. 
 
 ```{figure} images/split_general_site.jpeg
 ---
@@ -260,6 +276,10 @@ align: center
 ????
 ```
 
+
+We then repeat this process down the chain, as shown in {numref}`fig:split_general_site`. We start by taking the tensor $R$, which should be a $\chi \times 2^m$ matrix, where $\chi$ is the number of Schmidt values from the previous step. We reshape this into a $2\chi \times 2^{m-1}$ tensor, and then perform the SVD. Effectively, this groups the left virtual index with the next physical site, and then the other dimension corresponds to the rest of the sites. We then perform the SVD, reshape $U$ to be $\chi \times 2 \times 2^{m-1}$, and multiply $S$ into $V^\dagger$ to form the next $R$. We repeat this process until we have tensors for all sites, as shown in {numref}`fig:state_to_mps`. When we get to the end of the chain, we reshape $R$ into a rank-3 tensor, and this is the final tensor in the MPS. 
+
+
 ```{figure} images/state_to_mps.jpeg
 ---
 name: fig:state_to_mps
@@ -269,10 +289,12 @@ align: center
 ????
 ```
 
+This process of successively splitting the vector into tensors using SVD provides a proof-by-construction, that our MPS representation is equivalent to the original state vector. However, this process leads to a chain of tensor where the dimension of the virtual indices, known as the *bond dimension*, grows exponentially towards the centre of the chain. Hence, we have not actually gained anything. In practice, the power of MPS comes from truncating these tensors, restricting the bond dimension, and hence providing an approximation to the state vector. We will discuss this truncation process in more detail in the coming weeks.
+
 
 ````{admonition} Code: Extend the MPS Class
 
-Add TEXT!!!
+Since we have an algorithm to convert a state vector to an MPS, let us extend our MPS class to include this method. You should attempt this yourself, by following the structure below. A model solution can be found in the GitHub repository.
 
 ```python
 ## file: src/mps.py
@@ -291,12 +313,124 @@ class MPS:
         return cls(L, tensors)
 ```
 
-Add TEXT!!!
+We can add this as a `classmethod` to our MPS class. If you are not familiar with class methods, they are methods associated with the class type itself, not with an instance of the class. We would use this as follows: `psi = MPS.fromVector(vector)`. Here we are calling the method `fromVector`, on the abstract class type `MPS`, and it will return an instance of the class, which we call `psi`. Just like regular methods require `self` as the first argument, class methods require `cls`. 
 
 ````
 
 
 ## MPS to vector
 
+We can also convert back from an MPS to a state vector. This is a simple process of contracting the tensors in the MPS, and then reshaping the result into a vector. We can do this by contracting the tensors from left to right, as shown in {numref}`fig:mps_to_state`. We start by contracting the first two tensors, then contract the result with the next tensor. Each time, we reshape the resulting rank-4 tensor into a rank-3 tensor by grouping the physical legs. We continue this process until we have contracted all the tensors, and then take the $(0,0)$ element of the resulting $1\times 1$ matrix.
+
+```{figure} images/mps_to_state.jpeg
+---
+name: fig:mps_to_state
+width: 100%
+align: center
+---
+????
+```
+
+````{admonition} Code: Extend the MPS Class
+
+Let us also add the method to convert an MPS to a state vector.
+
+```python
+## file: src/mps.py
+
+class MPS:
+    
+    ## PREVIOUS CODE EXCLUDED ##
+
+    def toVector(self):
+
+        ## YOUR CODE HERE ##
+
+        return vector
+```
+
+We add this as a regular method to the MPS class. We can then call this method on an instance of the class, e.g. `vector = psi.toVector()`. 
+
+````
+
+
+## Product states
+
+As we mentioned above, creating an MPS from a state vector is not very useful (except for testing our code, as we will below). The power of MPS comes from representing quantum states with a low, finite bond dimension. A simple example of states that can be exactly represented with minimal bond dimension are product states. We will use these both as a starting point for time evolution to simulate a quantum quench (week 2), but also as a starting point for the DMRG algorithm to find the ground state of the Heisenberg model (week 3).
+
+A product state is a state which factorizes into a product of single site states. That is, the state of $N$ spins is given by
+
+$$
+|\psi\rangle = |\psi_1\rangle \otimes |\psi_2\rangle \otimes \cdots \otimes |\psi_N\rangle,
+$$
+
+where $|\psi_i\rangle$ is the state of the $i^{\text{th}}$ spin. The probability amplitudes for the many-body state $\psi_{i_1 i_2 \ldots i_N}$, can then be written as a product of the probability amplitudes for the single site states, i.e.,
+
+$$
+\psi_{i_1 i_2 \ldots i_N} = \psi_{i_1}^{[1]} \psi_{i_2}^{[2]} \cdots \psi_{i_N}^{[N]}.
+$$
+
+This product is actually already in the form of an MPS, with bond dimension 1. We simply need to take the two-dimensional vectors $\psi^{[i]}$ and reshape them into rank-3 tensors with dimensions $(1, 2, 1)$. We could easily add this to our MPS class (good exercise), but for now we will add a simplified version that creates a basis state, i.e., where each site is in a definite state, $\uparrow$ or $\downarrow$ ($0$ or $1$). 
+
+````{admonition} Code: Product State
+
+Let's add a method to the MPS class that creates a product state. We can specify the state as a list of $0$'s and $1$'s, where $0$ corresponds to $\uparrow$ and $1$ to $\downarrow$.
+
+```python
+## file: src/mps.py
+
+class MPS:
+    
+    ## PREVIOUS CODE EXCLUDED ##
+
+    @classmethod
+    def productState(self, L, ):
+        """
+        Create a product state MPS on L sites in a given basis state on each site.
+
+        Parameters
+        ----------
+        L : int
+            Number of sites.
+        state : list of ints
+            List of basis states for each site. E.g. [0, 1, 0, 1] for a 4-site system.
+        """
+
+        tensors = []
+        for s in state:
+            assert s in [0, 1], "Basis states must be 0 or 1."
+
+            if s == 0:
+                tensors.append(np.array([1,0]).reshape((1,2,1)))
+            else:
+                tensors.append(np.array([0,1]).reshape((1,2,1)))
+
+        return cls(L, tensors, 0)
+```
+
+````
+
 
 ## Summary
+
+This week we have introduced the problem we want to solve and presented Matrix Product State methods as a way to solve it. We have introduced the basic structure of the MPS, and shown how to convert a state vector into an MPS and back again. In the process we introduced tensor network diagrams and the numpy functions `tensordot`, `transpose`, and `reshape`, which will central to all the code we write in this course. It is important to understand these functions well, so I recommend playing about with these, and attempt the simple exercises in the Section {ref}`tensordot`.
+
+
+````{admonition} Tests: MPS basics
+
+It is also important that you test the MPS class and it's methods that you have written. Write the following tests.
+
+1) Create a random complex vector of length $2^N$ (for $N<10$). Normalise this vector then convert it to an MPS and back to a vector. Check that the original vector and the final vector are the same.
+
+2) Use the ED code (import using `from src.ed import *`) to compute the ground state of the Heisenberg model for $N<10$. Convert this state to an MPS and back to a vector. Check that the original vector and the final vector are the same.
+
+3) Create the product state $|0000\rangle$ and convert this to a vector. Check that the vector is the same as the basis state $|0000\rangle$, it should have a 1 in the first element.
+
+4) Create a basis state of your choice and convert to a vector. Check that the vector is the same as the basis state. The vector should have all zero elements except for a 1 in the position corresponding to the basis state. The binary representation of the basis state is the index of the 1 in the vector. e.g. $|0101\rangle$ should have a 1 in the 5th element of the vector.
+
+I would recommend adding a file `mps_basics.py` to your `test` directory and working through these exercises there. Using $N<10$ should make this quick on most laptops. Make sure to add the line `from fix_pathing import root_dir`. You can then import your MPS class using `from src.mps import MPS`. 
+
+````
+
+Next week we will start by introducing a specific form of the MPS tensors called canonical form, which will allow us to perform more efficient calculations, and is important for correctly truncation our tensors. We will then introduce the Time Evolving Block Decimation (TEBD) algorithm, which is a way to simulate the time evolution of a quantum system using MPS. 
+
