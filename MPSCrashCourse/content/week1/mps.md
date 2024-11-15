@@ -137,7 +137,8 @@ M = np.array([[1, 2], [3, 4]])  # matrix
 # Contract the matrix with the vector
 result = np.tensordot(M, v, axes=([1], [0]))
 
-assert np.allclose(result, M @ v)  # check that the result matches
+# check that the result matches
+assert np.allclose(result, M @ v), "matrix-vector multiplication failed!" 
 
 ```
 
@@ -158,8 +159,9 @@ result1 = np.tensordot(A, B, axes=([1], [0]))
 result2 = np.tensordot(B, A, axes=([0], [1]))
 result2 = np.transpose(result2, (1, 0))  # transpose the result to match the order of the indices
 
-assert np.allclose(result1, A @ B)  # check that the result matches
-assert np.allclose(result2, A @ B)  # check that the result matches
+# check that the result matches
+assert np.allclose(result1, A @ B), "matrix-matrix method 1 failed!"  
+assert np.allclose(result2, A @ B), "matrix-matrix method 2 failed!" 
 
 ```
 
@@ -262,7 +264,8 @@ name: fig:split_first_site
 width: 60%
 align: center
 ---
-????
+
+The first step of using Singular Value Decomposition to split a vector into an MPS. The vector is first reshaped into a matrix, and then decomposed into $U$, $S$, and $V^\dagger$. The matrix $U$ is reshapes into a rank-3 tensor and is the first tensor of the MPS. The matrices $S$ and $V^\dagger$ are combined to form the matrix $R$, which goes to the next step.
 ```
 
 The matrix $U$ is then the first tensor in our MPS, i.e. $M^{[1]}$. For practical reasons, we want this tensor to be rank-3, so that we can deal with the tensors from each site in the same way. Therefore, we reshape this tensor again using `np.reshape(U, (1, 2, -1))`. The first index has dimension 1, and we represent this using a dashed line, as shown in {numref}`fig:split_first_site`. The second index has dimension 2 and this is the physical index, and the third index connects to the rest of the sites and is the virtual index. For the first site it will also be dimension 2. We then combine $S$ and $V^\dagger$ to form a tensor which we call $R$. 
@@ -273,7 +276,8 @@ name: fig:split_general_site
 width: 70%
 align: center
 ---
-????
+
+The general step for converting a state vector into an MPS. The tensor $R$ is reshaped and then decomposed using SVD. The resulting $U$ is reshaped into a rank-3 tensor, and the $S$ is multiplied into $V^\dagger$ to form the next $R$.
 ```
 
 
@@ -286,7 +290,8 @@ name: fig:state_to_mps
 width: 100%
 align: center
 ---
-????
+
+Tensor network diagrams for the process of converting a state vector to an MPS. The tensors of the MPS are split off from the vector by repeatedly reshaping and performing singular value decomposition. The final MPS is then a chain of tensors with bond dimension growing exponentially towards the centre of the chain.
 ```
 
 This process of successively splitting the vector into tensors using SVD provides a proof-by-construction, that our MPS representation is equivalent to the original state vector. However, this process leads to a chain of tensor where the dimension of the virtual indices, known as the *bond dimension*, grows exponentially towards the centre of the chain. Hence, we have not actually gained anything. In practice, the power of MPS comes from truncating these tensors, restricting the bond dimension, and hence providing an approximation to the state vector. We will discuss this truncation process in more detail in the coming weeks.
@@ -328,7 +333,8 @@ name: fig:mps_to_state
 width: 100%
 align: center
 ---
-????
+
+Tensor network diagrams for the process of converting an MPS to a state vector. The tensors of the MPS are contracted from left to right, and the result reshaped into a vector. 
 ```
 
 ````{admonition} Code: Extend the MPS Class
