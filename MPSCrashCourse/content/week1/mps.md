@@ -108,7 +108,7 @@ align: center
 
 These kind of tensor contractions are the core part of the code we will write to manipulate MPS. 
 
-We are then able to draw our MPS from Eq.{eq}`eq:mps` as a tensor network diagram, as shown in {numref}`fig:mps_diagram`. It consists of a line of rank-3 tensors. The legs that are not contracted are referred to as physical legs, and those that are contracted are virtual legs. The physical legs correspond to the indices of the tensor that are associated with the physical degrees of freedom of the system, in this case the spin states. The virtual legs correspond to the indices that are summed over in the contraction. 
+We are then able to draw our MPS from Eq.{eq}`eq:mps` as a tensor network diagram, as shown in {numref}`fig:mps_diagram`. It consists of a line of rank-3 tensors. The *physical legs* are those that are not connected, and correspond to the indices of the tensor that are associated with the physical degrees of freedom of the system, in this case the spin states. The *virtual legs* are the indices that are summed over in the contraction. 
 
 ```{figure} images/mps_diagram.jpeg
 ---
@@ -116,7 +116,7 @@ name: fig:mps_diagram
 width: 50%
 align: center
 ---
-A matrix product state on 5 sites as a tensor network diagram. The physical legs are the dangling vertical lines that are labelled, and the virtual legs are the horizontal lines. The end tensors are shown with a dashed line to indicate that there free indices are dimension 1. This allows us to write each tensor as a rank-3 numpy array, simplifying our code. Strictly speaking, the results of the contraction of this diagram is a $1\times 1$ matrix (which is equivalent to a scalar).
+A matrix product state on 5 sites as a tensor network diagram. The physical legs are the dangling vertical lines that are labelled, and the virtual legs are the horizontal lines. The end tensors are shown with a dashed line to indicate that their free indices are dimension 1. This allows us to write each tensor as a rank-3 numpy array, simplifying our code. Strictly speaking, the results of the contraction of this diagram is a $1\times 1$ matrix (which is equivalent to a scalar).
 ```
 
 
@@ -227,11 +227,11 @@ I would recommend adding a file `tensordot.py` to your `exercises` directory and
 
 ## MPS from a state vector
 
-Now we have the diagramatic notation and the corresponding python functions at our disposal, let us return to the MPS representation. In particular, we want to explicitly relate the matrices in the MPS to the vector of probability amplitudes. The MPS can be drawn as the tensor network diagram shown in ???. Note the dashed virtual indices that are dangling on the end tensors. These are 1 dimensional indices and are simply included to make our code simpler (we only have to treat one shape of array). The result of this diagram when we specify all the physical indices is then not technically a number, but a $1\times 1$ matrix. 
+Now we have the diagramatic notation and the corresponding python functions at our disposal, let us return to the MPS representation. In particular, we want to explicitly relate the matrices in the MPS to the vector of probability amplitudes. The MPS can be drawn as the tensor network diagram shown in {numref}`fig:mps_diagram`. Note the dashed virtual indices that are dangling on the end tensors. These are 1 dimensional indices and are simply included to make our code simpler (we only have to treat one shape of array). The result of this diagram when we specify all the physical indices is then not technically a number, but a $1\times 1$ matrix. 
 
 We will now show how to convert a state vector into this MPS form. This will involve the use of numpy `reshape`, as well as singular value decomposition (SVD).
 
-Let us start by thinking what we mean by treating $\psi_{i_1, i_2, \ldots, i_N}$ as a vector. One way to think of this is that $(i_1, i_2, \ldots, i_N)$ is a binary representation of the index of the vector. That is the probability amplitude corresponding to $|000\rangle$ is in the 0th position, $|001\rangle$ in the 1st position, and so on. Instead, we will no choose to separate out the first spin, and instead write the state as the matrix $\psi_{(i_1),(i_2 \ldots i_N)}$. That is, $|000\rangle$ corresponds to $\psi_{0, 0}$, $|001\rangle$ to $\psi_{0, 1}$, and $|100\rangle$ to $\psi_{1,0}$, and so on. This is a simple reshaping of the vector into a matrix, and can be done using `reshape` as follows in python:
+Let us start by thinking what we mean by treating $\psi_{i_1, i_2, \ldots, i_N}$ as a vector. One way to think of this is that $(i_1, i_2, \ldots, i_N)$ is a binary representation of the index of the vector. That is the probability amplitude corresponding to $|000\rangle$ is in the 0th position, $|001\rangle$ in the 1st position, and so on. Instead, we will now choose to separate out the first spin, and instead write the state as the matrix $\psi_{(i_1),(i_2 \ldots i_N)}$. That is, $|000\rangle$ corresponds to $\psi_{0, 0}$, $|001\rangle$ to $\psi_{0, 1}$, and $|100\rangle$ to $\psi_{1,0}$, and so on. This is a simple reshaping of the vector into a matrix, and can be done using `reshape` as follows in python:
 
 ```python
 
@@ -299,7 +299,7 @@ This process of successively splitting the vector into tensors using SVD provide
 
 ````{admonition} Code: Extend the MPS Class
 
-Since we have an algorithm to convert a state vector to an MPS, let us extend our MPS class to include this method. You should attempt this yourself, by following the structure below. A model solution can be found in the GitHub repository.
+Since we have an algorithm to convert a state vector to an MPS, let us extend our MPS class to include this method. You should attempt this yourself, by following the structure below. A model solution can be found in the [GitHub repository](https://github.com/MPS-crash-course/MPS-model-code).
 
 ```python
 ## file: src/mps.py
@@ -419,7 +419,7 @@ class MPS:
 
 ## Summary
 
-This week we have introduced the problem we want to solve and presented Matrix Product State methods as a way to solve it. We have introduced the basic structure of the MPS, and shown how to convert a state vector into an MPS and back again. In the process we introduced tensor network diagrams and the numpy functions `tensordot`, `transpose`, and `reshape`, which will central to all the code we write in this course. It is important to understand these functions well, so I recommend playing about with these, and attempt the simple exercises in the Section {ref}`tensordot`.
+This week we have introduced the problem we want to solve and presented Matrix Product State methods as a way to solve it. We have introduced the basic structure of the MPS, and shown how to convert a state vector into an MPS and back again. In the process we introduced tensor network diagrams and the numpy functions `tensordot`, `transpose`, and `reshape`, which will be central to all the code we write in this course. It is important to understand these functions well, so I recommend playing about with these, and attempt the simple exercises in the Section {ref}`tensordot`.
 
 
 ````{admonition} Tests: MPS basics

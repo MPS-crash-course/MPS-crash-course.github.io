@@ -25,7 +25,7 @@ align: center
 Data from B. Lake *et al* {cite}`Lake2013`. The left panel shows the experimental data for the dynamical structure factor of $\text{KCuF}_3$. The right panel shows the theoretical prediction for the Heisenberg model obtained using Bethe Ansatz.
 ```
 
-This data reveals that the model is gapless, and has a very distinct dispersion relation. There is a single magnon (spin wave excitation) that has a dispersion that touches at $k=0, \pi$. Above this there is a continuum of mult-magnon excitations. The end goal of this course is to provide the theory predictions for this experiments using MPS methods.
+This data reveals that the model is gapless, and has a very distinct dispersion relation. There is a single magnon (spin wave excitation) that has a dispersion that touches at $k=0, \pi$. Above this there is a continuum of multi-magnon excitations. The end goal of this course is to provide the theory predictions for this experiments using MPS methods.
 
 ## The dynamical structure factor
 
@@ -35,7 +35,7 @@ $$
 S^{\alpha,\beta}(q, \omega) = \sum_{j,k} e^{iq(j-k)} \int_{-\infty}^{\infty} e^{i\omega t} \langle S^\alpha_j(t) S^\beta_k(0) \rangle dt.
 $$ (eq:dsf)
 
-The actual quantity that is measured in experiments is the cross-section for the outgoing neutrons, which is related to the dynamical structure factor by the following by simple momentum polarization and magnetic form factors. These details go beyond the scope of this course. In fact, due to symmetries of the model, we will only be concerned with the $S^{zz}(q, \omega)$ component.
+The actual quantity that is measured in experiments is the cross-section for the outgoing neutrons, which is related to the dynamical structure factor but also includes simple momentum polarization and magnetic form factors. These details go beyond the scope of this course. In fact, due to symmetries of the model, we will only be concerned with the $S^{zz}(q, \omega)$ component.
 
 The DSSF is the Fourier transform of a two-point unequal time spin correlation function,
 
