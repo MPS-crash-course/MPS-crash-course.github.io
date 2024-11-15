@@ -6,8 +6,9 @@
 
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Index &#8212; MPS Crash Course</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>MPS Crash Course &#8212; MPS Crash Course</title>
   
   
   
@@ -59,9 +60,12 @@
     <script async="async" src="_static/sphinx-thebe.js?v=c100c467"></script>
     <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
     <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'genindex';</script>
-    <link rel="index" title="Index" href="#" />
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'home';</script>
+    <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="1. Introduction" href="content/week1/intro.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="" />
@@ -134,7 +138,7 @@
     
   
 
-<a class="navbar-brand logo" href="home.html">
+<a class="navbar-brand logo" href="#">
   
   
   
@@ -161,8 +165,8 @@
     <div class="bd-toc-item navbar-nav active">
         
         <ul class="nav bd-sidenav bd-sidenav__home-link">
-            <li class="toctree-l1">
-                <a class="reference internal" href="home.html">
+            <li class="toctree-l1 current active">
+                <a class="reference internal" href="#">
                     MPS Crash Course
                 </a>
             </li>
@@ -257,7 +261,7 @@
       
       
       
-      <li><a href="https://github.com/MPS-crash-course/MPS-crash-course.github.io/issues/new?title=Issue%20on%20page%20%2Fgenindex.html&body=Your%20issue%20content%20here." target="_blank"
+      <li><a href="https://github.com/MPS-crash-course/MPS-crash-course.github.io/issues/new?title=Issue%20on%20page%20%2Fhome.html&body=Your%20issue%20content%20here." target="_blank"
    class="btn btn-sm btn-source-issues-button dropdown-item"
    title="Open an issue"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -269,6 +273,54 @@
   </span>
 <span class="btn__text-container">Open issue</span>
 </a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="_sources/home.md" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.md</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
 </li>
       
   </ul>
@@ -313,7 +365,7 @@
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1></h1>
+    <h1>MPS Crash Course</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
@@ -327,13 +379,65 @@
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-
-<h1 id="index">Index</h1>
-
-<div class="genindex-jumpbox">
- 
+  <section class="tex2jax_ignore mathjax_ignore" id="mps-crash-course">
+<h1>MPS Crash Course<a class="headerlink" href="#mps-crash-course" title="Link to this heading">#</a></h1>
+<p>In this course we will cover the basics of Matrix Product States (MPS) over four weeks. This will include: how MPS can be used to represent quantum many-body states, how to perform unitary time evolution using the TEBD algorithm, and how to find ground states using DMRG.</p>
+<p>This course is intended to be practical and will be based around writing your own code. You really won’t get the most out of the course unless you try to write your own code following along with the lectures. However, I will provide a <a class="reference external" href="https://github.com/MPS-crash-course/MPS-model-code">GitHub repository with model code</a>. There will be a branch with model code for each week. The <code class="docutils literal notranslate"><span class="pre">main</span></code> branch (and branch called <code class="docutils literal notranslate"><span class="pre">week0-template</span></code>) provides a folder structure to start with, as well as yaml files for setting up a conda environment.</p>
+<p>Although you will be writing your own code, I must stress that the goal is not to produce high-performance MPS code. Furthermore, the model code will provide the minimal code to cover the contents of this course. If you intend to use MPS (or tensor networks more generally) for your research, I would strongly recommend using a well-developed package. I can recommend <a class="reference external" href="https://tenpy.readthedocs.io/en/latest/">TeNPy</a> for python, and <a class="reference external" href="https://itensor.org">iTensor</a> for Julia, but there are many more. The goal of this course is to allow to use these packages without feeling like everything is a black box. At the very minimum, I hope that it demystifies those talks where the speaker very helpfully assumes that everyone is the audience is experts on MPS.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This is the first time I am running this course, and I will be creating the content as I go along. I would be very grateful for any feedback on any aspect of the course so that I can improve it for future iterations.</p>
+<p>I hope you find it useful!</p>
 </div>
+<div class="toctree-wrapper compound">
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Week 1</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="content/week1/intro.html">1. Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="content/week1/problem.html">2. The Heisenberg Antiferromagnet</a></li>
+<li class="toctree-l1"><a class="reference internal" href="content/week1/mps.html">3. Matrix Product States</a></li>
+</ul>
+</div>
+<div class="toctree-wrapper compound">
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Week 2</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="content/week2/canonical.html">4. Canonical Form and Truncation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="content/week2/tebd.html">5. Time Evolving Block Decimation (TEBD)</a></li>
+</ul>
+</div>
+<div class="toctree-wrapper compound">
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Week 3</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="content/week3/mpo.html">6. Matrix Product Operators</a></li>
+<li class="toctree-l1"><a class="reference internal" href="content/week3/dmrg.html">7. Density Matrix Renormalization Group (DMRG)</a></li>
+</ul>
+</div>
+<div class="toctree-wrapper compound">
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Week 4</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="content/week4/dsf.html">8. Bringing It All Together</a></li>
+</ul>
+</div>
+</section>
 
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./."
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
 
                 </article>
               
@@ -345,6 +449,15 @@
                 <footer class="prev-next-footer d-print-none">
                   
 <div class="prev-next-area">
+    <a class="right-next"
+       href="content/week1/intro.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title"><span class="section-number">1. </span>Introduction</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
 </div>
                 </footer>
               
