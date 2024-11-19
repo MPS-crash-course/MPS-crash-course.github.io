@@ -43,7 +43,7 @@ where each $M^{[n] i_n}$ is a $\chi_n \times \chi_{n+1}$ matrix. We include the 
 Instead of dealing with an MPS as a product of matrices, it is instead more useful to expose the matrix indices explicitly. That is $[M^{[n] i_n}]_{\alpha_n, \alpha_{n+1}} = M^{[n] i_n}_{\alpha_n, \alpha_{n+1}}$ where $\alpha_n$ and $\alpha_{n+1}$ are the indices of the matrix. The state of the system can then be written as
 
 $$
-\psi_{i_1 i_2 \ldots i_N} = \sum_{\alpha_1, \alpha_2, \ldots, \alpha_N} M^{[1]i_1}_{\alpha_0,\alpha_1} M^{[2]i_2}_{\alpha_2, \alpha_3}M^{[3]i_3}_{\alpha_3, \alpha_4} \cdots M^{[N]i_N}_{\alpha_{N},\alpha_{N+1}}.
+\psi_{i_1 i_2 \ldots i_N} = \sum_{\alpha_1, \alpha_2, \ldots, \alpha_{N-1}} M^{[1]i_1}_{\alpha_0,\alpha_1} M^{[2]i_2}_{\alpha_1, \alpha_2}M^{[3]i_3}_{\alpha_2, \alpha_3} \cdots M^{[N]i_N}_{\alpha_{N-1},\alpha_{N}}.
 $$ (eq:mps)
 
 It is then more useful to treat the matrices $M^{[n]i_n}_{\alpha_n,\alpha_{n+1}}$, as rank-3 tensors, with indices $i_n, \alpha_n, \alpha_n$. Since these expressions can become cumbersome, we will also introduce a graphical notation to represent these tensors. This graphical notation is known as the tensor network diagram, and is a powerful tool for understanding and manipulating tensor networks. Let us introduce this notation before returning to this expression for the matrix product state.
