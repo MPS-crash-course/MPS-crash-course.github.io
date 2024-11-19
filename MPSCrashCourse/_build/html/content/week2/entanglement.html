@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>6. Time Evolving Block Decimation (TEBD) &#8212; MPS Crash Course</title>
+    <title>5. Entanglement and Truncation &#8212; MPS Crash Course</title>
   
   
   
@@ -60,11 +60,13 @@
     <script async="async" src="../../_static/sphinx-thebe.js?v=c100c467"></script>
     <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
     <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'content/week2/tebd';</script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'content/week2/entanglement';</script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="7. Matrix Product Operators" href="../week3/mpo.html" />
-    <link rel="prev" title="5. Entanglement and Truncation" href="entanglement.html" />
+    <link rel="next" title="6. Time Evolving Block Decimation (TEBD)" href="tebd.html" />
+    <link rel="prev" title="4. Canonical Form" href="canonical.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="" />
@@ -177,8 +179,8 @@
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">Week 2</span></p>
 <ul class="current nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="canonical.html">4. Canonical Form</a></li>
-<li class="toctree-l1"><a class="reference internal" href="entanglement.html">5. Entanglement and Truncation</a></li>
-<li class="toctree-l1 current active"><a class="current reference internal" href="#">6. Time Evolving Block Decimation (TEBD)</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">5. Entanglement and Truncation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tebd.html">6. Time Evolving Block Decimation (TEBD)</a></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">Week 3</span></p>
 <ul class="nav bd-sidenav">
@@ -259,7 +261,7 @@
       
       
       
-      <li><a href="https://github.com/MPS-crash-course/MPS-crash-course.github.io/issues/new?title=Issue%20on%20page%20%2Fcontent/week2/tebd.html&body=Your%20issue%20content%20here." target="_blank"
+      <li><a href="https://github.com/MPS-crash-course/MPS-crash-course.github.io/issues/new?title=Issue%20on%20page%20%2Fcontent/week2/entanglement.html&body=Your%20issue%20content%20here." target="_blank"
    class="btn btn-sm btn-source-issues-button dropdown-item"
    title="Open an issue"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -289,7 +291,7 @@
       
       
       
-      <li><a href="../../_sources/content/week2/tebd.md" target="_blank"
+      <li><a href="../../_sources/content/week2/entanglement.md" target="_blank"
    class="btn btn-sm btn-download-source-button dropdown-item"
    title="Download source file"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -352,7 +354,9 @@
 <button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
     <i class="fa-solid fa-magnifying-glass fa-lg"></i>
 </button>
-
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
 </div></div>
       
     </div>
@@ -363,11 +367,20 @@
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>Time Evolving Block Decimation (TEBD)</h1>
+    <h1>Entanglement and Truncation</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
             
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-schmidt-decomposition">5.1. The Schmidt decomposition</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#truncation">5.2. Truncation</a></li>
+</ul>
+            </nav>
         </div>
     </div>
 </div>
@@ -377,9 +390,101 @@
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section class="tex2jax_ignore mathjax_ignore" id="time-evolving-block-decimation-tebd">
-<h1><span class="section-number">6. </span>Time Evolving Block Decimation (TEBD)<a class="headerlink" href="#time-evolving-block-decimation-tebd" title="Link to this heading">#</a></h1>
-<p>Watch this space!</p>
+  <section class="tex2jax_ignore mathjax_ignore" id="entanglement-and-truncation">
+<h1><span class="section-number">5. </span>Entanglement and Truncation<a class="headerlink" href="#entanglement-and-truncation" title="Link to this heading">#</a></h1>
+<p>One of the central concepts in MPS is entanglement. Entanglement is a measure of how correlated two parts of a quantum system are. The entanglement spectrum (Schmidt values) also allows us to controllably truncate the MPS representation.</p>
+<section id="the-schmidt-decomposition">
+<h2><span class="section-number">5.1. </span>The Schmidt decomposition<a class="headerlink" href="#the-schmidt-decomposition" title="Link to this heading">#</a></h2>
+<figure class="align-center" id="fig-schmidt">
+<a class="reference internal image-reference" href="../../_images/schmidt.jpeg"><img alt="../../_images/schmidt.jpeg" src="../../_images/schmidt.jpeg" style="width: 50%;" /></a>
+<figcaption>
+<p><span class="caption-number">Fig. 5.1 </span><span class="caption-text">???</span><a class="headerlink" href="#fig-schmidt" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+<p>Given a pure quantum state <span class="math notranslate nohighlight">\(|\psi\rangle\)</span>, and a bipartition of the system into two parts <span class="math notranslate nohighlight">\(A\)</span> and <span class="math notranslate nohighlight">\(B\)</span>, the Schmidt decomposition of <span class="math notranslate nohighlight">\(|\psi\rangle\)</span> is given by</p>
+<div class="math notranslate nohighlight">
+\[
+|\psi\rangle = \sum_i \lambda_i |i_A\rangle \otimes |i_B\rangle,
+\]</div>
+<p>where <span class="math notranslate nohighlight">\(\{|i_A\rangle\}\)</span> and <span class="math notranslate nohighlight">\(\{|i_B\rangle\}\)</span> are orthonormal bases for parts <span class="math notranslate nohighlight">\(A\)</span> and <span class="math notranslate nohighlight">\(B\)</span>, respectively, and <span class="math notranslate nohighlight">\(\lambda_i\)</span> are the Schmidt values. The Schmidt values are non-negative and are related to the entanglement of the state. In particular, the entanglement between the two subsystems can be quantified by the von Neumann entanglement entropy</p>
+<div class="math notranslate nohighlight">
+\[
+S = -\sum_i \lambda_i^2 \log \lambda_i^2.
+\]</div>
+<p>The MPS form a quantum state naturally gives us access to the Schmidt values. In particular, the Schmidt decomposition of a state can be written as the tensor network diagram shown in <a class="reference internal" href="#fig-schmidt"><span class="std std-numref">Fig. 5.1</span></a>. However, because we have chosen not to introduce the central tensors, the Schmidt values are not directly accessible. We therefore need to perform SVD in order to extract the Schmidt values, as shown in <a class="reference internal" href="#fig-extract-schmidt"><span class="std std-numref">Fig. 5.2</span></a>. If we want to measure the entanglement entropy on the bond between sites <span class="math notranslate nohighlight">\(n\)</span> and <span class="math notranslate nohighlight">\(n+1\)</span>, then we need to first move the centre to site <span class="math notranslate nohighlight">\(n\)</span> and then perform the SVD.</p>
+<figure class="align-center" id="fig-extract-schmidt">
+<a class="reference internal image-reference" href="../../_images/extract_schmidt.jpeg"><img alt="../../_images/extract_schmidt.jpeg" src="../../_images/extract_schmidt.jpeg" style="width: 80%;" /></a>
+<figcaption>
+<p><span class="caption-number">Fig. 5.2 </span><span class="caption-text">???</span><a class="headerlink" href="#fig-extract-schmidt" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Note that the singular values from SVD are not necessarily the Schmidt values. For instance, if we did not move the centre and instead combined two sites into one then performed the SVD, the singular values would not be the Schmidt values. In fact, we would have no physical interpretation of the singular values in this case. This is because the states to the left and right of this bond are not orthonormal. Orthonormality is only guaranteed when the centre is at the site of interest.</p>
+<p>For us a bipartition is always defined with respect to a bond. The subsystems <span class="math notranslate nohighlight">\(A\)</span> and <span class="math notranslate nohighlight">\(B\)</span> are the contiguous sites to the left and right of the bond, respectively. While other bipartitions are possible, it is not easy to extract the Schmidt values from the MPS representation in those cases.</p>
+</div>
+<div class="admonition-code-entanglement-entropy admonition">
+<p class="admonition-title">Code: Entanglement entropy</p>
+<p>It will be useful for us to measure the bipartite entanglement entropy of our state, so let’s add this to our MPS class.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1">## file: src/mps.py</span>
+
+<span class="k">class</span> <span class="nc">MPS</span><span class="p">:</span>
+
+    <span class="c1">## PREVIOUS CODE OMITTED ##</span>
+
+    <span class="k">def</span> <span class="nf">entropy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">site</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Compute the bipartite entanglement entropy of the bond between site and site+1.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Move the centre to the site of interest</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">move_centre</span><span class="p">(</span><span class="n">site</span><span class="p">)</span>
+
+        <span class="c1">## YOUR CODE HERE ##</span>
+
+        <span class="k">return</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">S</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">S</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span>
+
+
+</pre></div>
+</div>
+</div>
+</section>
+<section id="truncation">
+<h2><span class="section-number">5.2. </span>Truncation<a class="headerlink" href="#truncation" title="Link to this heading">#</a></h2>
+<p>The Schmidt values provide us with a controlled way to truncate the MPS representation. The idea is to keep only the largest Schmidt values and discard the rest. This is equivalent to keeping only the most important correlations in the state.</p>
+<div class="admonition-code-entanglement-entropy admonition">
+<p class="admonition-title">Code: Entanglement entropy</p>
+<p>???</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1">## file: src/svd.py</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">numpy.linalg</span> <span class="k">as</span> <span class="nn">la</span>
+
+<span class="k">def</span> <span class="nf">svd_truncated</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">chiMax</span><span class="p">,</span> <span class="n">threshold</span><span class="p">):</span>
+
+    <span class="n">U</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">Vdg</span> <span class="o">=</span> <span class="n">la</span><span class="o">.</span><span class="n">svd</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">full_matrices</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    
+    <span class="k">if</span> <span class="p">(</span><span class="n">chiMax</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">threshold</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="c1"># truncate the singular values</span>
+        <span class="n">chi</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">S</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">chiMax</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">chi</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">chi</span><span class="p">,</span> <span class="n">chiMax</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">threshold</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">chi</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">chi</span><span class="p">,</span> <span class="nb">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">cumsum</span><span class="p">(</span><span class="n">S</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">/</span><span class="nb">sum</span><span class="p">(</span><span class="n">S</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="o">-</span><span class="n">threshold</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="n">U</span> <span class="o">=</span> <span class="n">U</span><span class="p">[:,</span> <span class="p">:</span><span class="n">chi</span><span class="p">]</span>
+        <span class="n">S</span> <span class="o">=</span> <span class="n">S</span><span class="p">[:</span><span class="n">chi</span><span class="p">]</span>
+        <span class="n">Vdg</span> <span class="o">=</span> <span class="n">Vdg</span><span class="p">[:</span><span class="n">chi</span><span class="p">,</span> <span class="p">:]</span>
+    
+    <span class="c1"># normalize the singular values</span>
+    <span class="n">S</span> <span class="o">=</span> <span class="n">S</span> <span class="o">/</span> <span class="n">la</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">S</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">U</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">Vdg</span>
+
+
+</pre></div>
+</div>
+</div>
+</section>
 </section>
 
     <script type="text/x-thebe-config">
@@ -413,20 +518,20 @@
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="entanglement.html"
+       href="canonical.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title"><span class="section-number">5. </span>Entanglement and Truncation</p>
+        <p class="prev-next-title"><span class="section-number">4. </span>Canonical Form</p>
       </div>
     </a>
     <a class="right-next"
-       href="../week3/mpo.html"
+       href="tebd.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title"><span class="section-number">7. </span>Matrix Product Operators</p>
+        <p class="prev-next-title"><span class="section-number">6. </span>Time Evolving Block Decimation (TEBD)</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -436,6 +541,23 @@
             </div>
             
             
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-schmidt-decomposition">5.1. The Schmidt decomposition</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#truncation">5.2. Truncation</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
               
             
           </div>

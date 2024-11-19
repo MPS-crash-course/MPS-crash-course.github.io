@@ -14,6 +14,7 @@ parts:
   numbered: true
   chapters:
   - file: content/week2/canonical
+  - file: content/week2/entanglement
   - file: content/week2/tebd
 
 - caption: "Week 3"
