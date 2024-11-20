@@ -398,7 +398,7 @@
 <figure class="align-center" id="fig-schmidt">
 <a class="reference internal image-reference" href="../../_images/schmidt.jpeg"><img alt="../../_images/schmidt.jpeg" src="../../_images/schmidt.jpeg" style="width: 50%;" /></a>
 <figcaption>
-<p><span class="caption-number">Fig. 5.1 </span><span class="caption-text">???</span><a class="headerlink" href="#fig-schmidt" title="Link to this image">#</a></p>
+<p><span class="caption-number">Fig. 5.1 </span><span class="caption-text">The Schmidt decomposition of a quantum state with respect to a bipartition of the system into two contiguous parts <span class="math notranslate nohighlight">\(A\)</span> and <span class="math notranslate nohighlight">\(B\)</span>, written in tensor network diagrams. The Schmidt values are contained in a diagonal matrix <span class="math notranslate nohighlight">\(\Lambda\)</span>, and can be used to computed the entanglement entropy between the two parts.</span><a class="headerlink" href="#fig-schmidt" title="Link to this image">#</a></p>
 </figcaption>
 </figure>
 <p>Given a pure quantum state <span class="math notranslate nohighlight">\(|\psi\rangle\)</span>, and a bipartition of the system into two parts <span class="math notranslate nohighlight">\(A\)</span> and <span class="math notranslate nohighlight">\(B\)</span>, the Schmidt decomposition of <span class="math notranslate nohighlight">\(|\psi\rangle\)</span> is given by</p>
@@ -411,11 +411,11 @@
 \[
 S = -\sum_i \lambda_i^2 \log \lambda_i^2.
 \]</div>
-<p>The MPS form a quantum state naturally gives us access to the Schmidt values. In particular, the Schmidt decomposition of a state can be written as the tensor network diagram shown in <a class="reference internal" href="#fig-schmidt"><span class="std std-numref">Fig. 5.1</span></a>. However, because we have chosen not to introduce the central tensors, the Schmidt values are not directly accessible. We therefore need to perform SVD in order to extract the Schmidt values, as shown in <a class="reference internal" href="#fig-extract-schmidt"><span class="std std-numref">Fig. 5.2</span></a>. If we want to measure the entanglement entropy on the bond between sites <span class="math notranslate nohighlight">\(n\)</span> and <span class="math notranslate nohighlight">\(n+1\)</span>, then we need to first move the centre to site <span class="math notranslate nohighlight">\(n\)</span> and then perform the SVD.</p>
+<p>The MPS form a quantum state naturally gives us access to the Schmidt values. In particular, the Schmidt decomposition of a state can be written as the tensor network diagram shown in <a class="reference internal" href="#fig-schmidt"><span class="std std-numref">Fig. 5.1</span></a>. However, because we have chosen not to introduce the central tensors, the Schmidt values are not directly accessible. We therefore need to perform SVD in order to extract the Schmidt values, as shown in <a class="reference internal" href="tebd.html#fig-extract-schmidt"><span class="std std-numref">Fig. 6.1</span></a>. If we want to measure the entanglement entropy on the bond between sites <span class="math notranslate nohighlight">\(n\)</span> and <span class="math notranslate nohighlight">\(n+1\)</span>, then we need to first move the centre to site <span class="math notranslate nohighlight">\(n\)</span> and then perform the SVD.</p>
 <figure class="align-center" id="fig-extract-schmidt">
 <a class="reference internal image-reference" href="../../_images/extract_schmidt.jpeg"><img alt="../../_images/extract_schmidt.jpeg" src="../../_images/extract_schmidt.jpeg" style="width: 80%;" /></a>
 <figcaption>
-<p><span class="caption-number">Fig. 5.2 </span><span class="caption-text">???</span><a class="headerlink" href="#fig-extract-schmidt" title="Link to this image">#</a></p>
+<p><span class="caption-number">Fig. 5.2 </span><span class="caption-text">In our code we don’t explicitly expose the Schmidt values and so need to extract them from the central tensor. This is done by contracting with a neighbouring tensor and then performing SVD. Here we have contracted to the right, but could have equivalently contracted to the left, assuming that all tensors are in left (right) canonical form to the left (right) of the centre tensor.</span><a class="headerlink" href="#fig-extract-schmidt" title="Link to this image">#</a></p>
 </figcaption>
 </figure>
 <div class="admonition note">
@@ -437,7 +437,7 @@ S = -\sum_i \lambda_i^2 \log \lambda_i^2.
 <span class="sd">        Compute the bipartite entanglement entropy of the bond between site and site+1.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Move the centre to the site of interest</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">move_centre</span><span class="p">(</span><span class="n">site</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">move_centre_to</span><span class="p">(</span><span class="n">site</span><span class="p">)</span>
 
         <span class="c1">## YOUR CODE HERE ##</span>
 
@@ -450,10 +450,22 @@ S = -\sum_i \lambda_i^2 \log \lambda_i^2.
 </section>
 <section id="truncation">
 <h2><span class="section-number">5.2. </span>Truncation<a class="headerlink" href="#truncation" title="Link to this heading">#</a></h2>
-<p>The Schmidt values provide us with a controlled way to truncate the MPS representation. The idea is to keep only the largest Schmidt values and discard the rest. This is equivalent to keeping only the most important correlations in the state.</p>
-<div class="admonition-code-entanglement-entropy admonition">
-<p class="admonition-title">Code: Entanglement entropy</p>
-<p>???</p>
+<figure class="align-center" id="fig-truncated-svd">
+<a class="reference internal image-reference" href="../../_images/truncated_svd.jpeg"><img alt="../../_images/truncated_svd.jpeg" src="../../_images/truncated_svd.jpeg" style="width: 80%;" /></a>
+<figcaption>
+<p><span class="caption-number">Fig. 5.3 </span><span class="caption-text">We will encounter tensors on two sites in the TEBD and DMRG algorithms. In order to split this tensor into two tensors, we need to perform SVD. We can truncate this SVD to limit the bond dimension of our MPS by keeping only the largest Schmidt values and the corresponding columns of <span class="math notranslate nohighlight">\(U\)</span> and rows of <span class="math notranslate nohighlight">\(V^\dagger\)</span>.</span><a class="headerlink" href="#fig-truncated-svd" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+<p>The Schmidt values provide us with a controlled way to truncate the MPS representation. The idea is to keep only the largest Schmidt values and discard the rest. This is equivalent to keeping only the most important correlations in the state. As shown in <a class="reference internal" href="#fig-truncated-svd"><span class="std std-numref">Fig. 5.3</span></a>, in the TEBD and DMRG algorithms, we will end up with a tensor on two sites. We then want to perform SVD to split this tensor into two tensors, one on each site. In order to limit the size of the tensors in our MPS, we can truncate this SVD. This is done by keeping only the largest <span class="math notranslate nohighlight">\(\chi\)</span> singular values, only the <span class="math notranslate nohighlight">\(\chi\)</span> columns of <span class="math notranslate nohighlight">\(U\)</span> and the <span class="math notranslate nohighlight">\(\chi\)</span> rows of <span class="math notranslate nohighlight">\(V^\dagger\)</span>.</p>
+<p>To determine how many singular values to keep, we can introduce two thresholds. The first is a threshold on the accuracy of the truncation, <span class="math notranslate nohighlight">\(\epsilon\)</span>. We keep all singular values such that</p>
+<div class="math notranslate nohighlight">
+\[
+\sum_{i=1}^{\chi} \lambda_i^2 \geq 1 - \epsilon.
+\]</div>
+<p>Because the Schmidt values are related to the Schmidt decomposition of the state (so long as this tensor is at the centre), the infidelity between the correct state and the truncated state is given by <span class="math notranslate nohighlight">\(\epsilon\)</span>. This is one of the powerful aspects of MPS methods, that it is a controlled approximation, and we can keep track of the errors accumulated in our simulations. The second threshold is to set a maximum allowable <span class="math notranslate nohighlight">\(\chi = \chi_\text{max}\)</span>. This is useful when we want to limit the computational cost of the simulation since the required <span class="math notranslate nohighlight">\(\chi\)</span> to satisfy our accuracy threshold can be very large, particularly for highly entangled states. When we truncate the Schmidt values, the state will no longer be normalized since <span class="math notranslate nohighlight">\(\sum_{i}^{\chi} \lambda_i^2 &lt; 1\)</span>. We therefore also need to renormalize the Schmidt values.</p>
+<div class="admonition-code-truncated-svd admonition">
+<p class="admonition-title">Code: Truncated SVD</p>
+<p>Here I provide code for the truncated SVD. This function takes a matrix <span class="math notranslate nohighlight">\(M\)</span>, so you may need to reshape your tensor before and after applying this SVD. The function returns the truncated <span class="math notranslate nohighlight">\(U\)</span>, <span class="math notranslate nohighlight">\(S\)</span> and <span class="math notranslate nohighlight">\(V^\dagger\)</span> matrices, where the bond dimension is determined by the accuracy threshold <span class="math notranslate nohighlight">\(\epsilon\)</span>, and the maximum bond dimension <span class="math notranslate nohighlight">\(\chi_\text{max}\)</span>.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1">## file: src/svd.py</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -484,6 +496,7 @@ S = -\sum_i \lambda_i^2 \log \lambda_i^2.
 </pre></div>
 </div>
 </div>
+<p>Although we won’t do it systematically in this course, MPS simulations should be repeated for different values of <span class="math notranslate nohighlight">\(\chi_\text{max}\)</span> to determine where the simulations are converged. This is particularly important when studying ground states close to phase transitions, or when simulating unitary time evolution where the entanglement grows rapidly. In these cases, the required bond dimension can be very large, and it is important to know when the simulation is converged. In the context of TEBD, we will consider an example where we plot the entanglement entropy as a function of time for different values of <span class="math notranslate nohighlight">\(\chi_\text{max}\)</span>, which allows us to determine up to which time we can trust the simulation.</p>
 </section>
 </section>
 
