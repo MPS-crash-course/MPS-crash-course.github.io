@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>5. Time Evolving Block Decimation (TEBD) &#8212; MPS Crash Course</title>
+    <title>6. Time Evolving Block Decimation (TEBD) &#8212; MPS Crash Course</title>
   
   
   
@@ -60,11 +60,13 @@
     <script async="async" src="../../_static/sphinx-thebe.js?v=c100c467"></script>
     <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
     <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'content/week2/tebd';</script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="6. Matrix Product Operators" href="../week3/mpo.html" />
-    <link rel="prev" title="4. Canonical Form and Truncation" href="canonical.html" />
+    <link rel="next" title="7. Matrix Product Operators" href="../week3/mpo.html" />
+    <link rel="prev" title="5. Entanglement and Truncation" href="entanglement.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="" />
@@ -176,17 +178,18 @@
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">Week 2</span></p>
 <ul class="current nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="canonical.html">4. Canonical Form and Truncation</a></li>
-<li class="toctree-l1 current active"><a class="current reference internal" href="#">5. Time Evolving Block Decimation (TEBD)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="canonical.html">4. Canonical Form</a></li>
+<li class="toctree-l1"><a class="reference internal" href="entanglement.html">5. Entanglement and Truncation</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">6. Time Evolving Block Decimation (TEBD)</a></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">Week 3</span></p>
 <ul class="nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="../week3/mpo.html">6. Matrix Product Operators</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../week3/dmrg.html">7. Density Matrix Renormalization Group (DMRG)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../week3/mpo.html">7. Matrix Product Operators</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../week3/dmrg.html">8. Density Matrix Renormalization Group (DMRG)</a></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">Week 4</span></p>
 <ul class="nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="../week4/dsf.html">8. Bringing It All Together</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../week4/dsf.html">9. Bringing It All Together</a></li>
 </ul>
 
     </div>
@@ -351,7 +354,9 @@
 <button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
     <i class="fa-solid fa-magnifying-glass fa-lg"></i>
 </button>
-
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
 </div></div>
       
     </div>
@@ -367,6 +372,16 @@
     <div id="print-main-content">
         <div id="jb-print-toc">
             
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#trotter-decomposition">6.1. Trotter decomposition</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#applying-gates-to-mps">6.2. Applying gates to MPS</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#global-quench-test">6.3. Global quench test</a></li>
+</ul>
+            </nav>
         </div>
     </div>
 </div>
@@ -377,8 +392,169 @@
                 <article class="bd-article">
                   
   <section class="tex2jax_ignore mathjax_ignore" id="time-evolving-block-decimation-tebd">
-<h1><span class="section-number">5. </span>Time Evolving Block Decimation (TEBD)<a class="headerlink" href="#time-evolving-block-decimation-tebd" title="Link to this heading">#</a></h1>
-<p>Watch this space!</p>
+<h1><span class="section-number">6. </span>Time Evolving Block Decimation (TEBD)<a class="headerlink" href="#time-evolving-block-decimation-tebd" title="Link to this heading">#</a></h1>
+<p>We will now introduce our first MPS algorithm: Time Evolving Block Decimation. This algorithm allows us to simulate the time evolution of a quantum many-body system, where the state is represented by an MPS. The algorithm can also be used to simulate the imaginary (or complex) time evolution of a quantum system, which can be used to find ground states or to compute finite temperature correlation functions. We will focus on the real-time (unitary) time evolution in this course. We will consider the example of a global quench, to test our code against exact results.</p>
+<section id="trotter-decomposition">
+<h2><span class="section-number">6.1. </span>Trotter decomposition<a class="headerlink" href="#trotter-decomposition" title="Link to this heading">#</a></h2>
+<p>The TEBD algorithm is based on the Trotter decomposition of the time evolution operator. This allows us to approximate the evolution by a discrete sequence of local gates. The TEBD algorithm essentially tells us how to apply these gates to update our MPS.</p>
+<p>The real-time evolution operator for a Hamiltonian <span class="math notranslate nohighlight">\(H\)</span> is the unitary operator <span class="math notranslate nohighlight">\(U(t) = e^{-iHt}\)</span>. The Trotter (or Trotter-Suzuki) decomposition proceeds by two steps. First, we discretize time into small time steps <span class="math notranslate nohighlight">\(\Delta t\)</span>. The time evolution operator can then be written as <span class="math notranslate nohighlight">\(U(n\Delta t) = U(\Delta t)^n\)</span>. This first step is exact. The second step is to approximate the evolution operator <span class="math notranslate nohighlight">\(U(\Delta t)\)</span> for a small time-step by a sequence of local unitary gates acting on pairs of sites (this can be made more general). Our Hamiltonian can be written as a sum of local terms <span class="math notranslate nohighlight">\(H = \sum_i h_i\)</span>, and we can approximate the evolution operator as</p>
+<div class="math notranslate nohighlight">
+\[
+U(\Delta t) = \prod_{n \; \text{even}} e^{-i h_n \Delta t} \prod_{n \; \text{odd}} e^{-i h_n \Delta t}  + O(\Delta t^2).
+\]</div>
+<p>This is the first-order Trotter decomposition, and is shown diagramatically in <a class="reference internal" href="#fig-trotter"><span class="std std-numref">Fig. 6.1</span></a>. It is also possible to use higher-order Trotter decompositions (and this is typically a good idea), but we will stick to first-order for simplicity. Therefore, we can approximate each time step by a sequence of local gates acting on pairs of sites of the form <span class="math notranslate nohighlight">\(e^{-i h_n \Delta t}\)</span>. We have arranged the product such that we apply all odd terms first, and then all even terms. This is because all the odd (even) terms commute with each other, but do not commute with the even (odd) terms.</p>
+<figure class="align-center" id="fig-trotter">
+<a class="reference internal image-reference" href="../../_images/trotter.jpeg"><img alt="../../_images/trotter.jpeg" src="../../_images/trotter.jpeg" style="width: 60%;" /></a>
+<figcaption>
+<p><span class="caption-number">Fig. 6.1 </span><span class="caption-text">Tensor network diagram of the trotter decomposition of unitary time evolution of a matrix product state. The time evolution operator is approximated by a sequence of local unitary gates acting on pairs of sites.</span><a class="headerlink" href="#fig-trotter" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</section>
+<section id="applying-gates-to-mps">
+<h2><span class="section-number">6.2. </span>Applying gates to MPS<a class="headerlink" href="#applying-gates-to-mps" title="Link to this heading">#</a></h2>
+<p>The main routine of the TEBD algorithm is then to apply a two-site unitary to the MPS as shown in <a class="reference internal" href="#fig-theta"><span class="std std-numref">Fig. 6.2</span></a>. First we must move the centre to one of the two site we are acting on. We will do sweeps from left to right, so we will move the centre to the left site. We then reshape the <span class="math notranslate nohighlight">\(4 \times 4\)</span> unitary into a tensor with shape <span class="math notranslate nohighlight">\((2,2,2,2)\)</span>. We can then contract this tensor with the two tensors it acts on (shown in left of <a class="reference internal" href="#fig-theta"><span class="std std-numref">Fig. 6.2</span></a>) to get a new tensor, which we call <span class="math notranslate nohighlight">\(\Theta\)</span>. Finally, we perform a truncated SVD on <span class="math notranslate nohighlight">\(\Theta\)</span> to get the state back in MPS form with updated tensors. All that is left to complete one TEBD step is loop over all the odd unitary gates, then all the even gates.</p>
+<figure class="align-center" id="fig-theta">
+<a class="reference internal image-reference" href="../../_images/theta.jpeg"><img alt="../../_images/theta.jpeg" src="../../_images/theta.jpeg" style="width: 100%;" /></a>
+<figcaption>
+<p><span class="caption-number">Fig. 6.2 </span><span class="caption-text">Main routine of the TEBD algorithm. We apply the unitary gate to a pair of sites and return to the MPS form by performing a truncated SVD.</span><a class="headerlink" href="#fig-theta" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Just a note on keeping track of index order in python. If we have a <span class="math notranslate nohighlight">\(4 \times 4\)</span> unitary, I would label the indices (out, in). Meaning that I would contract the <code class="docutils literal notranslate"><span class="pre">in</span></code> index with a vector if I were doing matrix-vector multiplication. If I reshape this matrix into a rank-4 tensor then I would get (out_left, out_right, in_left, in_right), where out_left refers to the leg coming out of the tensor corresponding to the left spin. In <a class="reference internal" href="#fig-theta"><span class="std std-numref">Fig. 6.2</span></a> the in indices are at the top, and out at the bottom. Similarly for the other indices. WARNING: if you are using Julia, then the labelling would be different.</p>
+</div>
+<div class="admonition-code-tebd-step admonition">
+<p class="admonition-title">Code: TEBD Step</p>
+<p>Let us create a new file for our TEBD code called <code class="docutils literal notranslate"><span class="pre">tebd.py</span></code> in the <code class="docutils literal notranslate"><span class="pre">src</span></code> folder. We will need to add the following functions. I leave the implementation of the <code class="docutils literal notranslate"><span class="pre">applyGate</span></code> function to you.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1">## file: src/tebd.py</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">scipy</span> <span class="k">as</span> <span class="nn">sp</span>
+
+<span class="kn">from</span> <span class="nn">.svd</span> <span class="kn">import</span> <span class="n">svd_truncated</span>
+
+<span class="n">PauliX</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">],[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">]])</span>
+<span class="n">PauliY</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="n">j</span><span class="p">],[</span><span class="mi">1</span><span class="n">j</span><span class="p">,</span><span class="mi">0</span><span class="p">]])</span>
+<span class="n">PauliZ</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">],[</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">]])</span>
+<span class="n">XX</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">kron</span><span class="p">(</span><span class="n">PauliX</span><span class="p">,</span> <span class="n">PauliX</span><span class="p">)</span>
+<span class="n">YY</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">kron</span><span class="p">(</span><span class="n">PauliY</span><span class="p">,</span> <span class="n">PauliY</span><span class="p">)</span>
+<span class="n">ZZ</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">kron</span><span class="p">(</span><span class="n">PauliZ</span><span class="p">,</span> <span class="n">PauliZ</span><span class="p">)</span>
+<span class="n">heisenberg_term</span> <span class="o">=</span> <span class="mi">1</span><span class="o">/</span><span class="mi">4</span><span class="o">*</span><span class="p">(</span><span class="n">XX</span> <span class="o">+</span> <span class="n">YY</span> <span class="o">+</span> <span class="n">ZZ</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">heisenbergGate</span><span class="p">(</span><span class="n">dt</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute the two-site Heisenberg gate for a given time step dt.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">return</span> <span class="n">sp</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">expm</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">dt</span><span class="o">*</span><span class="n">heisenberg_term</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">applyGate</span><span class="p">(</span><span class="n">psi</span><span class="p">,</span> <span class="n">site</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">chiMax</span><span class="p">,</span> <span class="n">tol</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Apply a two-site gate for the Heisenberg model on site and site+1.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">gate</span> <span class="o">=</span> <span class="n">heisenbergGate</span><span class="p">(</span><span class="n">dt</span><span class="p">)</span>
+
+    <span class="n">psi</span><span class="o">.</span><span class="n">move_centre_to</span><span class="p">(</span><span class="n">site</span><span class="p">)</span>
+
+    <span class="c1">## YOUR CODE HERE ##</span>
+
+
+
+<span class="k">def</span> <span class="nf">TEBD_step</span><span class="p">(</span><span class="n">psi</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">chiMax</span><span class="p">,</span> <span class="n">tol</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Perform a single time step of the time-evolution block decimation (TEBD) algorithm. First-order trotterization of the Heisenberg Hamiltonian.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    psi : MPS</span>
+<span class="sd">        Matrix Product State object.</span>
+<span class="sd">    dt : float</span>
+<span class="sd">        Time step.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">L</span> <span class="o">=</span> <span class="n">psi</span><span class="o">.</span><span class="n">L</span>
+
+    <span class="c1"># apply the Heisenberg gate to each pair of odd sites</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">L</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">):</span>
+        <span class="n">applyGate</span><span class="p">(</span><span class="n">psi</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">chiMax</span><span class="o">=</span><span class="n">chiMax</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="n">tol</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">L</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">):</span>
+        <span class="n">applyGate</span><span class="p">(</span><span class="n">psi</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">chiMax</span><span class="o">=</span><span class="n">chiMax</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="n">tol</span><span class="p">)</span>
+
+
+</pre></div>
+</div>
+</div>
+</section>
+<section id="global-quench-test">
+<h2><span class="section-number">6.3. </span>Global quench test<a class="headerlink" href="#global-quench-test" title="Link to this heading">#</a></h2>
+<p>We now have all the ingredients to test our TEBD algorithm. Let us consider a global quench of the Heisenberg model. Starting from a product state with alternating spins up and down, i.e. <span class="math notranslate nohighlight">\(|0101010\cdots \rangle\)</span>, we will evolve this state under the Heisenberg Hamiltonian. We will measure the magnetization of the system at the central site as a function of time, as well as the entanglement entropy, as shown in <a class="reference internal" href="#fig-tebd-test"><span class="std std-numref">Fig. 6.3</span></a>. We will compare our results for different bond dimensions <span class="math notranslate nohighlight">\(\chi\)</span> to the results from exact diagonalization.</p>
+<figure class="align-center" id="fig-tebd-test">
+<a class="reference internal image-reference" href="../../_images/tebd_test.png"><img alt="../../_images/tebd_test.png" src="../../_images/tebd_test.png" style="width: 60%;" /></a>
+<figcaption>
+<p><span class="caption-number">Fig. 6.3 </span><span class="caption-text">Global quench of the Heisenberg model. The magnetization at the central site and the entanglement entropy are shown as a function of time. The TEBD results for different <span class="math notranslate nohighlight">\(\chi_\text{max}\)</span> are compared to exact diagonalization.</span><a class="headerlink" href="#fig-tebd-test" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+<p>In <a class="reference internal" href="#fig-tebd-test"><span class="std std-numref">Fig. 6.3</span></a> the simulation was performed for <span class="math notranslate nohighlight">\(L=10, dt=0.05, t_\text{max}=6\)</span>. The accuracy tolerance was set to <code class="docutils literal notranslate"><span class="pre">None</span></code> and the MPS code was run for different values of <span class="math notranslate nohighlight">\(\chi_\text{max} = 2,4,8,16\)</span>. We can see that the TEBD simulation matches the exact results well up to time set by <span class="math notranslate nohighlight">\(\chi_\text{max}\)</span>. The entanglement entropy shows that the point where the results deviate corresponds to the point where the entanglement saturates due to the SVD truncation. At this point, we are throwing too much information about the state away and the agreement gets worse. By running simulations with varying <span class="math notranslate nohighlight">\(\chi_\text{max}\)</span>, and by monitoring the entanglement entropy, we can determine up to which point we can trust our results.</p>
+<div class="admonition-ed-code-global-quench admonition">
+<p class="admonition-title">ED Code: Global Quench</p>
+<p>As before, I provide here the ED code for the global quench. This code will be used to compare the results of the TEBD algorithm.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1">## file: src/ed.py</span>
+
+<span class="c1">## PREVIOUS CODE OMITTED ##</span>
+
+<span class="k">def</span> <span class="nf">entanglementEntropy</span><span class="p">(</span><span class="n">psi</span><span class="p">,</span> <span class="n">site</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute the entanglement entropy of a quantum state psi across bond between site and site+1.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">psi</span> <span class="o">=</span> <span class="n">psi</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="mi">2</span><span class="o">**</span><span class="p">(</span><span class="n">site</span><span class="o">+</span><span class="mi">1</span><span class="p">),</span> <span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">svd</span><span class="p">(</span><span class="n">psi</span><span class="p">,</span> <span class="n">full_matrices</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">S</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">S</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span>
+
+
+<span class="k">def</span> <span class="nf">HeisenbergTimeEvolution</span><span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">tMax</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute the time evolution of the Heisenberg Hamiltonian for a 1D chain of length L. L is even!</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">H</span> <span class="o">=</span> <span class="n">HeisenbergHamiltonian</span><span class="p">(</span><span class="n">L</span><span class="p">)</span>
+    <span class="n">psi0</span> <span class="o">=</span> <span class="mf">1.</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">state</span><span class="p">:</span>
+        <span class="n">psi0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">kron</span><span class="p">(</span><span class="n">psi0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span> <span class="o">==</span> <span class="mi">0</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">i</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)]))</span>
+    
+    <span class="n">psi</span> <span class="o">=</span> <span class="n">psi0</span>
+    <span class="n">nSteps</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">tMax</span> <span class="o">/</span> <span class="n">dt</span><span class="p">)</span>
+
+    <span class="n">U</span> <span class="o">=</span> <span class="n">expm</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">dt</span><span class="o">*</span><span class="n">H</span><span class="p">)</span>
+    <span class="n">Z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">kron</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">kron</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">2</span><span class="o">**</span><span class="p">(</span><span class="n">L</span><span class="o">//</span><span class="mi">2</span><span class="p">)),</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">],[</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">]])),</span><span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">2</span><span class="o">**</span><span class="p">(</span><span class="n">L</span><span class="o">//</span><span class="mi">2</span><span class="o">-</span><span class="mi">1</span><span class="p">)))</span>
+
+    <span class="n">magnetization</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">entanglement</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nSteps</span><span class="p">):</span>
+        <span class="n">psi</span> <span class="o">=</span> <span class="n">U</span> <span class="o">@</span> <span class="n">psi</span>
+        <span class="n">magnetization</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span> <span class="n">psi</span><span class="o">.</span><span class="n">conj</span><span class="p">()</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">Z</span> <span class="o">@</span> <span class="n">psi</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="n">entanglement</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">entanglementEntropy</span><span class="p">(</span><span class="n">psi</span><span class="p">,</span> <span class="n">L</span><span class="o">//</span><span class="mi">2</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">magnetization</span><span class="p">,</span> <span class="n">entanglement</span>
+
+</pre></div>
+</div>
+</div>
+<div class="admonition-exercise-local-quench admonition">
+<p class="admonition-title">Exercise: Local Quench</p>
+<p>A good exercise for you would be to implement the TEBD algorithm for a local quench. Consider a 1D chain in an initial product state where all spins are up, except for three. I have chosen to place these at L/4, L/2, 3L/4. You can then perform the time evolution using TEBD and measure the magnetization on all sites, allowing you to plot the magnetization profile as a function of time, as shown in <a class="reference internal" href="#fig-tebd-exercise"><span class="std std-numref">Fig. 6.4</span></a>. You can add this code to a file called <code class="docutils literal notranslate"><span class="pre">tebd_exercise.py</span></code> in the <code class="docutils literal notranslate"><span class="pre">exercises</span></code> folder.</p>
+<figure class="align-center" id="fig-tebd-exercise">
+<a class="reference internal image-reference" href="../../_images/tebd_exercise.png"><img alt="../../_images/tebd_exercise.png" src="../../_images/tebd_exercise.png" style="width: 60%;" /></a>
+<figcaption>
+<p><span class="caption-number">Fig. 6.4 </span><span class="caption-text">Magnetization for a local quench of the Heisenberg model. The initial state is a product state with all spins up, except for three spins at L/4, L/2, 3L/4.</span><a class="headerlink" href="#fig-tebd-exercise" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+<p>To produce this figure I set <span class="math notranslate nohighlight">\(L=51, dt=0.1, t_\text{max}=25\)</span>. The accuracy tolerance was set to <code class="docutils literal notranslate"><span class="pre">None</span></code> and the MPS code was run for <span class="math notranslate nohighlight">\(\chi_\text{max} = 8\)</span> (which gives exact results in this case). This showcases the ability for MPS methods to simulate time evolution for large systems sizes, without the need to store the full state vector. You could easily set <span class="math notranslate nohighlight">\(L=100\)</span> or <span class="math notranslate nohighlight">\(L=200\)</span> and still run this on your laptop in a reasonable amount of time. This example is particularly easy since the entanglement entropy growth is limited. This was not the case for the global quench, where the entanglement entropy grows rapidly.</p>
+</div>
+</section>
 </section>
 
     <script type="text/x-thebe-config">
@@ -412,12 +588,12 @@
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="canonical.html"
+       href="entanglement.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title"><span class="section-number">4. </span>Canonical Form and Truncation</p>
+        <p class="prev-next-title"><span class="section-number">5. </span>Entanglement and Truncation</p>
       </div>
     </a>
     <a class="right-next"
@@ -425,7 +601,7 @@
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title"><span class="section-number">6. </span>Matrix Product Operators</p>
+        <p class="prev-next-title"><span class="section-number">7. </span>Matrix Product Operators</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -435,6 +611,24 @@
             </div>
             
             
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#trotter-decomposition">6.1. Trotter decomposition</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#applying-gates-to-mps">6.2. Applying gates to MPS</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#global-quench-test">6.3. Global quench test</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
               
             
           </div>
