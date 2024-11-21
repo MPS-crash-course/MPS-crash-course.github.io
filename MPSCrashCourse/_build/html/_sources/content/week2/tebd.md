@@ -21,7 +21,7 @@ width: 60%
 align: center
 ---
 
-???
+Tensor network diagram of the trotter decomposition of unitary time evolution of a matrix product state. The time evolution operator is approximated by a sequence of local unitary gates acting on pairs of sites.
 ```
 
 ## Applying gates to MPS
@@ -36,7 +36,7 @@ width: 100%
 align: center
 ---
 
-???
+Main routine of the TEBD algorithm. We apply the unitary gate to a pair of sites and return to the MPS form by performing a truncated SVD.
 ```
 
 ```{note}
@@ -115,24 +115,75 @@ def TEBD_step(psi, dt, chiMax, tol):
 
 ## Global quench test
 
-
-
+We now have all the ingredients to test our TEBD algorithm. Let us consider a global quench of the Heisenberg model. Starting from a product state with alternating spins up and down, i.e. $|0101010\cdots \rangle$, we will evolve this state under the Heisenberg Hamiltonian. We will measure the magnetization of the system at the central site as a function of time, as well as the entanglement entropy, as shown in {numref}`fig:tebd_test`. We will compare our results for different bond dimensions $\chi$ to the results from exact diagonalization.
 
 ```{figure} images/tebd_test.png
 ---
-name: fig:extract_schmidt
+name: fig:tebd_test
 width: 60%
 align: center
 ---
 
-???
+Global quench of the Heisenberg model. The magnetization at the central site and the entanglement entropy are shown as a function of time. The TEBD results for different $\chi_\text{max}$ are compared to exact diagonalization.
 ```
+
+In {numref}`fig:tebd_test` the simulation was performed for $L=10, dt=0.05, t_\text{max}=6$. The accuracy tolerance was set to `None` and the MPS code was run for different values of $\chi_\text{max} = 2,4,8,16$. We can see that the TEBD simulation matches the exact results well up to time set by $\chi_\text{max}$. The entanglement entropy shows that the point where the results deviate corresponds to the point where the entanglement saturates due to the SVD truncation. At this point, we are throwing too much information about the state away and the agreement gets worse. By running simulations with varying $\chi_\text{max}$, and by monitoring the entanglement entropy, we can determine up to which point we can trust our results.
+
+
+````{admonition} ED Code: Global Quench
+
+As before, I provide here the ED code for the global quench. This code will be used to compare the results of the TEBD algorithm. 
+
+```python
+## file: src/ed.py
+
+## PREVIOUS CODE OMITTED ##
+
+def entanglementEntropy(psi, site):
+    """
+    Compute the entanglement entropy of a quantum state psi across bond between site and site+1.
+    """
+
+    psi = psi.copy().reshape((2**(site+1), -1))
+    _, S, _ = np.linalg.svd(psi, full_matrices=False)
+
+    return -np.sum(S**2 * np.log(S**2))
+
+
+def HeisenbergTimeEvolution(L, state, dt, tMax):
+    """
+    Compute the time evolution of the Heisenberg Hamiltonian for a 1D chain of length L. L is even!
+    """
+    H = HeisenbergHamiltonian(L)
+    psi0 = 1.
+    for i in state:
+        psi0 = np.kron(psi0, np.array([int(i == 0), int(i == 1)]))
+    
+    psi = psi0
+    nSteps = int(tMax / dt)
+
+    U = expm(-1j*dt*H)
+    Z = np.kron(np.kron(np.eye(2**(L//2)), np.array([[1,0],[0,-1]])),np.eye(2**(L//2-1)))
+
+    magnetization = []
+    entanglement = []
+    for i in range(nSteps):
+        psi = U @ psi
+        magnetization.append( np.real( psi.conj().T @ Z @ psi ) )
+        entanglement.append( entanglementEntropy(psi, L//2-1) )
+    
+    return magnetization, entanglement
+
+```
+
+````
+
 
 
 
 ````{admonition} Exercise: Local Quench
 
-A
+A good exercise for you would be to implement the TEBD algorithm for a local quench. Consider a 1D chain in an initial product state where all spins are up, except for three. I have chosen to place these at L/4, L/2, 3L/4. You can then perform the time evolution using TEBD and measure the magnetization on all sites, allowing you to plot the magnetization profile as a function of time, as shown in {numref}`fig:tebd_exercise`. 
 
 ```{figure} images/tebd_exercise.png
 ---
@@ -141,9 +192,10 @@ width: 60%
 align: center
 ---
 
-???
+Magnetization for a local quench of the Heisenberg model. The initial state is a product state with all spins up, except for three spins at L/4, L/2, 3L/4.
 ```
 
 
+To produce this figure I set $L=51, dt=0.1, t_\text{max}=25$. The accuracy tolerance was set to `None` and the MPS code was run for $\chi_\text{max} = 8$ (which gives exact results in this case). This showcases the ability for MPS methods to simulate time evolution for large systems sizes, without the need to store the full state vector. You could easily set $L=100$ or $L=200$ and still run this on your laptop in a reasonable amount of time.
 
 ````

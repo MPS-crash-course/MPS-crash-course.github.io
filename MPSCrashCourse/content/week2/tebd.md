@@ -21,7 +21,7 @@ width: 60%
 align: center
 ---
 
-???
+Tensor network diagram of the trotter decomposition of unitary time evolution of a matrix product state. The time evolution operator is approximated by a sequence of local unitary gates acting on pairs of sites.
 ```
 
 ## Applying gates to MPS
@@ -36,7 +36,7 @@ width: 100%
 align: center
 ---
 
-???
+Main routine of the TEBD algorithm. We apply the unitary gate to a pair of sites and return to the MPS form by performing a truncated SVD.
 ```
 
 ```{note}
@@ -124,7 +124,7 @@ width: 60%
 align: center
 ---
 
-???
+Global quench of the Heisenberg model. The magnetization at the central site and the entanglement entropy are shown as a function of time. The TEBD results for different $\chi_\text{max}$ are compared to exact diagonalization.
 ```
 
 In {numref}`fig:tebd_test` the simulation was performed for $L=10, dt=0.05, t_\text{max}=6$. The accuracy tolerance was set to `None` and the MPS code was run for different values of $\chi_\text{max} = 2,4,8,16$. We can see that the TEBD simulation matches the exact results well up to time set by $\chi_\text{max}$. The entanglement entropy shows that the point where the results deviate corresponds to the point where the entanglement saturates due to the SVD truncation. At this point, we are throwing too much information about the state away and the agreement gets worse. By running simulations with varying $\chi_\text{max}$, and by monitoring the entanglement entropy, we can determine up to which point we can trust our results.
@@ -183,7 +183,7 @@ def HeisenbergTimeEvolution(L, state, dt, tMax):
 
 ````{admonition} Exercise: Local Quench
 
-A good exercise for you would be to implement the TEBD algorithm for a local quench. Consider a 1D chain in an initial product state where all spins are up, except for three. I have chosen to place these at L/4, L/2, 3L/4. You can then perform the time evolution using TEBD and measure the magnetization on all sites, allowing you to plot the magnetization profile as a function of time, as shown in {numref}`fig:tebd_exercise`. 
+A good exercise for you would be to implement the TEBD algorithm for a local quench. Consider a 1D chain in an initial product state where all spins are up, except for three. I have chosen to place these at L/4, L/2, 3L/4. You can then perform the time evolution using TEBD and measure the magnetization on all sites, allowing you to plot the magnetization profile as a function of time, as shown in {numref}`fig:tebd_exercise`. You can add this code to a file called `tebd_exercise.py` in the `exercises` folder.
 
 ```{figure} images/tebd_exercise.png
 ---
@@ -192,11 +192,10 @@ width: 60%
 align: center
 ---
 
-???
+Magnetization for a local quench of the Heisenberg model. The initial state is a product state with all spins up, except for three spins at L/4, L/2, 3L/4.
 ```
 
-To produce this figure I set $L=51, dt=0.1, t_\text{max}=25$. The accuracy tolerance was set to `None` and the MPS code was run for $\chi_\text{max} = 8$ (which gives exact results in this case). This showcases the ability for MPS methods to simulate time evolution for large systems sizes, without the need to store the full state vector.
 
-
+To produce this figure I set $L=51, dt=0.1, t_\text{max}=25$. The accuracy tolerance was set to `None` and the MPS code was run for $\chi_\text{max} = 8$ (which gives exact results in this case). This showcases the ability for MPS methods to simulate time evolution for large systems sizes, without the need to store the full state vector. You could easily set $L=100$ or $L=200$ and still run this on your laptop in a reasonable amount of time. This example is particularly easy since the entanglement entropy growth is limited. This was not the case for the global quench, where the entanglement entropy grows rapidly.
 
 ````
