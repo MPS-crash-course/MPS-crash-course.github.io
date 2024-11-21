@@ -404,7 +404,7 @@ U(\Delta t) = \prod_{n \; \text{even}} e^{-i h_n \Delta t} \prod_{n \; \text{odd
 \]</div>
 <p>This is the first-order Trotter decomposition, and is shown diagramatically in <a class="reference internal" href="#fig-trotter"><span class="std std-numref">Fig. 6.1</span></a>. It is also possible to use higher-order Trotter decompositions (and this is typically a good idea), but we will stick to first-order for simplicity. Therefore, we can approximate each time step by a sequence of local gates acting on pairs of sites of the form <span class="math notranslate nohighlight">\(e^{-i h_n \Delta t}\)</span>. We have arranged the product such that we apply all odd terms first, and then all even terms. This is because all the odd (even) terms commute with each other, but do not commute with the even (odd) terms.</p>
 <figure class="align-center" id="fig-trotter">
-<a class="reference internal image-reference" href="content/week2/images/trotter.png"><img alt="content/week2/images/trotter.png" src="content/week2/images/trotter.png" style="width: 80%;" /></a>
+<a class="reference internal image-reference" href="../../_images/trotter.jpeg"><img alt="../../_images/trotter.jpeg" src="../../_images/trotter.jpeg" style="width: 60%;" /></a>
 <figcaption>
 <p><span class="caption-number">Fig. 6.1 </span><span class="caption-text">???</span><a class="headerlink" href="#fig-trotter" title="Link to this image">#</a></p>
 </figcaption>
@@ -412,16 +412,100 @@ U(\Delta t) = \prod_{n \; \text{even}} e^{-i h_n \Delta t} \prod_{n \; \text{odd
 </section>
 <section id="applying-gates-to-mps">
 <h2><span class="section-number">6.2. </span>Applying gates to MPS<a class="headerlink" href="#applying-gates-to-mps" title="Link to this heading">#</a></h2>
-<p>The main routine of the TEBD algorithm is then to apply a two-site unitary to the MPS.</p>
+<p>The main routine of the TEBD algorithm is then to apply a two-site unitary to the MPS as shown in <a class="reference internal" href="#fig-theta"><span class="std std-numref">Fig. 6.2</span></a>. First we must move the centre to one of the two site we are acting on. We will do sweeps from left to right, so we will move the centre to the left site. We then reshape the <span class="math notranslate nohighlight">\(4 \times 4\)</span> unitary into a tensor with shape <span class="math notranslate nohighlight">\((2,2,2,2)\)</span>. We can then contract this tensor with the two tensors it acts on (shown in left of <a class="reference internal" href="#fig-theta"><span class="std std-numref">Fig. 6.2</span></a>) to get a new tensor, which we call <span class="math notranslate nohighlight">\(\Theta\)</span>. Finally, we perform a truncated SVD on <span class="math notranslate nohighlight">\(\Theta\)</span> to get the state back in MPS form with updated tensors. All that is left to complete one TEBD step is loop over all the odd unitary gates, then all the even gates.</p>
+<figure class="align-center" id="fig-theta">
+<a class="reference internal image-reference" href="../../_images/theta.jpeg"><img alt="../../_images/theta.jpeg" src="../../_images/theta.jpeg" style="width: 100%;" /></a>
+<figcaption>
+<p><span class="caption-number">Fig. 6.2 </span><span class="caption-text">???</span><a class="headerlink" href="#fig-theta" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Just a note on keeping track of index order in python. If we have a <span class="math notranslate nohighlight">\(4 \times 4\)</span> unitary, I would label the indices (out, in). Meaning that I would contract the <code class="docutils literal notranslate"><span class="pre">in</span></code> index with a vector if I were doing matrix-vector multiplication. If I reshape this matrix into a rank-4 tensor then I would get (out_left, out_right, in_left, in_right), where out_left refers to the leg coming out of the tensor corresponding to the left spin. In <a class="reference internal" href="#fig-theta"><span class="std std-numref">Fig. 6.2</span></a> the in indices are at the top, and out at the bottom. Similarly for the other indices. WARNING: if you are using Julia, then the labelling would be different.</p>
+</div>
+<div class="admonition-code-tebd-step admonition">
+<p class="admonition-title">Code: TEBD Step</p>
+<p>Let us create a new file for our TEBD code called <code class="docutils literal notranslate"><span class="pre">tebd.py</span></code> in the <code class="docutils literal notranslate"><span class="pre">src</span></code> folder. We will need to add the following functions. I leave the implementation of the <code class="docutils literal notranslate"><span class="pre">applyGate</span></code> function to you.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1">## file: src/tebd.py</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">scipy</span> <span class="k">as</span> <span class="nn">sp</span>
+
+<span class="kn">from</span> <span class="nn">.svd</span> <span class="kn">import</span> <span class="n">svd_truncated</span>
+
+<span class="n">PauliX</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">],[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">]])</span>
+<span class="n">PauliY</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="n">j</span><span class="p">],[</span><span class="mi">1</span><span class="n">j</span><span class="p">,</span><span class="mi">0</span><span class="p">]])</span>
+<span class="n">PauliZ</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">],[</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">]])</span>
+<span class="n">XX</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">kron</span><span class="p">(</span><span class="n">PauliX</span><span class="p">,</span> <span class="n">PauliX</span><span class="p">)</span>
+<span class="n">YY</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">kron</span><span class="p">(</span><span class="n">PauliY</span><span class="p">,</span> <span class="n">PauliY</span><span class="p">)</span>
+<span class="n">ZZ</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">kron</span><span class="p">(</span><span class="n">PauliZ</span><span class="p">,</span> <span class="n">PauliZ</span><span class="p">)</span>
+<span class="n">heisenberg_term</span> <span class="o">=</span> <span class="mi">1</span><span class="o">/</span><span class="mi">4</span><span class="o">*</span><span class="p">(</span><span class="n">XX</span> <span class="o">+</span> <span class="n">YY</span> <span class="o">+</span> <span class="n">ZZ</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">heisenbergGate</span><span class="p">(</span><span class="n">dt</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute the two-site Heisenberg gate for a given time step dt.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">return</span> <span class="n">sp</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">expm</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">dt</span><span class="o">*</span><span class="n">heisenberg_term</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">applyGate</span><span class="p">(</span><span class="n">psi</span><span class="p">,</span> <span class="n">site</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">chiMax</span><span class="p">,</span> <span class="n">tol</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Apply a two-site gate for the Heisenberg model on site and site+1.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">gate</span> <span class="o">=</span> <span class="n">heisenbergGate</span><span class="p">(</span><span class="n">dt</span><span class="p">)</span>
+
+    <span class="n">psi</span><span class="o">.</span><span class="n">move_centre_to</span><span class="p">(</span><span class="n">site</span><span class="p">)</span>
+
+    <span class="c1">## YOUR CODE HERE ##</span>
+
+
+
+<span class="k">def</span> <span class="nf">TEBD_step</span><span class="p">(</span><span class="n">psi</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">chiMax</span><span class="p">,</span> <span class="n">tol</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Perform a single time step of the time-evolution block decimation (TEBD) algorithm. First-order trotterization of the Heisenberg Hamiltonian.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    psi : MPS</span>
+<span class="sd">        Matrix Product State object.</span>
+<span class="sd">    dt : float</span>
+<span class="sd">        Time step.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">L</span> <span class="o">=</span> <span class="n">psi</span><span class="o">.</span><span class="n">L</span>
+
+    <span class="c1"># apply the Heisenberg gate to each pair of odd sites</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">L</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">):</span>
+        <span class="n">applyGate</span><span class="p">(</span><span class="n">psi</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">chiMax</span><span class="o">=</span><span class="n">chiMax</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="n">tol</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">L</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">):</span>
+        <span class="n">applyGate</span><span class="p">(</span><span class="n">psi</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">chiMax</span><span class="o">=</span><span class="n">chiMax</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="n">tol</span><span class="p">)</span>
+
+
+</pre></div>
+</div>
+</div>
 </section>
 <section id="global-quench-test">
 <h2><span class="section-number">6.3. </span>Global quench test<a class="headerlink" href="#global-quench-test" title="Link to this heading">#</a></h2>
 <figure class="align-center" id="fig-extract-schmidt">
 <a class="reference internal image-reference" href="../../_images/tebd_test.png"><img alt="../../_images/tebd_test.png" src="../../_images/tebd_test.png" style="width: 60%;" /></a>
 <figcaption>
-<p><span class="caption-number">Fig. 6.2 </span><span class="caption-text">???</span><a class="headerlink" href="#fig-extract-schmidt" title="Link to this image">#</a></p>
+<p><span class="caption-number">Fig. 6.3 </span><span class="caption-text">???</span><a class="headerlink" href="#fig-extract-schmidt" title="Link to this image">#</a></p>
 </figcaption>
 </figure>
+<div class="admonition-exercise-local-quench admonition">
+<p class="admonition-title">Exercise: Local Quench</p>
+<p>A</p>
+<figure class="align-center" id="fig-tebd-exercise">
+<a class="reference internal image-reference" href="../../_images/tebd_exercise.png"><img alt="../../_images/tebd_exercise.png" src="../../_images/tebd_exercise.png" style="width: 60%;" /></a>
+<figcaption>
+<p><span class="caption-number">Fig. 6.4 </span><span class="caption-text">???</span><a class="headerlink" href="#fig-tebd-exercise" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
 </section>
 </section>
 

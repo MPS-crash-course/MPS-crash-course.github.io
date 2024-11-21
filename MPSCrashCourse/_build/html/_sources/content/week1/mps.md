@@ -390,7 +390,7 @@ class MPS:
     ## PREVIOUS CODE EXCLUDED ##
 
     @classmethod
-    def productState(self, L, ):
+    def productState(self, L, state):
         """
         Create a product state MPS on L sites in a given basis state on each site.
 
@@ -411,7 +411,7 @@ class MPS:
             else:
                 tensors.append(np.array([0,1]).reshape((1,2,1)))
 
-        return cls(L, tensors, 0)
+        return cls(L, tensors)
 ```
 
 ````

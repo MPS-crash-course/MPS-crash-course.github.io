@@ -100,7 +100,7 @@ Because the Schmidt values are related to the Schmidt decomposition of the state
 
 ````{admonition} Code: Truncated SVD
 
-Here I provide code for the truncated SVD. This function takes a matrix $M$, so you may need to reshape your tensor before and after applying this SVD. The function returns the truncated $U$, $S$ and $V^\dagger$ matrices, where the bond dimension is determined by the accuracy threshold $\epsilon$, and the maximum bond dimension $\chi_\text{max}$.
+Here I provide code for the truncated SVD. This function takes a matrix $M$, so you may need to reshape your tensor before and after applying this SVD. The function returns the truncated $U$, $S$ and $V^\dagger$ matrices, where the bond dimension is determined by the accuracy threshold $\epsilon$, and the maximum bond dimension $\chi_\text{max}$. We will add this code to a new file called `svd.py` in the `src` folder.
 
 ```python
 ## file: src/svd.py
