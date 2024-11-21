@@ -183,7 +183,7 @@ def HeisenbergTimeEvolution(L, state, dt, tMax):
 
 ````{admonition} Exercise: Local Quench
 
-A good exercise for you would be to implement the TEBD algorithm for a local quench. Consider a 1D chain in an initial product state where all spins are up, except for three. I have chosen to place these at L/4, L/2, 3L/4. You can then perform the time evolution using TEBD and measure the magnetization on all sites, allowing you to plot the magnetization profile as a function of time, as shown in {numref}`fig:tebd_exercise`. 
+A good exercise for you would be to implement the TEBD algorithm for a local quench. Consider a 1D chain in an initial product state where all spins are up, except for three. I have chosen to place these at L/4, L/2, 3L/4. You can then perform the time evolution using TEBD and measure the magnetization on all sites, allowing you to plot the magnetization profile as a function of time, as shown in {numref}`fig:tebd_exercise`. You can add this code to a file called `tebd_exercise.py` in the `exercises` folder.
 
 ```{figure} images/tebd_exercise.png
 ---
@@ -196,6 +196,6 @@ Magnetization for a local quench of the Heisenberg model. The initial state is a
 ```
 
 
-To produce this figure I set $L=51, dt=0.1, t_\text{max}=25$. The accuracy tolerance was set to `None` and the MPS code was run for $\chi_\text{max} = 8$ (which gives exact results in this case). This showcases the ability for MPS methods to simulate time evolution for large systems sizes, without the need to store the full state vector. You could easily set $L=100$ or $L=200$ and still run this on your laptop in a reasonable amount of time.
+To produce this figure I set $L=51, dt=0.1, t_\text{max}=25$. The accuracy tolerance was set to `None` and the MPS code was run for $\chi_\text{max} = 8$ (which gives exact results in this case). This showcases the ability for MPS methods to simulate time evolution for large systems sizes, without the need to store the full state vector. You could easily set $L=100$ or $L=200$ and still run this on your laptop in a reasonable amount of time. This example is particularly easy since the entanglement entropy growth is limited. This was not the case for the global quench, where the entanglement entropy grows rapidly.
 
 ````

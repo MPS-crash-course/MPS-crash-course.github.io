@@ -34,7 +34,7 @@
     <link rel="stylesheet" type="text/css" href="../../_static/styles/sphinx-book-theme.css?v=a3416100" />
     <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css?v=13237357" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css?v=be8a1c11" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css?v=4fa983c6" />
     <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
   
@@ -411,7 +411,7 @@
 \[
 S = -\sum_i \lambda_i^2 \log \lambda_i^2.
 \]</div>
-<p>The MPS form a quantum state naturally gives us access to the Schmidt values. In particular, the Schmidt decomposition of a state can be written as the tensor network diagram shown in <a class="reference internal" href="#fig-schmidt"><span class="std std-numref">Fig. 5.1</span></a>. However, because we have chosen not to introduce the central tensors, the Schmidt values are not directly accessible. We therefore need to perform SVD in order to extract the Schmidt values, as shown in <a class="reference internal" href="tebd.html#fig-extract-schmidt"><span class="std std-numref">Fig. 6.3</span></a>. If we want to measure the entanglement entropy on the bond between sites <span class="math notranslate nohighlight">\(n\)</span> and <span class="math notranslate nohighlight">\(n+1\)</span>, then we need to first move the centre to site <span class="math notranslate nohighlight">\(n\)</span> and then perform the SVD.</p>
+<p>The MPS form a quantum state naturally gives us access to the Schmidt values. In particular, the Schmidt decomposition of a state can be written as the tensor network diagram shown in <a class="reference internal" href="#fig-schmidt"><span class="std std-numref">Fig. 5.1</span></a>. However, because we have chosen not to introduce the central tensors, the Schmidt values are not directly accessible. We therefore need to perform SVD in order to extract the Schmidt values, as shown in <a class="reference internal" href="#fig-extract-schmidt"><span class="std std-numref">Fig. 5.2</span></a>. If we want to measure the entanglement entropy on the bond between sites <span class="math notranslate nohighlight">\(n\)</span> and <span class="math notranslate nohighlight">\(n+1\)</span>, then we need to first move the centre to site <span class="math notranslate nohighlight">\(n\)</span> and then perform the SVD.</p>
 <figure class="align-center" id="fig-extract-schmidt">
 <a class="reference internal image-reference" href="../../_images/extract_schmidt.jpeg"><img alt="../../_images/extract_schmidt.jpeg" src="../../_images/extract_schmidt.jpeg" style="width: 80%;" /></a>
 <figcaption>

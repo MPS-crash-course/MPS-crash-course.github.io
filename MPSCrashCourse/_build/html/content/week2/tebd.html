@@ -34,7 +34,7 @@
     <link rel="stylesheet" type="text/css" href="../../_static/styles/sphinx-book-theme.css?v=a3416100" />
     <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css?v=13237357" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css?v=be8a1c11" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css?v=4fa983c6" />
     <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
   
@@ -545,14 +545,14 @@ U(\Delta t) = \prod_{n \; \text{even}} e^{-i h_n \Delta t} \prod_{n \; \text{odd
 </div>
 <div class="admonition-exercise-local-quench admonition">
 <p class="admonition-title">Exercise: Local Quench</p>
-<p>A good exercise for you would be to implement the TEBD algorithm for a local quench. Consider a 1D chain in an initial product state where all spins are up, except for three. I have chosen to place these at L/4, L/2, 3L/4. You can then perform the time evolution using TEBD and measure the magnetization on all sites, allowing you to plot the magnetization profile as a function of time, as shown in <a class="reference internal" href="#fig-tebd-exercise"><span class="std std-numref">Fig. 6.4</span></a>.</p>
+<p>A good exercise for you would be to implement the TEBD algorithm for a local quench. Consider a 1D chain in an initial product state where all spins are up, except for three. I have chosen to place these at L/4, L/2, 3L/4. You can then perform the time evolution using TEBD and measure the magnetization on all sites, allowing you to plot the magnetization profile as a function of time, as shown in <a class="reference internal" href="#fig-tebd-exercise"><span class="std std-numref">Fig. 6.4</span></a>. You can add this code to a file called <code class="docutils literal notranslate"><span class="pre">tebd_exercise.py</span></code> in the <code class="docutils literal notranslate"><span class="pre">exercises</span></code> folder.</p>
 <figure class="align-center" id="fig-tebd-exercise">
 <a class="reference internal image-reference" href="../../_images/tebd_exercise.png"><img alt="../../_images/tebd_exercise.png" src="../../_images/tebd_exercise.png" style="width: 60%;" /></a>
 <figcaption>
 <p><span class="caption-number">Fig. 6.4 </span><span class="caption-text">Magnetization for a local quench of the Heisenberg model. The initial state is a product state with all spins up, except for three spins at L/4, L/2, 3L/4.</span><a class="headerlink" href="#fig-tebd-exercise" title="Link to this image">#</a></p>
 </figcaption>
 </figure>
-<p>To produce this figure I set <span class="math notranslate nohighlight">\(L=51, dt=0.1, t_\text{max}=25\)</span>. The accuracy tolerance was set to <code class="docutils literal notranslate"><span class="pre">None</span></code> and the MPS code was run for <span class="math notranslate nohighlight">\(\chi_\text{max} = 8\)</span> (which gives exact results in this case). This showcases the ability for MPS methods to simulate time evolution for large systems sizes, without the need to store the full state vector. You could easily set <span class="math notranslate nohighlight">\(L=100\)</span> or <span class="math notranslate nohighlight">\(L=200\)</span> and still run this on your laptop in a reasonable amount of time.</p>
+<p>To produce this figure I set <span class="math notranslate nohighlight">\(L=51, dt=0.1, t_\text{max}=25\)</span>. The accuracy tolerance was set to <code class="docutils literal notranslate"><span class="pre">None</span></code> and the MPS code was run for <span class="math notranslate nohighlight">\(\chi_\text{max} = 8\)</span> (which gives exact results in this case). This showcases the ability for MPS methods to simulate time evolution for large systems sizes, without the need to store the full state vector. You could easily set <span class="math notranslate nohighlight">\(L=100\)</span> or <span class="math notranslate nohighlight">\(L=200\)</span> and still run this on your laptop in a reasonable amount of time. This example is particularly easy since the entanglement entropy growth is limited. This was not the case for the global quench, where the entanglement entropy grows rapidly.</p>
 </div>
 </section>
 </section>
