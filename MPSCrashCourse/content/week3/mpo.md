@@ -30,7 +30,7 @@ Unlike MPS, we don't have a canonical form for MPOs.
 ```
 
 
-````{admonition} Code: TEBD Step
+````{admonition} Code: MPO Class
 
 Let us start writing the MPO class. It will consist of a set of tensors, and the number of sites. For now let us simply writing the initialization.
 
@@ -70,23 +70,64 @@ All local Hamiltonians can be written *exactly* as an MPO with a finite bond dim
 
 $$
 W^{[n]} = \left(\begin{matrix}
-1 & X & Y & Z & 0 \\
-0 & 0 & 0 & 0 & X \\
-0 & 0 & 0 & 0 & Y \\
-0 & 0 & 0 & 0 & Z \\
+1 & S^x & S^y & S^z & 0 \\
+0 & 0 & 0 & 0 & S^x \\
+0 & 0 & 0 & 0 & S^y \\
+0 & 0 & 0 & 0 & S^z \\
 0 & 0 & 0 & 0 & 1
 \end{matrix}\right)
 $$ (eq:mpo_heisenberg)
 
-where $X$, $Y$, and $Z$ are the Pauli matrices. Here we have written the MPO tensor as a matrix of matrices. The outer matrix correspond to the virtual indices, and the inner matrices correspond to the physical indices. More explicitly, we have, e.g., $W^{[n]}_{0,i,j,0} = 1_{i,j}$ and $W^{[n]}_{0,i,j,1} = X_{i,j}$.
+where $S^\alpha = \frac{1}{2}\sigma^\alpha$ are the spin operators. Here we have written the MPO tensor as a matrix of matrices. The outer matrix correspond to the virtual indices, and the inner matrices correspond to the physical indices. More explicitly, we have, e.g., $W^{[n]}_{0,i,j,0} = 1_{i,j}$ and $W^{[n]}_{0,i,j,1} = X_{i,j}$.
 
 
+````{admonition} Code: Create Hamiltonian MPO
+
+We can now add the class method to create the MPO for the Heisenberg model.
+
+```python
+## file: src/mpo.py
+
+class MPO:
+    
+    ## PREVIOUS CODE OMITTED ##
+
+    @classmethod
+    def Hamiltonian(cls, L):
+        """
+        Construct the MPO for the 1D Heisenberg Hamiltonian of length L.
+        """
+        # Define the spin matrices
+        identity = np.eye(2)
+        Sx = 1/2*np.array([[0, 1], [1, 0]])
+        Sy = 1/2*np.array([[0, -1j], [1j, 0]])
+        Sz = 1/2*np.array([[1, 0], [0, -1]])
+
+        W = np.zeros((5,2,2,5), dtype=complex)
+        W[0, :, :, 0] = identity
+        W[0, :, :, 1] = Sx
+        W[0, :, :, 2] = Sy
+        W[0, :, :, 3] = Sz
+        W[1, :, :, 4] = Sx
+        W[2, :, :, 4] = Sy
+        W[3, :, :, 4] = Sz
+        W[4, :, :, 4] = identity
+
+        # Construct the Heisenberg Hamiltonian
+        tensors = [W.copy() for _ in range(L)]
+
+        tensors[0] = tensors[0][0, :, :, :].reshape(1, 2, 2, 5)
+        tensors[-1] = tensors[-1][:, :, :, 4].reshape(5, 2, 2, 1)
+
+        return cls(L, tensors)
 
 
+```
+
+````
 
 
 ## Expectation values
-
 
 ```{figure} images/mpo_expectation.jpeg
 ---
@@ -97,6 +138,61 @@ align: center
 
 Computation of the expectation value of the Hamiltonian using the MPS and MPO representations. To contract the diagram we first contract the slices and convert them to matrices. The full contraction is then the matrix product of all the slices.
 ```
+
+We will also want to compute the expectation value of the Hamiltonian in MPO form. This is done by contracting the MPO with the MPS and its complex conjugate, as shown in {numref}`fig:mpo_expectation`. In this diagram, we can choose to perform the contraction in many different orders. We will perform the contraction by first contracting the "slices" of the MPO and MPS (i.e. the transfer matrix). When reshaped as matrices, the full contraction is then the matrix product of all the slices. We will also need to compute these slices for the DMRG algorithm. For these reasons, we will add a method to our class to construct the slice at a given site. We can then use that to compute the expectation value of the Hamiltonian.
+
+````{admonition} Code: MPO Expectation Value
+
+Let us add two new methods to the MPO class. The first computed the slice (transfer matrix) at site $i$ and the second computes the expectation value of the Hamiltonian.
+
+```python
+## file: src/mpo.py
+
+class MPO:
+    
+    ## PREVIOUS CODE OMITTED ##
+
+    def get_slice(self, psi, i):
+        ## YOUR CODE HERE ##
+
+        # return the slice as a rank-6 tensor
+        return M
+
+
+    def expectation(self, psi):
+        """
+        Compute the (real) expectation value of the (Hermitian) MPS with respect to a state.
+        """
+        assert psi.L == self.L, "State size does not match MPS size."
+
+        ## YOUR CODE HERE ##
+
+        return np.real(overlap[0, 0])   
+
+```
+````
+
+
+
+````{admonition} Tests: MPO
+
+Let us add a simple test for the MPO class. We will compute the expectation value of the Hamiltonian for a random state and compare it to the exact value computed using our ED code. Your test can use the following steps:
+
+1) Create a random normalized state vector.
+
+2) Convert the state vector to an MPS.
+
+3) Construct the exact Hamiltonian matrix using the ED code. Use this matrix to compute the expectation value with respect to the state vector from step 1.
+
+4) Use the MPO class method to construct the Hamiltonian MPO. Use the method on this instance to compute the expectation value with respect MPS from step 2.
+
+5) Compare the two expectation values.
+
+I would recommend adding a file `mpo.py` to your `test` directory and adding this test. Using $L<10$ should make this quick on most laptops. Make sure to add the line `from fix_pathing import root_dir`. 
+
+````
+
+
 
 
 

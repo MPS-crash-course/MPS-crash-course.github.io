@@ -30,7 +30,7 @@ Unlike MPS, we don't have a canonical form for MPOs.
 ```
 
 
-````{admonition} Code: TEBD Step
+````{admonition} Code: MPO Class
 
 Let us start writing the MPO class. It will consist of a set of tensors, and the number of sites. For now let us simply writing the initialization.
 
@@ -81,7 +81,50 @@ $$ (eq:mpo_heisenberg)
 where $X$, $Y$, and $Z$ are the Pauli matrices. Here we have written the MPO tensor as a matrix of matrices. The outer matrix correspond to the virtual indices, and the inner matrices correspond to the physical indices. More explicitly, we have, e.g., $W^{[n]}_{0,i,j,0} = 1_{i,j}$ and $W^{[n]}_{0,i,j,1} = X_{i,j}$.
 
 
+````{admonition} Code: Create Hamiltonian MPO
 
+We can now add the class method to create the MPO for the Heisenberg model.
+
+```python
+## file: src/mpo.py
+
+class MPO:
+    
+    ## PREVIOUS CODE OMITTED ##
+
+    @classmethod
+    def Hamiltonian(cls, L):
+        """
+        Construct the MPO for the 1D Heisenberg Hamiltonian of length L.
+        """
+        # Define the Pauli matrices
+        identity = np.eye(2)
+        X = np.array([[0, 1], [1, 0]])
+        Y = np.array([[0, -1j], [1j, 0]])
+        Z = np.array([[1, 0], [0, -1]])
+
+        W = np.zeros((5,2,2,5), dtype=complex)
+        W[0, :, :, 0] = identity
+        W[0, :, :, 1] = X
+        W[0, :, :, 2] = Y
+        W[0, :, :, 3] = Z
+        W[1, :, :, 4] = X
+        W[2, :, :, 4] = Y
+        W[3, :, :, 4] = Z
+        W[4, :, :, 4] = identity
+
+        # Construct the Heisenberg Hamiltonian
+        tensors = [W.copy() for _ in range(L)]
+
+        tensors[0] = tensors[0][0, :, :, :].reshape(1, 2, 2, 5)
+        tensors[-1] = tensors[-1][:, :, :, 4].reshape(5, 2, 2, 1)
+
+        return cls(L, tensors)
+
+
+```
+
+````
 
 
 
