@@ -442,14 +442,14 @@
 <div class="math notranslate nohighlight" id="equation-eq-mpo-heisenberg">
 <span class="eqno">(7.1)<a class="headerlink" href="#equation-eq-mpo-heisenberg" title="Link to this equation">#</a></span>\[\begin{split}
 W^{[n]} = \left(\begin{matrix}
-1 &amp; X &amp; Y &amp; Z &amp; 0 \\
-0 &amp; 0 &amp; 0 &amp; 0 &amp; X \\
-0 &amp; 0 &amp; 0 &amp; 0 &amp; Y \\
-0 &amp; 0 &amp; 0 &amp; 0 &amp; Z \\
+1 &amp; S^x &amp; S^y &amp; S^z &amp; 0 \\
+0 &amp; 0 &amp; 0 &amp; 0 &amp; S^x \\
+0 &amp; 0 &amp; 0 &amp; 0 &amp; S^y \\
+0 &amp; 0 &amp; 0 &amp; 0 &amp; S^z \\
 0 &amp; 0 &amp; 0 &amp; 0 &amp; 1
 \end{matrix}\right)
 \end{split}\]</div>
-<p>where <span class="math notranslate nohighlight">\(X\)</span>, <span class="math notranslate nohighlight">\(Y\)</span>, and <span class="math notranslate nohighlight">\(Z\)</span> are the Pauli matrices. Here we have written the MPO tensor as a matrix of matrices. The outer matrix correspond to the virtual indices, and the inner matrices correspond to the physical indices. More explicitly, we have, e.g., <span class="math notranslate nohighlight">\(W^{[n]}_{0,i,j,0} = 1_{i,j}\)</span> and <span class="math notranslate nohighlight">\(W^{[n]}_{0,i,j,1} = X_{i,j}\)</span>.</p>
+<p>where <span class="math notranslate nohighlight">\(S^\alpha = \frac{1}{2}\sigma^\alpha\)</span> are the spin operators. Here we have written the MPO tensor as a matrix of matrices. The outer matrix correspond to the virtual indices, and the inner matrices correspond to the physical indices. More explicitly, we have, e.g., <span class="math notranslate nohighlight">\(W^{[n]}_{0,i,j,0} = 1_{i,j}\)</span> and <span class="math notranslate nohighlight">\(W^{[n]}_{0,i,j,1} = X_{i,j}\)</span>.</p>
 <div class="admonition-code-create-hamiltonian-mpo admonition">
 <p class="admonition-title">Code: Create Hamiltonian MPO</p>
 <p>We can now add the class method to create the MPO for the Heisenberg model.</p>
@@ -464,20 +464,20 @@ W^{[n]} = \left(\begin{matrix}
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Construct the MPO for the 1D Heisenberg Hamiltonian of length L.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># Define the Pauli matrices</span>
+        <span class="c1"># Define the spin matrices</span>
         <span class="n">identity</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
-        <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]])</span>
-        <span class="n">Y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="n">j</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="n">j</span><span class="p">,</span> <span class="mi">0</span><span class="p">]])</span>
-        <span class="n">Z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]])</span>
+        <span class="n">Sx</span> <span class="o">=</span> <span class="mi">1</span><span class="o">/</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]])</span>
+        <span class="n">Sy</span> <span class="o">=</span> <span class="mi">1</span><span class="o">/</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="n">j</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="n">j</span><span class="p">,</span> <span class="mi">0</span><span class="p">]])</span>
+        <span class="n">Sz</span> <span class="o">=</span> <span class="mi">1</span><span class="o">/</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]])</span>
 
         <span class="n">W</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">5</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">5</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
         <span class="n">W</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">identity</span>
-        <span class="n">W</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">X</span>
-        <span class="n">W</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">Y</span>
-        <span class="n">W</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:,</span> <span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">Z</span>
-        <span class="n">W</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:,</span> <span class="mi">4</span><span class="p">]</span> <span class="o">=</span> <span class="n">X</span>
-        <span class="n">W</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:,</span> <span class="mi">4</span><span class="p">]</span> <span class="o">=</span> <span class="n">Y</span>
-        <span class="n">W</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:,</span> <span class="mi">4</span><span class="p">]</span> <span class="o">=</span> <span class="n">Z</span>
+        <span class="n">W</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">Sx</span>
+        <span class="n">W</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">Sy</span>
+        <span class="n">W</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:,</span> <span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">Sz</span>
+        <span class="n">W</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:,</span> <span class="mi">4</span><span class="p">]</span> <span class="o">=</span> <span class="n">Sx</span>
+        <span class="n">W</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:,</span> <span class="mi">4</span><span class="p">]</span> <span class="o">=</span> <span class="n">Sy</span>
+        <span class="n">W</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:,</span> <span class="mi">4</span><span class="p">]</span> <span class="o">=</span> <span class="n">Sz</span>
         <span class="n">W</span><span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:,</span> <span class="mi">4</span><span class="p">]</span> <span class="o">=</span> <span class="n">identity</span>
 
         <span class="c1"># Construct the Heisenberg Hamiltonian</span>
@@ -501,6 +501,54 @@ W^{[n]} = \left(\begin{matrix}
 <p><span class="caption-number">Fig. 7.4 </span><span class="caption-text">Computation of the expectation value of the Hamiltonian using the MPS and MPO representations. To contract the diagram we first contract the slices and convert them to matrices. The full contraction is then the matrix product of all the slices.</span><a class="headerlink" href="#fig-mpo-expectation" title="Link to this image">#</a></p>
 </figcaption>
 </figure>
+<p>We will also want to compute the expectation value of the Hamiltonian in MPO form. This is done by contracting the MPO with the MPS and its complex conjugate, as shown in <a class="reference internal" href="#fig-mpo-expectation"><span class="std std-numref">Fig. 7.4</span></a>. In this diagram, we can choose to perform the contraction in many different orders. We will perform the contraction by first contracting the “slices” of the MPO and MPS (i.e. the transfer matrix). When reshaped as matrices, the full contraction is then the matrix product of all the slices. We will also need to compute these slices for the DMRG algorithm. For these reasons, we will add a method to our class to construct the slice at a given site. We can then use that to compute the expectation value of the Hamiltonian.</p>
+<div class="admonition-code-mpo-expectation-value admonition">
+<p class="admonition-title">Code: MPO Expectation Value</p>
+<p>Let us add two new methods to the MPO class. The first computed the slice (transfer matrix) at site <span class="math notranslate nohighlight">\(i\)</span> and the second computes the expectation value of the Hamiltonian. The ordering of the indices and contractions that I used are shown in Fig. <a class="reference internal" href="#fig-slice-indexing"><span class="std std-numref">Fig. 7.5</span></a>.</p>
+<figure class="align-center" id="fig-slice-indexing">
+<a class="reference internal image-reference" href="../../_images/slice_indexing.jpeg"><img alt="../../_images/slice_indexing.jpeg" src="../../_images/slice_indexing.jpeg" style="width: 70%;" /></a>
+<figcaption>
+<p><span class="caption-number">Fig. 7.5 </span><span class="caption-text">Contraction of MPS and MPO tensors to construct the slice (transfer matrix) at site <span class="math notranslate nohighlight">\(i\)</span>. The red indices correspond to the first input to <code class="docutils literal notranslate"><span class="pre">tensordot</span></code>, and green are the second. The final step is a transpose of the indices.</span><a class="headerlink" href="#fig-slice-indexing" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1">## file: src/mpo.py</span>
+
+<span class="k">class</span> <span class="nc">MPO</span><span class="p">:</span>
+    
+    <span class="c1">## PREVIOUS CODE OMITTED ##</span>
+
+    <span class="k">def</span> <span class="nf">get_slice</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">psi</span><span class="p">,</span> <span class="n">i</span><span class="p">):</span>
+        <span class="c1">## YOUR CODE HERE ##</span>
+
+        <span class="c1"># return the slice as a rank-6 tensor</span>
+        <span class="k">return</span> <span class="n">M</span>
+
+
+    <span class="k">def</span> <span class="nf">expectation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">psi</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Compute the (real) expectation value of the (Hermitian) MPS with respect to a state.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="n">psi</span><span class="o">.</span><span class="n">L</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">L</span><span class="p">,</span> <span class="s2">&quot;State size does not match MPS size.&quot;</span>
+
+        <span class="c1">## YOUR CODE HERE ##</span>
+
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">overlap</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>   
+
+</pre></div>
+</div>
+</div>
+<div class="admonition-tests-mpo admonition">
+<p class="admonition-title">Tests: MPO</p>
+<p>Let us add a simple test for the MPO class. We will compute the expectation value of the Hamiltonian for a random state and compare it to the exact value computed using our ED code. Your test can use the following steps:</p>
+<ol class="arabic simple">
+<li><p>Create a random normalized state vector.</p></li>
+<li><p>Convert the state vector to an MPS.</p></li>
+<li><p>Construct the exact Hamiltonian matrix using the ED code. Use this matrix to compute the expectation value with respect to the state vector from step 1.</p></li>
+<li><p>Use the MPO class method to construct the Hamiltonian MPO. Use the method on this instance to compute the expectation value with respect MPS from step 2.</p></li>
+<li><p>Compare the two expectation values.</p></li>
+</ol>
+<p>I would recommend adding a file <code class="docutils literal notranslate"><span class="pre">mpo.py</span></code> to your <code class="docutils literal notranslate"><span class="pre">test</span></code> directory and adding this test. Using <span class="math notranslate nohighlight">\(L&lt;10\)</span> should make this quick on most laptops. Make sure to add the line <code class="docutils literal notranslate"><span class="pre">from</span> <span class="pre">fix_pathing</span> <span class="pre">import</span> <span class="pre">root_dir</span></code>.</p>
+</div>
 </section>
 <hr class="docutils" />
 <section id="references">

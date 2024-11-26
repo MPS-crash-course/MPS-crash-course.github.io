@@ -143,7 +143,18 @@ We will also want to compute the expectation value of the Hamiltonian in MPO for
 
 ````{admonition} Code: MPO Expectation Value
 
-Let us add two new methods to the MPO class. The first computed the slice (transfer matrix) at site $i$ and the second computes the expectation value of the Hamiltonian.
+Let us add two new methods to the MPO class. The first computed the slice (transfer matrix) at site $i$ and the second computes the expectation value of the Hamiltonian. The ordering of the indices and contractions that I used are shown in Fig. {numref}`fig:slice_indexing`.
+
+```{figure} images/slice_indexing.jpeg
+---
+name: fig:slice_indexing
+width: 70%
+align: center
+---
+
+Contraction of MPS and MPO tensors to construct the slice (transfer matrix) at site $i$. The red indices correspond to the first input to `tensordot`, and green are the second. The final step is a transpose of the indices.
+```
+
 
 ```python
 ## file: src/mpo.py
