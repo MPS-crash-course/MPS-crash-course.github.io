@@ -34,7 +34,7 @@
     <link rel="stylesheet" type="text/css" href="../../_static/styles/sphinx-book-theme.css?v=a3416100" />
     <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css?v=13237357" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css?v=be8a1c11" />
     <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css?v=4fa983c6" />
     <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
   
@@ -60,6 +60,8 @@
     <script async="async" src="../../_static/sphinx-thebe.js?v=c100c467"></script>
     <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
     <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'content/week3/mpo';</script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
@@ -352,7 +354,9 @@
 <button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
     <i class="fa-solid fa-magnifying-glass fa-lg"></i>
 </button>
-
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
 </div></div>
       
     </div>
@@ -368,6 +372,16 @@
     <div id="print-main-content">
         <div id="jb-print-toc">
             
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mpo-representation-of-the-hamiltonian">7.1. MPO representation of the Hamiltonian</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#expectation-values">7.2. Expectation values</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#references">7.3. References</a></li>
+</ul>
+            </nav>
         </div>
     </div>
 </div>
@@ -379,7 +393,85 @@
                   
   <section class="tex2jax_ignore mathjax_ignore" id="matrix-product-operators">
 <h1><span class="section-number">7. </span>Matrix Product Operators<a class="headerlink" href="#matrix-product-operators" title="Link to this heading">#</a></h1>
-<p>Watch this space!</p>
+<p>This week we will introduce the Density Matrix Renormalization Group (DMRG) algorithm to find the ground state of a 1D quantum many-body system. It may seem that finding ground states would be the first task to tackle before time evolution, especially for the problem we set out. However, the DMRG algorithm is conceptually more complex than TEBD. The main reason for this is that the modern formulation of DMRG is based on the Matrix Product Operator (MPO) representation of the Hamiltonian, and so in this section we will introduce MPOs.</p>
+<figure class="align-center" id="fig-mpo">
+<a class="reference internal image-reference" href="../../_images/mpo.jpeg"><img alt="../../_images/mpo.jpeg" src="../../_images/mpo.jpeg" style="width: 65%;" /></a>
+<figcaption>
+<p><span class="caption-number">Fig. 7.1 </span><span class="caption-text">The MPO representation of an operator, such as the Hamiltonian. The operator is represented as a product of rank-4 tensors.</span><a class="headerlink" href="#fig-mpo" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+<p>Similar to MPS, MPOs are a way to represent the elements of an operator as a product of matrices. It will again be more useful to consider the full operator at the product of rank-4 tensors. The MPO representation of an operator is shown in <a class="reference internal" href="#fig-mpo"><span class="std std-numref">Fig. 7.1</span></a>. As with MPS, we also include a dimension 1 index on the first and last tensors so that all tensors have the same rank. In our code, we will choose the labelling of the legs as shown in <a class="reference internal" href="#fig-mpo-tensor"><span class="std std-numref">Fig. 7.2</span></a>.</p>
+<figure class="align-center" id="fig-mpo-tensor">
+<a class="reference internal image-reference" href="../../_images/mpo_tensor.jpeg"><img alt="../../_images/mpo_tensor.jpeg" src="../../_images/mpo_tensor.jpeg" style="width: 33%;" /></a>
+<figcaption>
+<p><span class="caption-number">Fig. 7.2 </span><span class="caption-text">Labeling the indices of the rank-4 tensors in the MPO representation.</span><a class="headerlink" href="#fig-mpo-tensor" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Unlike MPS, we don’t have a canonical form for MPOs.</p>
+</div>
+<div class="admonition-code-tebd-step admonition">
+<p class="admonition-title">Code: TEBD Step</p>
+<p>Let us start writing the MPO class. It will consist of a set of tensors, and the number of sites. For now let us simply writing the initialization.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1">## file: src/mpo.py</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="k">class</span> <span class="nc">MPO</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Matrix Product State class for 1D quantum systems of spin-1/2 particles.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">tensors</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">L</span> <span class="o">=</span> <span class="n">L</span>  <span class="c1"># number of sites</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tensors</span> <span class="o">=</span> <span class="n">tensors</span>  <span class="c1"># list of tensors. Indices are (left, p_out, p_in, right)</span>
+
+</pre></div>
+</div>
+</div>
+<section id="mpo-representation-of-the-hamiltonian">
+<h2><span class="section-number">7.1. </span>MPO representation of the Hamiltonian<a class="headerlink" href="#mpo-representation-of-the-hamiltonian" title="Link to this heading">#</a></h2>
+<figure class="align-center" id="fig-fsm">
+<a class="reference internal image-reference" href="../../_images/FSM.jpeg"><img alt="../../_images/FSM.jpeg" src="../../_images/FSM.jpeg" style="width: 60%;" /></a>
+<figcaption>
+<p><span class="caption-number">Fig. 7.3 </span><span class="caption-text">Finite State Machine representation of the Heisenberg Hamiltonian. The MPO tensors can be easily extracted from this diagram.</span><a class="headerlink" href="#fig-fsm" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+<p>All local Hamiltonians can be written <em>exactly</em> as an MPO with a finite bond dimension. In the case of the Heisenberg model, we can write it as an MPO with bond dimension 5. To construct the MPO representation of the Hamiltonian, we use a Finite State Machine (FSM) representation of the Hamiltonian, as shown in <a class="reference internal" href="#fig-fsm"><span class="std std-numref">Fig. 7.3</span></a>. See Ref. <span id="id1">[<a class="reference internal" href="#id3" title="Gregory M. Crosswhite and Dave Bacon. Finite automata for caching in matrix product algorithms. Phys. Rev. A, 78:012356, Jul 2008. URL: https://link.aps.org/doi/10.1103/PhysRevA.78.012356, doi:10.1103/PhysRevA.78.012356.">CB08</a>]</span> for more details of this construction. Ultimately, we end up with the following MPO tensors for the Heisenberg model:</p>
+<div class="math notranslate nohighlight" id="equation-eq-mpo-heisenberg">
+<span class="eqno">(7.1)<a class="headerlink" href="#equation-eq-mpo-heisenberg" title="Link to this equation">#</a></span>\[\begin{split}
+W^{[n]} = \left(\begin{matrix}
+1 &amp; X &amp; Y &amp; Z &amp; 0 \\
+0 &amp; 0 &amp; 0 &amp; 0 &amp; X \\
+0 &amp; 0 &amp; 0 &amp; 0 &amp; Y \\
+0 &amp; 0 &amp; 0 &amp; 0 &amp; Z \\
+0 &amp; 0 &amp; 0 &amp; 0 &amp; 1
+\end{matrix}\right)
+\end{split}\]</div>
+<p>where <span class="math notranslate nohighlight">\(X\)</span>, <span class="math notranslate nohighlight">\(Y\)</span>, and <span class="math notranslate nohighlight">\(Z\)</span> are the Pauli matrices. Here we have written the MPO tensor as a matrix of matrices. The outer matrix correspond to the virtual indices, and the inner matrices correspond to the physical indices. More explicitly, we have, e.g., <span class="math notranslate nohighlight">\(W^{[n]}_{0,i,j,0} = 1_{i,j}\)</span> and <span class="math notranslate nohighlight">\(W^{[n]}_{0,i,j,1} = X_{i,j}\)</span>.</p>
+</section>
+<section id="expectation-values">
+<h2><span class="section-number">7.2. </span>Expectation values<a class="headerlink" href="#expectation-values" title="Link to this heading">#</a></h2>
+<figure class="align-center" id="fig-mpo-expectation">
+<a class="reference internal image-reference" href="../../_images/mpo_expectation.jpeg"><img alt="../../_images/mpo_expectation.jpeg" src="../../_images/mpo_expectation.jpeg" style="width: 80%;" /></a>
+<figcaption>
+<p><span class="caption-number">Fig. 7.4 </span><span class="caption-text">Computation of the expectation value of the Hamiltonian using the MPS and MPO representations. To contract the diagram we first contract the slices and convert them to matrices. The full contraction is then the matrix product of all the slices.</span><a class="headerlink" href="#fig-mpo-expectation" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</section>
+<hr class="docutils" />
+<section id="references">
+<h2><span class="section-number">7.3. </span>References<a class="headerlink" href="#references" title="Link to this heading">#</a></h2>
+<div class="docutils container" id="id2">
+<div role="list" class="citation-list">
+<div class="citation" id="id3" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">CB08</a><span class="fn-bracket">]</span></span>
+<p>Gregory M. Crosswhite and Dave Bacon. Finite automata for caching in matrix product algorithms. <em>Phys. Rev. A</em>, 78:012356, Jul 2008. URL: <a class="reference external" href="https://link.aps.org/doi/10.1103/PhysRevA.78.012356">https://link.aps.org/doi/10.1103/PhysRevA.78.012356</a>, <a class="reference external" href="https://doi.org/10.1103/PhysRevA.78.012356">doi:10.1103/PhysRevA.78.012356</a>.</p>
+</div>
+</div>
+</div>
+</section>
 </section>
 
     <script type="text/x-thebe-config">
@@ -436,6 +528,24 @@
             </div>
             
             
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mpo-representation-of-the-hamiltonian">7.1. MPO representation of the Hamiltonian</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#expectation-values">7.2. Expectation values</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#references">7.3. References</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
               
             
           </div>
