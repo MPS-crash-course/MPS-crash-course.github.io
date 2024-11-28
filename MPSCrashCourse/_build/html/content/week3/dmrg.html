@@ -60,6 +60,8 @@
     <script async="async" src="../../_static/sphinx-thebe.js?v=c100c467"></script>
     <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
     <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'content/week3/dmrg';</script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
@@ -379,7 +381,46 @@
                   
   <section class="tex2jax_ignore mathjax_ignore" id="density-matrix-renormalization-group-dmrg">
 <h1><span class="section-number">8. </span>Density Matrix Renormalization Group (DMRG)<a class="headerlink" href="#density-matrix-renormalization-group-dmrg" title="Link to this heading">#</a></h1>
-<p>Watch this space!</p>
+<p>Now that we have introduced MPOs, we are in a position to discuss the Density Matrix Renormalization Group (DMRG) algorithm. DMRG is a numerical method for finding the ground state of a 1D quantum system. It was first introduced by Steven White in 1992 <span id="id1">[<a class="reference internal" href="../week1/intro.html#id14" title="Steven R. White. Density matrix formulation for quantum renormalization groups. Phys. Rev. Lett., 69:2863–2866, Nov 1992. URL: https://link.aps.org/doi/10.1103/PhysRevLett.69.2863, doi:10.1103/PhysRevLett.69.2863.">Whi92</a>]</span> and has since become one of the most powerful methods for studying 1D quantum systems. The algorithm is iterative and involves sweeping through the system, updating the tensors in the MPS representation. We will explain a variant of the DMRG algorithm that uses a two-site update. This is the simplest variant of DMRG since it naturally allows the bond dimension to grow as we sweep through the system. There is also a one-site update variant, which we will not discuss in this course.</p>
+<p>The basis of the DMRG algorithm is to locally update the tensors in the MPS representation in order to minimise <span class="math notranslate nohighlight">\(\langle \psi | H |\psi\rangle\)</span>. This is done by considering two sites at a time and finding the ground state for an effective Hamiltonian on these two sites. The process is summarised in <code class="xref std std-numref docutils literal notranslate"><span class="pre">dmrg_blocks</span></code>. Let us consider updating the tensors on site <span class="math notranslate nohighlight">\(n\)</span> and <span class="math notranslate nohighlight">\(n+1\)</span>. We can split the computation of the energy in to several parts. First, after moving the centre to site <span class="math notranslate nohighlight">\(n\)</span>, we can contract all the tensors to the left of site <span class="math notranslate nohighlight">\(n\)</span>, to construct a rank-3 tensor <span class="math notranslate nohighlight">\(L^{[n-1]}\)</span>, which we refer to as the left environment. Similarly, we can construct the right environment <span class="math notranslate nohighlight">\(R^{[n+2]}\)</span> by contracting all tensors to the right of site <span class="math notranslate nohighlight">\(n+1\)</span>. In between the left and right environments, we have the tensors from the MPO, the MPS and its conjugate on site <span class="math notranslate nohighlight">\(n\)</span> and <span class="math notranslate nohighlight">\(n+1\)</span>. We can further combine the tensors from the MPS into <span class="math notranslate nohighlight">\(\Theta\)</span>, as shown in <code class="xref std std-numref docutils literal notranslate"><span class="pre">dmrg_blocks</span></code>. The goal is then to update the tensor <span class="math notranslate nohighlight">\(\Theta\)</span> in order to minimise the value from contracting the entire diagram.</p>
+<figure class="align-center" id="fig-dmrg-blocks">
+<a class="reference internal image-reference" href="../../_images/dmrg_blocks.jpeg"><img alt="../../_images/dmrg_blocks.jpeg" src="../../_images/dmrg_blocks.jpeg" style="width: 100%;" /></a>
+<figcaption>
+<p><span class="caption-number">Fig. 8.1 </span><span class="caption-text">Blocks of tensor contractions to set up the DMRG algorithm with a two-site update. The diagram computes the energy of the MPS <span class="math notranslate nohighlight">\(\langle \psi | H | \psi \rangle\)</span>. When updating sites <span class="math notranslate nohighlight">\(n\)</span> and <span class="math notranslate nohighlight">\(n+1\)</span>, we can contract all the tensors to the left of <span class="math notranslate nohighlight">\(n\)</span> into a left environment, and similarly can construct a right environment from all those right of <span class="math notranslate nohighlight">\(n+1\)</span>. The DMRG algorithm aims to locally change the grouped tensor <span class="math notranslate nohighlight">\(\Theta\)</span> in order to minimise the energy.</span><a class="headerlink" href="#fig-dmrg-blocks" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+<p>In order to update the tensor <span class="math notranslate nohighlight">\(\Theta\)</span>, we construct an effective Hamiltonian for the sites <span class="math notranslate nohighlight">\(n\)</span> and <span class="math notranslate nohighlight">\(n+1\)</span>. This is done by simply removing <span class="math notranslate nohighlight">\(\Theta\)</span> and its conjugate from the diagram in <code class="xref std std-numref docutils literal notranslate"><span class="pre">dmrg_blocks</span></code> to get the rank-8 tensor shown in <code class="xref std std-numref docutils literal notranslate"><span class="pre">h_effective</span></code>. We can then reshape this tensor into a matrix. The problem of minimising the value of the entire tensor network contraction is equivalent to finding a new <span class="math notranslate nohighlight">\(\tilde{\Theta}\)</span>, which is the ground state of <span class="math notranslate nohighlight">\(H_\text{eff}\)</span>.</p>
+<figure class="align-center" id="fig-h-effective">
+<a class="reference internal image-reference" href="../../_images/h_effective.jpeg"><img alt="../../_images/h_effective.jpeg" src="../../_images/h_effective.jpeg" style="width: 70%;" /></a>
+<figcaption>
+<p><span class="caption-number">Fig. 8.2 </span><span class="caption-text">The energy minimisation problem when using a two-site update is equivalent to finding the ground state of the effective Hamiltonian shown in this diagram. The resulting rank-8 tensor can be reshaped into a matrix to use standard eigensolvers.</span><a class="headerlink" href="#fig-h-effective" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Solving the local eigenproblem is the most costly part of the DMRG algorithm. In this course we will solve it using a sparse iterative solver <code class="docutils literal notranslate"><span class="pre">scipy.sparse.linalg.eigsh</span></code>. This allows us to find only the lowest eigenvalue and eigenstate without solving the full eigenproblem.</p>
+<p>I practice, for performance, the eigensolver should be replaced by a custom iterative solver. You can then approximately solve this eigenproblem with just a few iterations, using the previous solution as a starting point. As few as 2 iterations can be sufficient for the DMRG algorithm to converge since you are sweeping through the system and each tensor will be updated multiple times. Reducing the time spent on each eigenproblem dramatically increases the performance. We won’t do this in this course.</p>
+</div>
+<p>After finding the ground state of the effective Hamiltonian, we want to split the new <span class="math notranslate nohighlight">\(\tilde{\Theta}\)</span> tensor into the tensors of our MPS. As always, we do this by performing a truncated SVD, as shown in <a class="reference internal" href="#fig-svd"><span class="std std-numref">Fig. 8.3</span></a>. First we reshape the vector into a matrix, with the left virtual and physical legs grouped, and similarly for the right. We can then perform the truncated SVD and combine the Schmidt values into the right tensor. For a left to right sweep, we will start with the centre on site <span class="math notranslate nohighlight">\(n\)</span> and move it to <span class="math notranslate nohighlight">\(n+1\)</span> after the SVD. For the right to left sweep we will do the opposite and start with the centre on site <span class="math notranslate nohighlight">\(n+1\)</span> and move it to <span class="math notranslate nohighlight">\(n\)</span>. By doing this we never have to explicitly move the centre, we make the move as a biproduct of having the do SVD. All we will have to do is move the centre at the very start of the DRMG algorithm.</p>
+<figure class="align-center" id="fig-svd">
+<a class="reference internal image-reference" href="../../_images/svd.jpeg"><img alt="../../_images/svd.jpeg" src="../../_images/svd.jpeg" style="width: 80%;" /></a>
+<figcaption>
+<p><span class="caption-number">Fig. 8.3 </span><span class="caption-text">We can extract the MPS tensors from the new <span class="math notranslate nohighlight">\(\tilde{\Theta}\)</span> tensor by performing truncated SVD.</span><a class="headerlink" href="#fig-svd" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+<p>The DMRG algorithm then proceeds by sweeping through the system from left to right and back again, updating two sites at a time until it converges.</p>
+<figure class="align-center" id="fig-update-l">
+<a class="reference internal image-reference" href="../../_images/update_L.jpeg"><img alt="../../_images/update_L.jpeg" src="../../_images/update_L.jpeg" style="width: 45%;" /></a>
+<figcaption>
+<p><span class="caption-number">Fig. 8.4 </span><span class="caption-text">???</span><a class="headerlink" href="#fig-update-l" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+<figure class="align-center" id="fig-h-contraction">
+<a class="reference internal image-reference" href="../../_images/h_contraction.jpeg"><img alt="../../_images/h_contraction.jpeg" src="../../_images/h_contraction.jpeg" style="width: 75%;" /></a>
+<figcaption>
+<p><span class="caption-number">Fig. 8.5 </span><span class="caption-text">???</span><a class="headerlink" href="#fig-h-contraction" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
 </section>
 
     <script type="text/x-thebe-config">

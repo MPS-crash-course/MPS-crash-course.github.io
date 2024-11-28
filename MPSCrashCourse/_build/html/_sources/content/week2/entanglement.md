@@ -112,7 +112,7 @@ def svd_truncated(M, chiMax, threshold):
 
     U, S, Vdg = la.svd(M, full_matrices=False)
     
-    if (chiMax is not None) and (threshold is not None):
+    if (chiMax is not None) or (threshold is not None):
         # truncate the singular values
         chi = len(S)
         if chiMax is not None:
