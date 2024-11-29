@@ -354,7 +354,9 @@
 <button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
     <i class="fa-solid fa-magnifying-glass fa-lg"></i>
 </button>
-
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
 </div></div>
       
     </div>
@@ -370,6 +372,14 @@
     <div id="print-main-content">
         <div id="jb-print-toc">
             
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#testing-the-dmrg-algorithm">8.1. Testing the DMRG algorithm</a></li>
+</ul>
+            </nav>
         </div>
     </div>
 </div>
@@ -408,19 +418,161 @@
 <p><span class="caption-number">Fig. 8.3 </span><span class="caption-text">We can extract the MPS tensors from the new <span class="math notranslate nohighlight">\(\tilde{\Theta}\)</span> tensor by performing truncated SVD.</span><a class="headerlink" href="#fig-svd" title="Link to this image">#</a></p>
 </figcaption>
 </figure>
-<p>The DMRG algorithm then proceeds by sweeping through the system from left to right and back again, updating two sites at a time until it converges.</p>
+<p>The DMRG algorithm then proceeds by sweeping through the system from left to right and back again, updating two sites at a time until it converges. In the process we will have to compute new left and right environments. Instead of computing the contract of the entire left/right environment every time, the environment can be updated iteratively, as shown in <a class="reference internal" href="#fig-update-l"><span class="std std-numref">Fig. 8.4</span></a>. We can use the <code class="docutils literal notranslate"><span class="pre">get_slice</span></code> method of the MPO that we defined last time to compute the slice using the updated MPS. When sweeping from left to right, we can contract this slice with <span class="math notranslate nohighlight">\(L^{[n-1]}\)</span> we get <span class="math notranslate nohighlight">\(L^{[n]}\)</span>. This is because none of the tensors in the MPS to the left of site <span class="math notranslate nohighlight">\(n\)</span> have changed. We can update the right environment similarly when sweeping from right to left. Finally, we can store a list of all the environments to the left and right of the current site, so that we can reuse them when we sweep back. More explicitly, as we sweep left to right, we add the new <span class="math notranslate nohighlight">\(L^{[n]}\)</span> to the list of left environments, and then we remove <span class="math notranslate nohighlight">\(R^{[n+2]}\)</span> from the list of right environments since it involves tensors that will be updated in the next step.</p>
 <figure class="align-center" id="fig-update-l">
 <a class="reference internal image-reference" href="../../_images/update_L.jpeg"><img alt="../../_images/update_L.jpeg" src="../../_images/update_L.jpeg" style="width: 45%;" /></a>
 <figcaption>
-<p><span class="caption-number">Fig. 8.4 </span><span class="caption-text">???</span><a class="headerlink" href="#fig-update-l" title="Link to this image">#</a></p>
+<p><span class="caption-number">Fig. 8.4 </span><span class="caption-text">Computing the left environement tensor <span class="math notranslate nohighlight">\(L^{[n]}\)</span> from <span class="math notranslate nohighlight">\(L^{[n-1]}\)</span> by contracting with the next slice. This avoids computing the full contraction of the left environment each time.</span><a class="headerlink" href="#fig-update-l" title="Link to this image">#</a></p>
 </figcaption>
 </figure>
+<div class="admonition-algorithm-dmrg admonition">
+<p class="admonition-title">Algorithm: DMRG</p>
+<p>Let us summarise the steps of the DMRG algorithm with a two-site update:</p>
+<ol class="arabic simple">
+<li><p>Start by creating a product state MPS and move the centre to the far right of the MPS.</p></li>
+<li><p>Iterative construct the list of left environments (leaving the last two sites of the chain). Start with <span class="math notranslate nohighlight">\(L^{[0]} = 1\)</span> and then for each site <span class="math notranslate nohighlight">\(n\)</span> contract the slice of the MPO with <span class="math notranslate nohighlight">\(L^{[n-1]}\)</span> to get <span class="math notranslate nohighlight">\(L^{[n]}\)</span>.</p></li>
+<li><p>Contruct the list of right environements. This will contain a single element <span class="math notranslate nohighlight">\(R^{[N+1]} = 1\)</span>.</p></li>
+<li><p>Sweep from right to left (repeat until we end at the first two sites):</p>
+<ol class="arabic simple">
+<li><p>Construct effective Hamiltonian for sites <span class="math notranslate nohighlight">\(n\)</span> and <span class="math notranslate nohighlight">\(n+1\)</span>.</p></li>
+<li><p>Find the ground state of the effective Hamiltonian.</p></li>
+<li><p>Perform truncated SVD to update the MPS tensors (moving the centre one step to the left).</p></li>
+<li><p>Update the right environment tensor <span class="math notranslate nohighlight">\(R^{[n+1]}\)</span> by contracting the slice of the MPO with <span class="math notranslate nohighlight">\(R^{[n+2]}\)</span> and add to list of right environments.</p></li>
+<li><p>Remove <span class="math notranslate nohighlight">\(L^{[n-1]}\)</span> from the list of left environments.</p></li>
+</ol>
+</li>
+<li><p>Sweep from left to right (repeat until we end at the last two sites):</p>
+<ol class="arabic simple">
+<li><p>Construct effective Hamiltonian for sites <span class="math notranslate nohighlight">\(n\)</span> and <span class="math notranslate nohighlight">\(n+1\)</span>.</p></li>
+<li><p>Find the ground state of the effective Hamiltonian.</p></li>
+<li><p>Perform truncated SVD to update the MPS tensors (moving the centre one step to the right).</p></li>
+<li><p>Update the left environment tensor <span class="math notranslate nohighlight">\(L^{[n]}\)</span> by contracting the slice of the MPO with <span class="math notranslate nohighlight">\(L^{[n-1]}\)</span> and add to list of left environments.</p></li>
+<li><p>Remove <span class="math notranslate nohighlight">\(R^{[n+2]}\)</span> from the list of right environments.</p></li>
+</ol>
+</li>
+<li><p>Measure and store the energy with respect to the current MPS. Repeat steps 4 and 5 until we hit the maximimum number of sweeps.</p></li>
+</ol>
+<p>It would be best to add a convergence criteria to stop the algorithm earlier if it converges, but we won’t do that in this course.</p>
+</div>
+<div class="admonition-code-dmrg-algorithm admonition">
+<p class="admonition-title">Code: DMRG Algorithm</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1">## file: src/dmrg.y</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">.mpo</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">.mps</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">.svd</span> <span class="kn">import</span> <span class="n">svd_truncated</span>
+
+<span class="kn">import</span> <span class="nn">scipy.sparse</span> <span class="k">as</span> <span class="nn">sp</span>
+
+
+<span class="k">def</span> <span class="nf">dmrg</span><span class="p">(</span><span class="n">psi</span><span class="p">,</span> <span class="n">H_mpo</span><span class="p">,</span> <span class="n">chiMax</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mf">1E-12</span><span class="p">,</span> <span class="n">nSweeps</span><span class="o">=</span><span class="mi">5</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Perform density matrix renormalization group (DMRG) for a matrix product state (MPS).</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    psi : MPS</span>
+<span class="sd">        Initial matrix product state.</span>
+<span class="sd">    H_mpo : MPO</span>
+<span class="sd">        Hamiltonian as a matrix product operator.</span>
+<span class="sd">    chiMax : int</span>
+<span class="sd">        Maximum bond dimension.</span>
+<span class="sd">    tol : float, optional</span>
+<span class="sd">        Convergence tolerance.</span>
+<span class="sd">    nSweeps : int, optional</span>
+<span class="sd">        Number of DMRG sweeps.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    psi : MPS</span>
+<span class="sd">        Ground state matrix product state.</span>
+<span class="sd">    E : float</span>
+<span class="sd">        Ground state energy.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="n">L</span> <span class="o">=</span> <span class="n">psi</span><span class="o">.</span><span class="n">L</span>
+    <span class="k">assert</span> <span class="n">L</span> <span class="o">==</span> <span class="n">H_mpo</span><span class="o">.</span><span class="n">L</span><span class="p">,</span> <span class="s2">&quot;MPS and MPO sizes do not match.&quot;</span>
+    
+    <span class="c1"># move centre to right end (won&#39;t do anything for product state)</span>
+    <span class="n">psi</span><span class="o">.</span><span class="n">move_centre_to</span><span class="p">(</span><span class="n">L</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>  
+
+    <span class="c1"># build left environment list</span>
+    <span class="n">L_envs</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">))]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">L</span><span class="o">-</span><span class="mi">2</span><span class="p">):</span>
+        <span class="c1">## YOUR CODE HERE ##</span>
+
+    <span class="c1"># build right environment</span>
+    <span class="n">R_envs</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">))]</span>
+
+    <span class="n">E_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nSweeps</span><span class="p">):</span>
+
+        <span class="c1"># sweep right to left in dmrg</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">L</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+            <span class="n">psi</span><span class="o">.</span><span class="n">move_centre_to</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># Shouldn&#39;t actually do anything (but just to be safe)</span>
+
+            <span class="n">H_block</span><span class="p">,</span> <span class="n">chi_left</span><span class="p">,</span> <span class="n">chi_right</span> <span class="o">=</span> <span class="n">construct_H_block</span><span class="p">(</span><span class="n">H_mpo</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">L_envs</span><span class="p">,</span> <span class="n">R_envs</span><span class="p">)</span>
+
+            <span class="c1">## YOUR CODE HERE ##</span>
+        
+        <span class="c1"># sweep left to right in dmrg</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">L</span><span class="o">-</span><span class="mi">2</span><span class="p">):</span>
+            <span class="n">psi</span><span class="o">.</span><span class="n">move_centre_to</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+
+            <span class="n">H_block</span><span class="p">,</span> <span class="n">chi_left</span><span class="p">,</span> <span class="n">chi_right</span> <span class="o">=</span> <span class="n">construct_H_block</span><span class="p">(</span><span class="n">H_mpo</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">L_envs</span><span class="p">,</span> <span class="n">R_envs</span><span class="p">)</span>
+
+            <span class="c1">## YOUR CODE HERE ##</span>
+
+        <span class="c1"># compute final energy</span>
+        <span class="n">E_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">H_mpo</span><span class="o">.</span><span class="n">expectation</span><span class="p">(</span><span class="n">psi</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">psi</span><span class="p">,</span> <span class="n">E_list</span>
+
+
+<span class="k">def</span> <span class="nf">construct_H_block</span><span class="p">(</span><span class="n">H_mpo</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">L_envs</span><span class="p">,</span> <span class="n">R_envs</span><span class="p">):</span>
+    <span class="c1">## YOUR CODE HERE ##</span>
+
+    <span class="n">chi_left</span><span class="p">,</span> <span class="n">d2</span><span class="p">,</span> <span class="n">d3</span><span class="p">,</span> <span class="n">chi_right</span><span class="p">,</span> <span class="n">d5</span><span class="p">,</span> <span class="n">d6</span><span class="p">,</span> <span class="n">d7</span><span class="p">,</span> <span class="n">d8</span> <span class="o">=</span> <span class="n">H_block</span><span class="o">.</span><span class="n">shape</span>
+    <span class="n">H_block</span> <span class="o">=</span> <span class="n">H_block</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">chi_left</span><span class="o">*</span><span class="n">d2</span><span class="o">*</span><span class="n">d3</span><span class="o">*</span><span class="n">chi_right</span><span class="p">,</span> <span class="n">d5</span><span class="o">*</span><span class="n">d6</span><span class="o">*</span><span class="n">d7</span><span class="o">*</span><span class="n">d8</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">H_block</span><span class="p">,</span> <span class="n">chi_left</span><span class="p">,</span> <span class="n">chi_right</span>
+</pre></div>
+</div>
+<p>In order to contrust the <span class="math notranslate nohighlight">\(H_\text{eff}\)</span> Hamiltonian we have defined a function called <code class="docutils literal notranslate"><span class="pre">construct_H_block</span></code>. This should perform the contraction shown in <a class="reference internal" href="#fig-h-contraction"><span class="std std-numref">Fig. 8.5</span></a>.</p>
 <figure class="align-center" id="fig-h-contraction">
 <a class="reference internal image-reference" href="../../_images/h_contraction.jpeg"><img alt="../../_images/h_contraction.jpeg" src="../../_images/h_contraction.jpeg" style="width: 75%;" /></a>
 <figcaption>
-<p><span class="caption-number">Fig. 8.5 </span><span class="caption-text">???</span><a class="headerlink" href="#fig-h-contraction" title="Link to this image">#</a></p>
+<p><span class="caption-number">Fig. 8.5 </span><span class="caption-text">Contractions to compute the <span class="math notranslate nohighlight">\(H_\text{eff}\)</span> tensor. The red indices correspond to the first input to <code class="docutils literal notranslate"><span class="pre">tensordot</span></code>, and green are the second. The final step is a transpose of the indices.</span><a class="headerlink" href="#fig-h-contraction" title="Link to this image">#</a></p>
 </figcaption>
 </figure>
+</div>
+<section id="testing-the-dmrg-algorithm">
+<h2><span class="section-number">8.1. </span>Testing the DMRG algorithm<a class="headerlink" href="#testing-the-dmrg-algorithm" title="Link to this heading">#</a></h2>
+<p>The DMRG algorithm is significantly more complicated than the TEBD algorithm, so it is important that we test that it is working as expected. To do this we should compare the energy to results from exact diagonalization for small system sizes. You should write code to plot the absolute error as a function of DMRG sweeps (iterations), for different bond dimensions, to get the results shown in <a class="reference internal" href="#fig-dmrg-test"><span class="std std-numref">Fig. 8.6</span></a>.</p>
+<figure class="align-center" id="fig-dmrg-test">
+<a class="reference internal image-reference" href="../../_images/dmrg_test.png"><img alt="../../_images/dmrg_test.png" src="../../_images/dmrg_test.png" style="width: 60%;" /></a>
+<figcaption>
+<p><span class="caption-number">Fig. 8.6 </span><span class="caption-text">Testing the DMRG algorithm on the Antiferromagnetic Heisenberg model against exact diagonalization for different maximum bond dimensions. The absolute error in the energy is shown. Results are for system size <span class="math notranslate nohighlight">\(L=10\)</span>, tolerance = <span class="math notranslate nohighlight">\(10^{-14}\)</span>.</span><a class="headerlink" href="#fig-dmrg-test" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+<p>We can see that the DMRG algorithm very quickly converges in energy up to a limit in accuracy set by the maximum bond dimension. For this system size (<span class="math notranslate nohighlight">\(L=10\)</span>), the algorithm has converged after only 3 full sweeps. By increasing the bond dimension we increase the accuracy of the final result. By bond dimension 32 (<span class="math notranslate nohighlight">\(=2^5\)</span>), we are able to exactly represent the state for <span class="math notranslate nohighlight">\(L=10\)</span> states, and can get the correct energy up to machine precision.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Now we have set up the DMRG algorithm and tested it, we can find the ground state for larger systems, beyond the reach of exact diagonalization. When doing this, we need to check that the energy is converged in the bond dimension.</p>
+<p>The DMRG algorithm is particularly powerful for finding ground states of <em>gapped</em> one-dimensional systems, since the ground states satisfy an <em>area-law</em>. This means that as we increase the system size, we don’t need to increase the bond dimension. However, the Hamiltonian we have chosen to look at in this course is actually <em>gapless</em>, and so we will need to increase the bond dimension with system size to achieve a comparable accuracy. This makes it one of the harder cases for DMRG. Thankfully, we will be able to access a system size of 100 with only a moderate bond dimension of 16 for our final simulation next week and get sufficiently accurate results.</p>
+</div>
+<div class="admonition-exercise-large-system-entanglement admonition">
+<p class="admonition-title">Exercise: Large system entanglement</p>
+<p>It would be good to get some practice with using the DMRG and to use it on system size beyond ED, so let us write an exercise. I added the file <code class="docutils literal notranslate"><span class="pre">exercises/dmrg_exercise.py</span></code>. In this exercise, find the ground state of the Antiferromagnetic Heisenberg model for system size <span class="math notranslate nohighlight">\(L=100\)</span> and bond dimension <span class="math notranslate nohighlight">\(\chi=16\)</span> and 5 sweeps. From this state, compute the entanglement entropy with respect to every bond in the chain, and plot entropy vs bond. Repeat this with system size <span class="math notranslate nohighlight">\(L=101\)</span>. You should find the results shown in <a class="reference internal" href="#fig-entanglement-profile"><span class="std std-numref">Fig. 8.7</span></a>.</p>
+<figure class="align-center" id="fig-entanglement-profile">
+<a class="reference internal image-reference" href="../../_images/entanglement_profile.png"><img alt="../../_images/entanglement_profile.png" src="../../_images/entanglement_profile.png" style="width: 90%;" /></a>
+<figcaption>
+<p><span class="caption-number">Fig. 8.7 </span><span class="caption-text">The entanglement entropy profile for the ground state of the Antiferromagnetic Heisenberg chain for system size <span class="math notranslate nohighlight">\(L=100\)</span> and <span class="math notranslate nohighlight">\(L=101\)</span>, computed using DMRG.</span><a class="headerlink" href="#fig-entanglement-profile" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+<p>From these results we can see behaviour related to the gaplessness of the model. First of all, there is a characteristic “arch” shape to the entanglement profile. This contrasts area-law, which would give a flat profile, and volume-law, which would give a triangle shaped profile. Instead, the centre of the profile will increase logarithmically with system size. The second feature is the dramatic difference in the profile when changing the system size by just one site. Gapless systems do not have a finite correlation length and instead have polynomially decaying correlations. This is revealed here by a sensitivity to the boundary of the system.</p>
+</div>
+</section>
 </section>
 
     <script type="text/x-thebe-config">
@@ -477,6 +629,22 @@
             </div>
             
             
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#testing-the-dmrg-algorithm">8.1. Testing the DMRG algorithm</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
               
             
           </div>
