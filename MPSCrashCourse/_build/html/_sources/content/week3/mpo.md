@@ -12,7 +12,7 @@ align: center
 The MPO representation of an operator, such as the Hamiltonian. The operator is represented as a product of rank-4 tensors.
 ```
 
-Similar to MPS, MPOs are a way to represent the elements of an operator as a product of matrices. It will again be more useful to consider the full operator at the product of rank-4 tensors. The MPO representation of an operator is shown in {numref}`fig:mpo`. As with MPS, we also include a dimension 1 index on the first and last tensors so that all tensors have the same rank. In our code, we will choose the labelling of the legs as shown in {numref}`fig:mpo_tensor`. 
+Similar to MPS, MPOs are a way to represent the elements of an operator as a product of matrices. It will again be more useful to consider the full operator as the product of rank-4 tensors. The MPO representation of an operator is shown in {numref}`fig:mpo`. As with MPS, we also include a dimension 1 index on the first and last tensors so that all tensors have the same rank. In our code, we will choose the labelling of the legs as shown in {numref}`fig:mpo_tensor`. 
 
 
 ```{figure} images/mpo_tensor.jpeg

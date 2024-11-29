@@ -2,7 +2,7 @@
 
 Now that we have introduced MPOs, we are in a position to discuss the Density Matrix Renormalization Group (DMRG) algorithm. DMRG is a numerical method for finding the ground state of a 1D quantum system. It was first introduced by Steven White in 1992 {cite}`White1992` and has since become one of the most powerful methods for studying 1D quantum systems. The algorithm is iterative and involves sweeping through the system, updating the tensors in the MPS representation. We will explain a variant of the DMRG algorithm that uses a two-site update. This is the simplest variant of DMRG since it naturally allows the bond dimension to grow as we sweep through the system. There is also a one-site update variant, which we will not discuss in this course.
 
-The basis of the DMRG algorithm is to locally update the tensors in the MPS representation in order to minimise $\langle \psi | H |\psi\rangle$. This is done by considering two sites at a time and finding the ground state for an effective Hamiltonian on these two sites. The process is summarised in {numref}`dmrg_blocks`. Let us consider updating the tensors on site $n$ and $n+1$. We can split the computation of the energy in to several parts. First, after moving the centre to site $n$, we can contract all the tensors to the left of site $n$, to construct a rank-3 tensor $L^{[n-1]}$, which we refer to as the left environment. Similarly, we can construct the right environment $R^{[n+2]}$ by contracting all tensors to the right of site $n+1$. In between the left and right environments, we have the tensors from the MPO, the MPS and its conjugate on site $n$ and $n+1$. We can further combine the tensors from the MPS into $\Theta$, as shown in {numref}`dmrg_blocks`. The goal is then to update the tensor $\Theta$ in order to minimise the value from contracting the entire diagram. 
+The basis of the DMRG algorithm is to locally update the tensors in the MPS representation in order to minimise $\langle \psi | H |\psi\rangle$. This is done by considering two sites at a time and finding the ground state for an effective Hamiltonian on these two sites. The process is summarised in {numref}`fig:dmrg_blocks`. Let us consider updating the tensors on site $n$ and $n+1$. We can split the computation of the energy in to several parts. First, after moving the centre to site $n$, we can contract all the tensors to the left of site $n$, to construct a rank-3 tensor $L^{[n-1]}$, which we refer to as the left environment. Similarly, we can construct the right environment $R^{[n+2]}$ by contracting all tensors to the right of site $n+1$. In between the left and right environments, we have the tensors from the MPO, the MPS and its conjugate on site $n$ and $n+1$. We can further combine the tensors from the MPS into $\Theta$, as shown in {numref}`fig:dmrg_blocks`. The goal is then to update the tensor $\Theta$ in order to minimise the value from contracting the entire diagram. 
 
 
 
@@ -16,7 +16,7 @@ align: center
 Blocks of tensor contractions to set up the DMRG algorithm with a two-site update. The diagram computes the energy of the MPS $\langle \psi | H | \psi \rangle$. When updating sites $n$ and $n+1$, we can contract all the tensors to the left of $n$ into a left environment, and similarly can construct a right environment from all those right of $n+1$. The DMRG algorithm aims to locally change the grouped tensor $\Theta$ in order to minimise the energy.
 ```
 
-In order to update the tensor $\Theta$, we construct an effective Hamiltonian for the sites $n$ and $n+1$. This is done by simply removing $\Theta$ and its conjugate from the diagram in {numref}`dmrg_blocks` to get the rank-8 tensor shown in {numref}`h_effective`. We can then reshape this tensor into a matrix. The problem of minimising the value of the entire tensor network contraction is equivalent to finding a new $\tilde{\Theta}$, which is the ground state of $H_\text{eff}$.
+In order to update the tensor $\Theta$, we construct an effective Hamiltonian for the sites $n$ and $n+1$. This is done by simply removing $\Theta$ and its conjugate from the diagram in {numref}`fig:dmrg_blocks` to get the rank-8 tensor shown in {numref}`fig:h_effective`. We can then reshape this tensor into a matrix. The problem of minimising the value of the entire tensor network contraction is equivalent to finding a new $\tilde{\Theta}$, which is the ground state of $H_\text{eff}$.
 
 
 
@@ -70,7 +70,7 @@ Let us summarise the steps of the DMRG algorithm with a two-site update:
 
 1. Start by creating a product state MPS and move the centre to the far right of the MPS.
 
-2. Iterative construct the list of left environments (leaving the last two sites of the chain). Start with $L^{[0]} = 1$ and then for each site $n$ contract the slice of the MPO with $L^{[n-1]}$ to get $L^{[n]}$.
+2. Iteratively construct the list of left environments (leaving the last two sites of the chain). Start with $L^{[0]} = 1$ and then for each site $n$ contract the slice of the MPO with $L^{[n-1]}$ to get $L^{[n]}$.
 
 3. Contruct the list of right environements. This will contain a single element $R^{[N+1]} = 1$.
 
@@ -78,14 +78,14 @@ Let us summarise the steps of the DMRG algorithm with a two-site update:
     1. Construct effective Hamiltonian for sites $n$ and $n+1$.
     2. Find the ground state of the effective Hamiltonian.
     3. Perform truncated SVD to update the MPS tensors (moving the centre one step to the left).
-    4. Update the right environment tensor $R^{[n+1]}$ by contracting the slice of the MPO with $R^{[n+2]}$ and add to list of right environments.
+    4. Create the right environment tensor $R^{[n+1]}$ by contracting the slice of the MPO with $R^{[n+2]}$ and add to list of right environments.
     5. Remove $L^{[n-1]}$ from the list of left environments.
 
 5. Sweep from left to right (repeat until we end at the last two sites):
     1. Construct effective Hamiltonian for sites $n$ and $n+1$.
     2. Find the ground state of the effective Hamiltonian.
     3. Perform truncated SVD to update the MPS tensors (moving the centre one step to the right).
-    4. Update the left environment tensor $L^{[n]}$ by contracting the slice of the MPO with $L^{[n-1]}$ and add to list of left environments.
+    4. Create the left environment tensor $L^{[n]}$ by contracting the slice of the MPO with $L^{[n-1]}$ and add to list of left environments.
     5. Remove $R^{[n+2]}$ from the list of right environments.
 
 6. Measure and store the energy with respect to the current MPS. Repeat steps 4 and 5 until we hit the maximimum number of sweeps.
@@ -243,3 +243,12 @@ The entanglement entropy profile for the ground state of the Antiferromagnetic H
 From these results we can see behaviour related to the gaplessness of the model. First of all, there is a characteristic "arch" shape to the entanglement profile. This contrasts area-law, which would give a flat profile, and volume-law, which would give a triangle shaped profile. Instead, the centre of the profile will increase logarithmically with system size. The second feature is the dramatic difference in the profile when changing the system size by just one site. Gapless systems do not have a finite correlation length and instead have polynomially decaying correlations. This is revealed here by a sensitivity to the boundary of the system. 
 
 ````
+
+
+---
+
+## References
+
+```{bibliography}
+:filter: docname in docnames
+```
