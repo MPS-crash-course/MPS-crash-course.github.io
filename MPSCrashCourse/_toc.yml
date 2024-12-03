@@ -26,3 +26,4 @@ parts:
   numbered: true
   chapters:
   - file: content/week4/dsf
+  - file: content/week4/beyond
