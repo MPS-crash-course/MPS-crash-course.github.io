@@ -383,6 +383,11 @@
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#removing-gibbs-oscillations">9.2.1. Removing Gibbs oscillations</a></li>
 </ul>
 </li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setting-up-the-calculation">9.3. Setting up the calculation</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#applying-an-operator-to-a-state">9.3.1. Applying an operator to a state</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#computing-the-overlap">9.3.2. Computing the overlap</a></li>
+</ul>
+</li>
 </ul>
             </nav>
         </div>
@@ -431,7 +436,7 @@ S^{\alpha\alpha}(q, \omega) &amp;= \frac{1}{2\pi} e^{-iqN/2}\sum_{r} e^{iqr} \in
 <div class="math notranslate nohighlight">
 \[\begin{split}
 \begin{aligned}
-&amp;= \int_{0}^{\infty} e^{i\omega t} \langle \psi_0 | S^\alpha_{r-N/2}(t) S^\alpha_{N/2}(0) | \psi_0 \rangle + \int_{-\infty}^{0} e^{i\omega t}\langle \psi_0 | S^\alpha_{r+N/2}(t) S^\alpha_{N/2}(0) | \psi_0 \rangle \;dt \\
+&amp;\int_{0}^{\infty} e^{i\omega t} \langle \psi_0 | S^\alpha_{r-N/2}(t) S^\alpha_{N/2}(0) | \psi_0 \rangle + \int_{-\infty}^{0} e^{i\omega t}\langle \psi_0 | S^\alpha_{r+N/2}(t) S^\alpha_{N/2}(0) | \psi_0 \rangle \;dt \\
 &amp;= \int_{0}^{\infty} e^{i\omega t} \langle \psi_0 | S^\alpha_{r-N/2}(t) S^\alpha_{N/2}(0) | \psi_0 \rangle + \int_{0}^{\infty} e^{-i\omega t}\langle \psi_0 | S^\alpha_{r+N/2}(-t) S^\alpha_{N/2}(0) | \psi_0 \rangle \;dt \\
 &amp;= \int_{0}^{\infty} e^{i\omega t} \langle \psi_0 | S^\alpha_{r-N/2}(t) S^\alpha_{N/2}(0) | \psi_0 \rangle + \int_{0}^{\infty} \left(e^{i\omega t}\langle \psi_0 | S^\alpha_{N/2}(t) S^\alpha_{r+N/2}(0) | \psi_0 \rangle \right)^* \;dt \\
 &amp;= \int_{0}^{\infty} e^{i\omega t} \langle \psi_0 | S^\alpha_{r-N/2}(t) S^\alpha_{N/2}(0) | \psi_0 \rangle + \int_{0}^{\infty} \left(e^{i\omega t}\langle \psi_0 | S^\alpha_{r+N/2}(-t) S^\alpha_{N/2}(0)| \psi_0 \rangle \right)^* \;dt \\
@@ -440,33 +445,104 @@ S^{\alpha\alpha}(q, \omega) &amp;= \frac{1}{2\pi} e^{-iqN/2}\sum_{r} e^{iqr} \in
 \end{split}\]</div>
 <p>In the second line, we flipped the integral limits, and sent <span class="math notranslate nohighlight">\(t\rightarrow -t\)</span>. In the third line, we used the fact that <span class="math notranslate nohighlight">\(\langle S^\alpha_{j}(-t) S^\alpha_{k}(0) \rangle = \langle S^\alpha_{k}(0) S^\alpha_{j}(-t) \rangle^* = \langle S^\alpha_{k}(t) S^\alpha_{j}(0) \rangle^*\)</span>. Then in the fourth line we again use the translation invariance to shift the indices, along with the fact that we sum over all <span class="math notranslate nohighlight">\(r\)</span> and so can flip the sign of <span class="math notranslate nohighlight">\(r\)</span>. The final line simply follows from <span class="math notranslate nohighlight">\(2\text{Re}(z) = z + z^*\)</span>. We therefore get the integral</p>
 <div class="math notranslate nohighlight" id="equation-eq-dsf-final">
-<span class="eqno">(9.5)<a class="headerlink" href="#equation-eq-dsf-final" title="Link to this equation">#</a></span>\[
+<span class="eqno">(9.7)<a class="headerlink" href="#equation-eq-dsf-final" title="Link to this equation">#</a></span>\[
 S^{\alpha\alpha}(q, \omega) = \frac{1}{2\pi} \sum_{r} e^{iqr} \int_{0}^{\infty} 2\text{Re}\left[e^{i\omega t} \langle \psi_0 | S^\alpha_{r+N/2}(t) S^\alpha_{N/2}(0) | \psi_0 \rangle\right] \;dt.
 \]</div>
 <p>Finally, we replace the integral by a sum over discrete time steps <span class="math notranslate nohighlight">\(\Delta t\)</span> from our simulation to get</p>
 <div class="math notranslate nohighlight" id="equation-eq-dsf-final">
-<span class="eqno">(9.5)<a class="headerlink" href="#equation-eq-dsf-final" title="Link to this equation">#</a></span>\[
+<span class="eqno">(9.7)<a class="headerlink" href="#equation-eq-dsf-final" title="Link to this equation">#</a></span>\[
 S^{\alpha\alpha}(q, \omega) \approx 2\sum_{r=-N/2}^{N/2-1} \sum_{m=0}^{M} e^{iqr} \text{Re}\left[e^{i\omega m \Delta t} \langle \psi_0 | S^\alpha_{r+N/2}(t) S^\alpha_{N/2}(0) | \psi_0 \rangle\right]
 \]</div>
 <section id="removing-gibbs-oscillations">
 <h3><span class="section-number">9.2.1. </span>Removing Gibbs oscillations<a class="headerlink" href="#removing-gibbs-oscillations" title="Link to this heading">#</a></h3>
 <figure class="align-center" id="fig-gibbs">
-<a class="reference internal image-reference" href="../../_images/gibbs.jpg"><img alt="../../_images/gibbs.jpg" src="../../_images/gibbs.jpg" style="width: 80%;" /></a>
+<a class="reference internal image-reference" href="../../_images/gibbs.jpg"><img alt="../../_images/gibbs.jpg" src="../../_images/gibbs.jpg" style="width: 85%;" /></a>
 <figcaption>
 <p><span class="caption-number">Fig. 9.2 </span><span class="caption-text">Removing Gibbs oscillations using a window function. Left shows the window function, a correlator, and the windowed correlator. The right shows the Fourier transform of the correlator and windowed correlator.</span><a class="headerlink" href="#fig-gibbs" title="Link to this image">#</a></p>
 </figcaption>
 </figure>
-<p>In replacing the integral over time with a finite sum over discrete time steps, we have introduced two sources of error. The first is due to the finite time step <span class="math notranslate nohighlight">\(\Delta t\)</span>, and the second is due to the finite time window <span class="math notranslate nohighlight">\(t = M\Delta t\)</span>. The finite time step error can be reduced by decreasing <span class="math notranslate nohighlight">\(\Delta t\)</span>. The finite time window effective introduces a sharp cutoff to the integral. This sharp cutoff can introduce Gibbs oscillations, as can be seen in <a class="reference internal" href="#fig-gibbs"><span class="std std-numref">Fig. 9.2</span></a>. To remove these oscillations, we can use a window function to introduce a smooth cutoff to the integral. There are many options for window functions. We will use a simple cosine squared window function (shown in <a class="reference internal" href="#fig-gibbs"><span class="std std-numref">Fig. 9.2</span></a>)</p>
+<p>In replacing the integral over time with a finite sum over discrete time steps, we have introduced two sources of error. The first is due to the finite time step <span class="math notranslate nohighlight">\(\Delta t\)</span>, and the second is due to the finite time window <span class="math notranslate nohighlight">\(t = M\Delta t\)</span>. The finite time step error can be reduced by decreasing <span class="math notranslate nohighlight">\(\Delta t\)</span>. The finite time window introduces a sharp cutoff to the integral. This sharp cutoff can introduce Gibbs oscillations, as can be seen in <a class="reference internal" href="#fig-gibbs"><span class="std std-numref">Fig. 9.2</span></a>. To remove these oscillations, we can use a window function to introduce a smooth cutoff to the integral. There are many options for window functions. We will use a simple cosine squared window function (shown in <a class="reference internal" href="#fig-gibbs"><span class="std std-numref">Fig. 9.2</span></a>)</p>
 <div class="math notranslate nohighlight" id="equation-eq-window">
 <span class="eqno">(9.6)<a class="headerlink" href="#equation-eq-window" title="Link to this equation">#</a></span>\[
-g(m) = \cos^2\left(\frac{\pi m}{2M}\right).
+g(m) = \cos^2\left(\frac{\pi m}{2M}\right),
 \]</div>
-<p>As we can see in <a class="reference internal" href="#fig-gibbs"><span class="std std-numref">Fig. 9.2</span></a>, the finite time window introduces oscillations in the Fourier transform of the correlator. By taking the Fourier transform of the windowed correlator, we can see that the oscillations are removed and the signal is smoothed.</p>
+<p>where the argument is chosen such that it is zero at <span class="math notranslate nohighlight">\(t=M\Delta t\)</span>. As we can see in <a class="reference internal" href="#fig-gibbs"><span class="std std-numref">Fig. 9.2</span></a>, the finite time window introduces oscillations in the Fourier transform of the correlator. By taking the Fourier transform of the windowed correlator, we can see that the oscillations are removed and the signal is smoothed.</p>
+<p>We can now write the final expression for the DSSF as</p>
+<div class="math notranslate nohighlight" id="equation-eq-dsf-final">
+<span class="eqno">(9.7)<a class="headerlink" href="#equation-eq-dsf-final" title="Link to this equation">#</a></span>\[
+S^{\alpha\alpha}(q, \omega) \approx 2\sum_{r=-N/2}^{N/2-1} \sum_{m=0}^{M} e^{iqr} \text{Re}\left[e^{i\omega m \Delta t} \langle \psi_0 | S^\alpha_{r+N/2}(t) S^\alpha_{N/2}(0) | \psi_0 \rangle \right] g(m)
+\]</div>
+<p>where we have introduced the window function <span class="math notranslate nohighlight">\(g(m)\)</span> to smooth the correlator.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>It is a bit unfortunate that the window function weights our correlator such that the longest times have the least impact on the final result. However, the later times are those that are hardest to compute, so it feels like we are throwing away that hard work. In practice, it is common to use a simple extrapolation method to extend the results of the simulation to longer times. These extropolated results cannot be fully trusted, but since they are strongly suppressed by the window function, they do not have a large impact on the final result. The time steps that we put hard work into calculating will now have a larger impact on the final result.</p>
 <p>For simplicity, we won’t introduce any extrapolation methods in this course.</p>
 </div>
+</section>
+</section>
+<section id="setting-up-the-calculation">
+<h2><span class="section-number">9.3. </span>Setting up the calculation<a class="headerlink" href="#setting-up-the-calculation" title="Link to this heading">#</a></h2>
+<p>Now that we have figured out how to correctly compute the Fourier transform, all that remains is to use MPS to compute the correlation functions</p>
+<div class="math notranslate nohighlight">
+\[
+C^{zz}_j(t) = \langle \psi_0 | S^z_{j}(t) S^z_{N/2}(0) | \psi_0 \rangle.
+\]</div>
+<p>Again, it is worth the effort to manipulate this expression to simplify our calculation. First let us reveal the time evolution of the operators</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+C^{zz}_j(t) &amp;= \langle \psi_0 | e^{iHt} S^z_{j} e^{-iHt} S^z_{N/2} | \psi_0 \rangle, \\
+&amp;= e^{iE_0 t} \langle \psi_0 | S^z_{j} e^{-iHt} S^z_{N/2} | \psi_0 \rangle, \\
+&amp;= e^{iE_0 t} \left(\langle \psi_0 | S^z_{j} e^{-iHt/2}\right) \left( e^{-iHt/2} S^z_{N/2} | \psi_0 \rangle \right), \\
+&amp;= 4e^{iE_0 t} \left(\langle \psi_0 | \sigma^z_{j} e^{-iHt/2}\right) \left( e^{-iHt/2} \sigma^z_{N/2} | \psi_0 \rangle \right).
+\end{aligned}
+\end{split}\]</div>
+<p>In the second line, we have used the fact that <span class="math notranslate nohighlight">\(|\psi_0\rangle\)</span> is the ground state of <span class="math notranslate nohighlight">\(H\)</span>, i.e. it is an eigenstate with eigenvalue <span class="math notranslate nohighlight">\(E_0\)</span>. In the third line, we have split the time evolution into two parts. This allows us to write the correlator as the overlap between two states that have been evolved only to time <span class="math notranslate nohighlight">\(t/2\)</span>. This is useful because computing the time evolution for long times is costly due to the growth of entanglement, and so we can save some computational effort. Finally, we rewrite in terms of the Pauli operators <span class="math notranslate nohighlight">\(\sigma^z\)</span>, instead of the spin operators <span class="math notranslate nohighlight">\(S^z = \sigma^z\)</span>. This is because the Pauli operators are unitary, and so we can act with them on the MPS without changing the canonical form.</p>
+<div class="admonition-algorithm-computing-the-correlator admonition">
+<p class="admonition-title">Algorithm: Computing the correlator</p>
+<p>Let us now wrtie down the steps to compute the correlator <span class="math notranslate nohighlight">\(C^{zz}_j(t)\)</span>.</p>
+<ol class="arabic simple">
+<li><p>Compute the ground state <span class="math notranslate nohighlight">\(|\psi_0\rangle\)</span> of the AFH model using DMRG.</p></li>
+<li><p>Compute the state <span class="math notranslate nohighlight">\(|\psi_{N/2}\rangle = \sigma^Z_{N/2} |\psi_0\rangle\)</span>. and the state <span class="math notranslate nohighlight">\(|\psi_j\rangle = \sigma^Z_{j} |\psi_0\rangle\)</span>.</p></li>
+<li><p>Evolve the states using TEBD to time <span class="math notranslate nohighlight">\(t/2\)</span>. More explicitly, we evolve <span class="math notranslate nohighlight">\(|\psi_{N/2}(t/2)\rangle = e^{-iHt/2} |\psi_{N/2}\rangle\)</span> and <span class="math notranslate nohighlight">\(|\psi_j(t/2)\rangle = e^{iHt/2} |\psi_j\rangle\)</span>. Note that evolve “backwards” in time for <span class="math notranslate nohighlight">\(|\psi_{j}(t/2)\rangle\)</span>, which is done by setting <span class="math notranslate nohighlight">\(\Delta t \rightarrow -\Delta t\)</span> in the TEBD algorithm.</p></li>
+<li><p>Compute the overlap between <span class="math notranslate nohighlight">\(|\psi_{N/2}(t/2)\rangle\)</span> and <span class="math notranslate nohighlight">\(|\psi_j(t/2)\rangle\)</span> to get the correlator <span class="math notranslate nohighlight">\(C^{zz}_j(t)\)</span>. More precisely, compute <span class="math notranslate nohighlight">\(C^{zz}_j(t) = 4 e^{iE_0t}\langle \psi_{j}(t/2) | \psi_{N/2}(t/2) \rangle\)</span>.</p></li>
+</ol>
+<p>Note that when doing the time evolution we can evolve one of the two states at a time. That is, evolve <span class="math notranslate nohighlight">\(|\psi_{N/2}(t/2)\rangle\)</span> forward one step, and then compute the overlap. Then evolve <span class="math notranslate nohighlight">\(|\psi_j(t/2)\rangle\)</span> backwards one step, and then compute the overlap. This way we only need to do the evolution <span class="math notranslate nohighlight">\(M\)</span> times and not <span class="math notranslate nohighlight">\(2M\)</span> times.</p>
+</div>
+<p>To compute the correlator, there are two operations that we need to perform that we have not yet implemented: applying an operator to a state, and computing the overlap between two states. These are simple operations on the MPS that we will add to our code.</p>
+<section id="applying-an-operator-to-a-state">
+<h3><span class="section-number">9.3.1. </span>Applying an operator to a state<a class="headerlink" href="#applying-an-operator-to-a-state" title="Link to this heading">#</a></h3>
+<figure class="align-center" id="fig-apply-local">
+<a class="reference internal image-reference" href="../../_images/apply_local.jpeg"><img alt="../../_images/apply_local.jpeg" src="../../_images/apply_local.jpeg" style="width: 45%;" /></a>
+<figcaption>
+<p><span class="caption-number">Fig. 9.3 </span><span class="caption-text">Applying a local unitary to an MPS can be done with a single local contraction. The operator is applied to the physical index of the MPS.</span><a class="headerlink" href="#fig-apply-local" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+<p>The first new operation is acting on an MPS with a local operator. In our case we only need to act with the <span class="math notranslate nohighlight">\(\sigma^z\)</span> operator. This is local and unitary. Because the operator is unitary, it does not change the canonical form, meaning we can do this operation with a single local contraction without needing to move the centre.</p>
+<div class="admonition-code-applying-an-operator-to-a-state admonition">
+<p class="admonition-title">Code: Applying an operator to a state</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1">## file: src/mps.py</span>
+
+
+</pre></div>
+</div>
+<figure class="align-center" id="id2">
+<a class="reference internal image-reference" href="../../_images/apply_contraction.jpeg"><img alt="../../_images/apply_contraction.jpeg" src="../../_images/apply_contraction.jpeg" style="width: 60%;" /></a>
+<figcaption>
+<p><span class="caption-number">Fig. 9.4 </span><span class="caption-text">Indexing for the local contraction of an operator applied to an MPS tensor.</span><a class="headerlink" href="#id2" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</section>
+<section id="computing-the-overlap">
+<h3><span class="section-number">9.3.2. </span>Computing the overlap<a class="headerlink" href="#computing-the-overlap" title="Link to this heading">#</a></h3>
+<figure class="align-center" id="fig-overlap">
+<a class="reference internal image-reference" href="../../_images/overlap.jpeg"><img alt="../../_images/overlap.jpeg" src="../../_images/overlap.jpeg" style="width: 75%;" /></a>
+<figcaption>
+<p><span class="caption-number">Fig. 9.5 </span><span class="caption-text">Tensor network diagram for the overlap between two MPS.</span><a class="headerlink" href="#fig-overlap" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+<p>The second new operation is computing the overlap between two states. Since the states we computing the overlap between are different states, we cannot take advantage of the canonical form, and therefore there is also no need to move the centre.</p>
 </section>
 </section>
 </section>
@@ -539,6 +615,11 @@ g(m) = \cos^2\left(\frac{\pi m}{2M}\right).
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dynamical-spin-structure-factor">9.1. Dynamical Spin Structure Factor</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#simplifying-the-dssf">9.2. Simplifying the DSSF</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#removing-gibbs-oscillations">9.2.1. Removing Gibbs oscillations</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setting-up-the-calculation">9.3. Setting up the calculation</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#applying-an-operator-to-a-state">9.3.1. Applying an operator to a state</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#computing-the-overlap">9.3.2. Computing the overlap</a></li>
 </ul>
 </li>
 </ul>

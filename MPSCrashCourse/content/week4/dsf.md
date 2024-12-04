@@ -112,23 +112,81 @@ $$
 \begin{aligned}
 C^{zz}_j(t) &= \langle \psi_0 | e^{iHt} S^z_{j} e^{-iHt} S^z_{N/2} | \psi_0 \rangle, \\
 &= e^{iE_0 t} \langle \psi_0 | S^z_{j} e^{-iHt} S^z_{N/2} | \psi_0 \rangle, \\
-&= e^{iE_0 t} \left(\langle \psi_0 | S^z_{j} e^{-iHt/2}\right) \left( e^{-iHt/2} S^z_{N/2} | \psi_0 \rangle \right).
+&= e^{iE_0 t} \left(\langle \psi_0 | S^z_{j} e^{-iHt/2}\right) \left( e^{-iHt/2} S^z_{N/2} | \psi_0 \rangle \right), \\
+&= 4e^{iE_0 t} \left(\langle \psi_0 | \sigma^z_{j} e^{-iHt/2}\right) \left( e^{-iHt/2} \sigma^z_{N/2} | \psi_0 \rangle \right).
 \end{aligned}
 $$
 
-In the second line, we have used the fact that $|\psi_0\rangle$ is the ground state of $H$, i.e. it is an eigenstate with eigenvalue $E_0$. In the third line, we have split the time evolution into two parts. This allows us to write the correlator as the overlap between two states that have been evolved only to time $t/2$. This is useful because computing the time evolution for long times is costly due to the growth of entanglement, and so we can save some computational effort.
+In the second line, we have used the fact that $|\psi_0\rangle$ is the ground state of $H$, i.e. it is an eigenstate with eigenvalue $E_0$. In the third line, we have split the time evolution into two parts. This allows us to write the correlator as the overlap between two states that have been evolved only to time $t/2$. This is useful because computing the time evolution for long times is costly due to the growth of entanglement, and so we can save some computational effort. Finally, we rewrite in terms of the Pauli operators $\sigma^z$, instead of the spin operators $S^z = \sigma^z$. This is because the Pauli operators are unitary, and so we can act with them on the MPS without changing the canonical form.
+
+
+
 
 ````{admonition} Algorithm: Computing the correlator
 Let us now wrtie down the steps to compute the correlator $C^{zz}_j(t)$.
 
 1. Compute the ground state $|\psi_0\rangle$ of the AFH model using DMRG.
 
-2. Compute the state $|\psi_{N/2}\rangle = S^Z_{N/2} |\psi_0\rangle$. and the state $|\psi_j\rangle = S^Z_{j} |\psi_0\rangle$.
+2. Compute the state $|\psi_{N/2}\rangle = \sigma^Z_{N/2} |\psi_0\rangle$. and the state $|\psi_j\rangle = \sigma^Z_{j} |\psi_0\rangle$.
 
 3. Evolve the states using TEBD to time $t/2$. More explicitly, we evolve $|\psi_{N/2}(t/2)\rangle = e^{-iHt/2} |\psi_{N/2}\rangle$ and $|\psi_j(t/2)\rangle = e^{iHt/2} |\psi_j\rangle$. Note that evolve "backwards" in time for $|\psi_{j}(t/2)\rangle$, which is done by setting $\Delta t \rightarrow -\Delta t$ in the TEBD algorithm.
 
-4. Compute the overlap between $|\psi_{N/2}(t/2)\rangle$ and $|\psi_j(t/2)\rangle$ to get the correlator $C^{zz}_j(t)$. More precisely, compute $C^{zz}_j(t) = \langle \psi_{j}(t/2) | \psi_{N/2}(t/2) \rangle$.
+4. Compute the overlap between $|\psi_{N/2}(t/2)\rangle$ and $|\psi_j(t/2)\rangle$ to get the correlator $C^{zz}_j(t)$. More precisely, compute $C^{zz}_j(t) = 4 e^{iE_0t}\langle \psi_{j}(t/2) | \psi_{N/2}(t/2) \rangle$.
 
 Note that when doing the time evolution we can evolve one of the two states at a time. That is, evolve $|\psi_{N/2}(t/2)\rangle$ forward one step, and then compute the overlap. Then evolve $|\psi_j(t/2)\rangle$ backwards one step, and then compute the overlap. This way we only need to do the evolution $M$ times and not $2M$ times.
 
 ````
+
+To compute the correlator, there are two operations that we need to perform that we have not yet implemented: applying an operator to a state, and computing the overlap between two states. These are simple operations on the MPS that we will add to our code.
+
+### Applying an operator to a state
+
+
+```{figure} images/apply_local.jpeg
+---
+name: fig:apply_local
+width: 45%
+align: center
+---
+
+Applying a local unitary to an MPS can be done with a single local contraction. The operator is applied to the physical index of the MPS.
+``` 
+
+The first new operation is acting on an MPS with a local operator. In our case we only need to act with the $\sigma^z$ operator. This is local and unitary. Because the operator is unitary, it does not change the canonical form, meaning we can do this operation with a single local contraction without needing to move the centre.
+
+
+````{admonition} Code: Applying an operator to a state
+
+```python
+## file: src/mps.py
+
+
+```
+```{figure} images/apply_contraction.jpeg
+---
+name: fig:apply_local
+width: 60%
+align: center
+---
+
+Indexing for the local contraction of an operator applied to an MPS tensor.
+``` 
+
+
+````
+
+
+### Computing the overlap
+
+```{figure} images/overlap.jpeg
+---
+name: fig:overlap
+width: 75%
+align: center
+---
+
+Tensor network diagram for the overlap between two MPS.
+``` 
+
+
+The second new operation is computing the overlap between two states. Since the states we computing the overlap between are different states, we cannot take advantage of the canonical form, and therefore there is also no need to move the centre. 
