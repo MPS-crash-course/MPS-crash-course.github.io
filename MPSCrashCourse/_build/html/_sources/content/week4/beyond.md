@@ -1,1 +1,1 @@
-# Beyond this course
+# Beyond This Course
