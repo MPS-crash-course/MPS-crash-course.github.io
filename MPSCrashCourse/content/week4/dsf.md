@@ -225,6 +225,136 @@ def overlap(psi1, psi2):
 
 ````
 
+## Putting it all together
+
+We now have all the elements we need to perform our computation. All that is left is to put all the elements together to perform our simulation. For this purpose I created a new file `src/dssf.py` where I will put all the code to perform the simulation. I chose to break the code into functions to simplify the scripts where I run and plot the results. For the final scripts, I chose to create a new folder called `run`. In this folder I also created a `data` folder. Since the simulation will take longer than our previous tests, it makes sense to save the data to file and then load it for plotting. That way we don't need to repeat the computation each time.
+
+````{admonition} Code: Putting it all together
+
+I think you should now be able to put this all together yourself. To help you out, let me show you how I structured my code (although feel free to do it your own way). I chose to break everything into functions. 
+
+```python 
+## file: src/dssf.py
+
+from src.tebd import *
+from src.dmrg import *
+from src.overlap import overlap
+
+import math
+import pickle
+from matplotlib import pyplot as plt
+
+def correlator(psi, E_0, j, dt, tMax, chiMax, tol, entropy=False):
+    """
+    Compute the time evolution of the correlator <psi0|Z_j(t) Z_N/2(0)|psi0> using TEBD, for a single site j.
+    Includes flag to return the half-chain entropy at each time step.
+
+    Args:
+    psi (MPS): mps ground state
+    E_0 (float): ground state energy
+    j (int): site index
+    dt (float): time step
+    tMax (float): maximum time
+    chiMax (int): maximum bond dimension
+    tol (float): convergence tolerance
+    entropy (bool): flag to compute entropy
+
+    Writes date to file.
+    """
+
+    ## YOUR CODE HERE ##
+
+    if entropy:
+        return t_list, correlator_list, entropy_list
+    else:
+        return t_list, correlator_list
+
+def computeCorrelator(L, dt, tMax, chiMax, tol, entropy=False):
+    """
+    Compute the correlators <Z_j(t) Z_N/2(0)> for all sites j using TEBD.
+    Starts by computing the ground state using DMRG.
+    """
+
+    ## YOUR CODE HERE ##
+
+    # save the correlator data to file using pickle
+    data = {'L': L, 't_list': t_list, 'correlator': correlator_array}
+    if entropy:
+        data['entropy'] = entropy_list
+
+    with open(f'data/correlator_L{L}_chi{chiMax}.pickle', 'wb') as handle:
+        pickle.dump(data, handle, protocol=pickle.HIGHEST_PROTOCOL)
+
+
+def plot_dssf(filename, omega):
+    """
+    Load the data from file and plot the dynamical structure factor.
+    """
+
+    with open('data/'+filename, 'rb') as handle:
+        data = pickle.load(handle)
+
+    L = data['L']
+    t_list = data['t_list']
+    correlator = data['correlator']
+    n_sites = len(correlator)
+
+    # define the window function
+    window_function = np.cos(t_list/t_list[-1]*np.pi/2)**2
+
+    ## YOUR CODE HERE ##
+
+    # plot the DSSF
+    plt.imshow((np.abs(DSSF)).T, aspect='auto', origin='lower', cmap='magma_r', extent=[0, 2*np.pi, 0, omega[-1]])
+    plt.xlabel('k')
+    plt.ylabel('$\omega$')
+    plt.xticks([0, np.pi, 2*np.pi], ['0', '$\pi$', '$2\pi$'])
+    plt.clim([0,200])
+    plt.colorbar()
+    plt.show()
+```
+
+You can then write two very short scripts to run and to plot.
+
+To run:
+```python
+## file: run/dssf_run.py
+
+from fix_pathing import root_dir
+from src.dssf import computeCorrelator
+
+L = 30
+chiMax = 8
+tol = 1e-14
+
+dt = 0.2
+tMax = 8  ## should be approximately L/4. Don't want to hit the boundary.
+
+computeCorrelator(L, dt, tMax, chiMax, tol, entropy=False)
+```
+
+To plot:
+```python
+from fix_pathing import root_dir
+from src.dssf import plot_dssf
+
+import numpy as np
+
+L = 30
+chi = 8
+
+filename = f'correlator_L{L}_chi{chi}.pickle'
+
+omega = np.linspace(0, 4, 2*L)
+
+plot_dssf(filename, omega)
+```
+You may want to use these parameters as your starting point, but feel free to tweak them!
+
+````
+
+
+
 ---
 
 ## References

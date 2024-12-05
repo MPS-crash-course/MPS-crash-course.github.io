@@ -93,7 +93,7 @@ $$
 where we have introduced the window function $g(m)$ to smooth the correlator.
 
 ```{note}
-It is a bit unfortunate that the window function weights our correlator such that the longest times have the least impact on the final result. However, the later times are those that are hardest to compute, so it feels like we are throwing away that hard work. In practice, it is common to use a simple extrapolation method to extend the results of the simulation to longer times. These extropolated results cannot be fully trusted, but since they are strongly suppressed by the window function, they do not have a large impact on the final result. The time steps that we put hard work into calculating will now have a larger impact on the final result.
+It is a bit unfortunate that the window function weights our correlator such that the longest times have the least impact on the final result. Especially since the later times are the hardest to compute, so it feels like we are throwing away that hard work. In practice, it is common to use a simple extrapolation method to extend the results of the simulation to longer times. These extropolated results cannot be fully trusted, but since they are strongly suppressed by the window function, they do not have a large impact on the final result. The time steps that we put hard work into calculating will now have a larger impact on the final result.
 
 For simplicity, we won't introduce any extrapolation methods in this course.
 ```
@@ -152,19 +152,32 @@ align: center
 Applying a local unitary to an MPS can be done with a single local contraction. The operator is applied to the physical index of the MPS.
 ``` 
 
-The first new operation is acting on an MPS with a local operator. In our case we only need to act with the $\sigma^z$ operator. This is local and unitary. Because the operator is unitary, it does not change the canonical form, meaning we can do this operation with a single local contraction without needing to move the centre.
+The first new operation is acting on an MPS with a local operator. In our case we only need to act with the $\sigma^z$ operator. This is local and unitary. Because the operator is unitary, it does not change the canonical form, meaning we can do this operation with a single local contraction without needing to move the centre. This operation is shown in {numref}`fig:apply_local`. Applying the operator only updates the single tensor it acts on and preserves the current canonical form of the MPS.
 
 
 ````{admonition} Code: Applying an operator to a state
 
+Let us add a method to the MPS class to apply an operator to a state. This method will take a unitary operator and an index, and apply the operator to the tensor at that index. The method will act in place to update the MPS. My code follows the contraction shown in {numref}`fig:apply_contraction`.
+
 ```python
 ## file: src/mps.py
 
+class MPS:
+
+    ## PREVIOUS CODE OMITTED ##
+
+    def applyOperator(self, O, site):
+        """
+        Apply the single site Unitary operator O to site i.
+        """
+
+        ## YOUR CODE HERE ##
 
 ```
+
 ```{figure} images/apply_contraction.jpeg
 ---
-name: fig:apply_local
+name: fig:apply_contraction
 width: 60%
 align: center
 ---
@@ -189,8 +202,28 @@ Tensor network diagram for the overlap between two MPS.
 ``` 
 
 
-The second new operation is computing the overlap between two states. Since the states we computing the overlap between are different states, we cannot take advantage of the canonical form, and therefore there is also no need to move the centre. 
+The second new operation is computing the overlap between two states. Since the states we are computing the overlap between are different states, we cannot take advantage of the canonical form, and therefore there is also no need to move the centre. 
 
+````{admonition} Code: Computing the overlap
+
+Let's add the function to compute overlaps between MPS. While this is not the only way to structure your code, I feel it most natural to call this function as `x = overlap(mps1, mps2)`, which would compute the overlap $\langle \text{mps1} | \text{mps2} \rangle$. I have therefore chosen to create a function in a separate file `overlap.py`.
+
+```python
+## file: src/overlap.py
+
+import numpy as np
+
+def overlap(psi1, psi2):
+    """
+    Compute the overlap between psi1 and psi2. Specifically, <psi1 | psi2>.
+    """
+
+    ## YOUR CODE HERE ##
+
+    return overlap
+```
+
+````
 
 ---
 
