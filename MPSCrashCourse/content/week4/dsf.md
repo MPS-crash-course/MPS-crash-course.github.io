@@ -8,19 +8,19 @@ Let us restate the problem that we are tackling with our MPS code. We want to co
 
 $$
 S^{\alpha\beta}(q, \omega) = \frac{1}{2\pi N}\sum_{j,k} e^{iq(j-k)} \int_{-\infty}^{\infty} e^{i\omega t} \langle \psi_0 | S^\alpha_j(t) S^\beta_k(0) | \psi_0 \rangle \;dt,
-$$ (eq:dsf)
+$$ (eq:dsf_2)
 
 for the antiferromagnetic Heisenberg (AFH) model described by the Hamiltonian
 
 $$
 H = J \sum_{i=1}^{N-1} \mathbf{S}_i \cdot \mathbf{S}_{i+1} = J \sum_{i=1}^{N-1} (S_i^x S_{i+1}^x + S_i^y S_{i+1}^y + S_i^z S_{i+1}^z).
-$$ (eq:heisenberg)
+$$ 
 
-In the DSSF, the state $|\psi_0\rangle$ is the ground state of the AFH model. The DSSF is directly related to what can be measured in inelastic neutron scattering experiments, and we want to use MPS methods to provide the theory predicitions corresponding to the experimental results shown in {numref}`fig:lake2013`.
+In the DSSF, the state $|\psi_0\rangle$ is the ground state of the AFH model. The DSSF is directly related to what can be measured in inelastic neutron scattering experiments, and we want to use MPS methods to provide the theory predicitions corresponding to the experimental results shown in {numref}`fig:lake2013_2`.
 
 ```{figure} ../week1/images/AFH_experiment.png
 ---
-name: fig:lake2013
+name: fig:lake2013_2
 width: 80%
 align: center
 ---
@@ -30,7 +30,7 @@ Data from B. Lake *et al* {cite}`Lake2013`. The left panel shows the experimenta
 
 ## Simplifying the DSSF
 
-Before setting up the calculation using MPS, we are going to simplify the DSSF expression in {eq}`eq:dsf`. Firstly, we are only interested in the diagonal components $S^{\alpha\alpha}$. Furthermore, due to the symmetry of the Hamiltonian, we can consider only $S^{zz}$. Then we can use an approximation that the system is translation invariant. We ideally would like to compute the DSSF for an infinite translation invariant system, but instead our MPS code will use a (large) finite system size $N$. This approximation gets better as we increase $N$. With this approximation, we can write the DSSF as 
+Before setting up the calculation using MPS, we are going to simplify the DSSF expression in {eq}`eq:dsf_2`. Firstly, we are only interested in the diagonal components $S^{\alpha\alpha}$. Furthermore, due to the symmetry of the Hamiltonian, we can consider only $S^{zz}$. Then we can use an approximation that the system is translation invariant. We ideally would like to compute the DSSF for an infinite translation invariant system, but instead our MPS code will use a (large) finite system size $N$. This approximation gets better as we increase $N$. With this approximation, we can write the DSSF as 
 
 $$
 \begin{aligned}
@@ -55,7 +55,7 @@ In the second line, we flipped the integral limits, and sent $t\rightarrow -t$. 
 
 $$
 S^{\alpha\alpha}(q, \omega) = \frac{1}{2\pi} \sum_{r} e^{iqr} \int_{0}^{\infty} 2\text{Re}\left[e^{i\omega t} \langle \psi_0 | S^\alpha_{r+N/2}(t) S^\alpha_{N/2}(0) | \psi_0 \rangle\right] \;dt.
-$$ (eq:dsf_final)
+$$
 
 Finally, we replace the integral by a sum over discrete time steps $\Delta t$ from our simulation to get
 
@@ -88,12 +88,12 @@ We can now write the final expression for the DSSF as
 
 $$
 S^{\alpha\alpha}(q, \omega) \approx 2\sum_{r=-N/2}^{N/2-1} \sum_{m=0}^{M} e^{iqr} \text{Re}\left[e^{i\omega m \Delta t} \langle \psi_0 | S^\alpha_{r+N/2}(t) S^\alpha_{N/2}(0) | \psi_0 \rangle \right] g(m)
-$$ (eq:dsf_final)
+$$ 
 
 where we have introduced the window function $g(m)$ to smooth the correlator.
 
 ```{note}
-It is a bit unfortunate that the window function weights our correlator such that the longest times have the least impact on the final result. However, the later times are those that are hardest to compute, so it feels like we are throwing away that hard work. In practice, it is common to use a simple extrapolation method to extend the results of the simulation to longer times. These extropolated results cannot be fully trusted, but since they are strongly suppressed by the window function, they do not have a large impact on the final result. The time steps that we put hard work into calculating will now have a larger impact on the final result.
+It is a bit unfortunate that the window function weights our correlator such that the longest times have the least impact on the final result. Especially since the later times are the hardest to compute, so it feels like we are throwing away that hard work. In practice, it is common to use a simple extrapolation method to extend the results of the simulation to longer times. These extropolated results cannot be fully trusted, but since they are strongly suppressed by the window function, they do not have a large impact on the final result. The time steps that we put hard work into calculating will now have a larger impact on the final result.
 
 For simplicity, we won't introduce any extrapolation methods in this course.
 ```
@@ -152,19 +152,32 @@ align: center
 Applying a local unitary to an MPS can be done with a single local contraction. The operator is applied to the physical index of the MPS.
 ``` 
 
-The first new operation is acting on an MPS with a local operator. In our case we only need to act with the $\sigma^z$ operator. This is local and unitary. Because the operator is unitary, it does not change the canonical form, meaning we can do this operation with a single local contraction without needing to move the centre.
+The first new operation is acting on an MPS with a local operator. In our case we only need to act with the $\sigma^z$ operator. This is local and unitary. Because the operator is unitary, it does not change the canonical form, meaning we can do this operation with a single local contraction without needing to move the centre. This operation is shown in {numref}`fig:apply_local`. Applying the operator only updates the single tensor it acts on and preserves the current canonical form of the MPS.
 
 
 ````{admonition} Code: Applying an operator to a state
 
+Let us add a method to the MPS class to apply an operator to a state. This method will take a unitary operator and an index, and apply the operator to the tensor at that index. The method will act in place to update the MPS. My code follows the contraction shown in {numref}`fig:apply_contraction`.
+
 ```python
 ## file: src/mps.py
 
+class MPS:
+
+    ## PREVIOUS CODE OMITTED ##
+
+    def applyOperator(self, O, site):
+        """
+        Apply the single site Unitary operator O to site i.
+        """
+
+        ## YOUR CODE HERE ##
 
 ```
+
 ```{figure} images/apply_contraction.jpeg
 ---
-name: fig:apply_local
+name: fig:apply_contraction
 width: 60%
 align: center
 ---
@@ -189,4 +202,33 @@ Tensor network diagram for the overlap between two MPS.
 ``` 
 
 
-The second new operation is computing the overlap between two states. Since the states we computing the overlap between are different states, we cannot take advantage of the canonical form, and therefore there is also no need to move the centre. 
+The second new operation is computing the overlap between two states. Since the states we are computing the overlap between are different states, we cannot take advantage of the canonical form, and therefore there is also no need to move the centre. 
+
+````{admonition} Code: Computing the overlap
+
+Let's add the function to compute overlaps between MPS. While this is not the only way to structure your code, I feel it most natural to call this function as `x = overlap(mps1, mps2)`, which would compute the overlap $\langle \text{mps1} | \text{mps2} \rangle$. I have therefore chosen to create a function in a separate file `overlap.py`.
+
+```python
+## file: src/overlap.py
+
+import numpy as np
+
+def overlap(psi1, psi2):
+    """
+    Compute the overlap between psi1 and psi2. Specifically, <psi1 | psi2>.
+    """
+
+    ## YOUR CODE HERE ##
+
+    return overlap
+```
+
+````
+
+---
+
+## References
+
+```{bibliography}
+:filter: docname in docnames
+```

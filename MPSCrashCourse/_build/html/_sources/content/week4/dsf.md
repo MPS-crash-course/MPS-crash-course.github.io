@@ -8,19 +8,19 @@ Let us restate the problem that we are tackling with our MPS code. We want to co
 
 $$
 S^{\alpha\beta}(q, \omega) = \frac{1}{2\pi N}\sum_{j,k} e^{iq(j-k)} \int_{-\infty}^{\infty} e^{i\omega t} \langle \psi_0 | S^\alpha_j(t) S^\beta_k(0) | \psi_0 \rangle \;dt,
-$$ (eq:dsf)
+$$ (eq:dsf_2)
 
 for the antiferromagnetic Heisenberg (AFH) model described by the Hamiltonian
 
 $$
 H = J \sum_{i=1}^{N-1} \mathbf{S}_i \cdot \mathbf{S}_{i+1} = J \sum_{i=1}^{N-1} (S_i^x S_{i+1}^x + S_i^y S_{i+1}^y + S_i^z S_{i+1}^z).
-$$ (eq:heisenberg)
+$$ 
 
-In the DSSF, the state $|\psi_0\rangle$ is the ground state of the AFH model. The DSSF is directly related to what can be measured in inelastic neutron scattering experiments, and we want to use MPS methods to provide the theory predicitions corresponding to the experimental results shown in {numref}`fig:lake2013`.
+In the DSSF, the state $|\psi_0\rangle$ is the ground state of the AFH model. The DSSF is directly related to what can be measured in inelastic neutron scattering experiments, and we want to use MPS methods to provide the theory predicitions corresponding to the experimental results shown in {numref}`fig:lake2013_2`.
 
 ```{figure} ../week1/images/AFH_experiment.png
 ---
-name: fig:lake2013
+name: fig:lake2013_2
 width: 80%
 align: center
 ---
@@ -30,7 +30,7 @@ Data from B. Lake *et al* {cite}`Lake2013`. The left panel shows the experimenta
 
 ## Simplifying the DSSF
 
-Before setting up the calculation using MPS, we are going to simplify the DSSF expression in {eq}`eq:dsf`. Firstly, we are only interested in the diagonal components $S^{\alpha\alpha}$. Furthermore, due to the symmetry of the Hamiltonian, we can consider only $S^{zz}$. Then we can use an approximation that the system is translation invariant. We ideally would like to compute the DSSF for an infinite translation invariant system, but instead our MPS code will use a (large) finite system size $N$. This approximation gets better as we increase $N$. With this approximation, we can write the DSSF as 
+Before setting up the calculation using MPS, we are going to simplify the DSSF expression in {eq}`eq:dsf_2`. Firstly, we are only interested in the diagonal components $S^{\alpha\alpha}$. Furthermore, due to the symmetry of the Hamiltonian, we can consider only $S^{zz}$. Then we can use an approximation that the system is translation invariant. We ideally would like to compute the DSSF for an infinite translation invariant system, but instead our MPS code will use a (large) finite system size $N$. This approximation gets better as we increase $N$. With this approximation, we can write the DSSF as 
 
 $$
 \begin{aligned}
@@ -55,7 +55,7 @@ In the second line, we flipped the integral limits, and sent $t\rightarrow -t$. 
 
 $$
 S^{\alpha\alpha}(q, \omega) = \frac{1}{2\pi} \sum_{r} e^{iqr} \int_{0}^{\infty} 2\text{Re}\left[e^{i\omega t} \langle \psi_0 | S^\alpha_{r+N/2}(t) S^\alpha_{N/2}(0) | \psi_0 \rangle\right] \;dt.
-$$ (eq:dsf_final)
+$$
 
 Finally, we replace the integral by a sum over discrete time steps $\Delta t$ from our simulation to get
 
@@ -88,7 +88,7 @@ We can now write the final expression for the DSSF as
 
 $$
 S^{\alpha\alpha}(q, \omega) \approx 2\sum_{r=-N/2}^{N/2-1} \sum_{m=0}^{M} e^{iqr} \text{Re}\left[e^{i\omega m \Delta t} \langle \psi_0 | S^\alpha_{r+N/2}(t) S^\alpha_{N/2}(0) | \psi_0 \rangle \right] g(m)
-$$ (eq:dsf_final)
+$$ 
 
 where we have introduced the window function $g(m)$ to smooth the correlator.
 
@@ -190,3 +190,12 @@ Tensor network diagram for the overlap between two MPS.
 
 
 The second new operation is computing the overlap between two states. Since the states we computing the overlap between are different states, we cannot take advantage of the canonical form, and therefore there is also no need to move the centre. 
+
+
+---
+
+## References
+
+```{bibliography}
+:filter: docname in docnames
+```

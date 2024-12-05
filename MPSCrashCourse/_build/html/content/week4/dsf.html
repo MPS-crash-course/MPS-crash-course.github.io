@@ -34,7 +34,7 @@
     <link rel="stylesheet" type="text/css" href="../../_static/styles/sphinx-book-theme.css?v=a3416100" />
     <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css?v=13237357" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css?v=be8a1c11" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css?v=4fa983c6" />
     <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
   
@@ -388,6 +388,7 @@
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#computing-the-overlap">9.3.2. Computing the overlap</a></li>
 </ul>
 </li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#references">9.4. References</a></li>
 </ul>
             </nav>
         </div>
@@ -405,28 +406,28 @@
 <section id="dynamical-spin-structure-factor">
 <h2><span class="section-number">9.1. </span>Dynamical Spin Structure Factor<a class="headerlink" href="#dynamical-spin-structure-factor" title="Link to this heading">#</a></h2>
 <p>Let us restate the problem that we are tackling with our MPS code. We want to compute the <em>dynamical spin structure factor</em> (DSSF)</p>
-<div class="math notranslate nohighlight" id="equation-eq-dsf">
-<span class="eqno">(9.1)<a class="headerlink" href="#equation-eq-dsf" title="Link to this equation">#</a></span>\[
+<div class="math notranslate nohighlight" id="equation-eq-dsf-2">
+<span class="eqno">(9.1)<a class="headerlink" href="#equation-eq-dsf-2" title="Link to this equation">#</a></span>\[
 S^{\alpha\beta}(q, \omega) = \frac{1}{2\pi N}\sum_{j,k} e^{iq(j-k)} \int_{-\infty}^{\infty} e^{i\omega t} \langle \psi_0 | S^\alpha_j(t) S^\beta_k(0) | \psi_0 \rangle \;dt,
 \]</div>
 <p>for the antiferromagnetic Heisenberg (AFH) model described by the Hamiltonian</p>
-<div class="math notranslate nohighlight" id="equation-eq-heisenberg">
-<span class="eqno">(9.2)<a class="headerlink" href="#equation-eq-heisenberg" title="Link to this equation">#</a></span>\[
+<div class="math notranslate nohighlight">
+\[
 H = J \sum_{i=1}^{N-1} \mathbf{S}_i \cdot \mathbf{S}_{i+1} = J \sum_{i=1}^{N-1} (S_i^x S_{i+1}^x + S_i^y S_{i+1}^y + S_i^z S_{i+1}^z).
 \]</div>
-<p>In the DSSF, the state <span class="math notranslate nohighlight">\(|\psi_0\rangle\)</span> is the ground state of the AFH model. The DSSF is directly related to what can be measured in inelastic neutron scattering experiments, and we want to use MPS methods to provide the theory predicitions corresponding to the experimental results shown in <a class="reference internal" href="#fig-lake2013"><span class="std std-numref">Fig. 9.1</span></a>.</p>
-<figure class="align-center" id="fig-lake2013">
+<p>In the DSSF, the state <span class="math notranslate nohighlight">\(|\psi_0\rangle\)</span> is the ground state of the AFH model. The DSSF is directly related to what can be measured in inelastic neutron scattering experiments, and we want to use MPS methods to provide the theory predicitions corresponding to the experimental results shown in <a class="reference internal" href="#fig-lake2013-2"><span class="std std-numref">Fig. 9.1</span></a>.</p>
+<figure class="align-center" id="fig-lake2013-2">
 <a class="reference internal image-reference" href="../../_images/AFH_experiment.png"><img alt="../../_images/AFH_experiment.png" src="../../_images/AFH_experiment.png" style="width: 80%;" /></a>
 <figcaption>
-<p><span class="caption-number">Fig. 9.1 </span><span class="caption-text">Data from B. Lake <em>et al</em> <span id="id1">[<a class="reference internal" href="../week1/problem.html#id11" title="B. Lake, D. A. Tennant, J.-S. Caux, T. Barthel, U. Schollwöck, S. E. Nagler, and C. D. Frost. Multispinon continua at zero and finite temperature in a near-ideal heisenberg chain. Phys. Rev. Lett., 111:137205, Sep 2013. URL: https://link.aps.org/doi/10.1103/PhysRevLett.111.137205, doi:10.1103/PhysRevLett.111.137205.">LTC+13</a>]</span>. The left panel shows the experimental data for the dynamical structure factor of <span class="math notranslate nohighlight">\(\text{KCuF}_3\)</span>. The right panel shows the theoretical prediction for the Heisenberg model obtained using Bethe Ansatz.</span><a class="headerlink" href="#fig-lake2013" title="Link to this image">#</a></p>
+<p><span class="caption-number">Fig. 9.1 </span><span class="caption-text">Data from B. Lake <em>et al</em> <span id="id1">[<a class="reference internal" href="#id11" title="B. Lake, D. A. Tennant, J.-S. Caux, T. Barthel, U. Schollwöck, S. E. Nagler, and C. D. Frost. Multispinon continua at zero and finite temperature in a near-ideal heisenberg chain. Phys. Rev. Lett., 111:137205, Sep 2013. URL: https://link.aps.org/doi/10.1103/PhysRevLett.111.137205, doi:10.1103/PhysRevLett.111.137205.">LTC+13</a>]</span>. The left panel shows the experimental data for the dynamical structure factor of <span class="math notranslate nohighlight">\(\text{KCuF}_3\)</span>. The right panel shows the theoretical prediction for the Heisenberg model obtained using Bethe Ansatz.</span><a class="headerlink" href="#fig-lake2013-2" title="Link to this image">#</a></p>
 </figcaption>
 </figure>
 </section>
 <section id="simplifying-the-dssf">
 <h2><span class="section-number">9.2. </span>Simplifying the DSSF<a class="headerlink" href="#simplifying-the-dssf" title="Link to this heading">#</a></h2>
-<p>Before setting up the calculation using MPS, we are going to simplify the DSSF expression in <a class="reference internal" href="#equation-eq-dsf">(9.1)</a>. Firstly, we are only interested in the diagonal components <span class="math notranslate nohighlight">\(S^{\alpha\alpha}\)</span>. Furthermore, due to the symmetry of the Hamiltonian, we can consider only <span class="math notranslate nohighlight">\(S^{zz}\)</span>. Then we can use an approximation that the system is translation invariant. We ideally would like to compute the DSSF for an infinite translation invariant system, but instead our MPS code will use a (large) finite system size <span class="math notranslate nohighlight">\(N\)</span>. This approximation gets better as we increase <span class="math notranslate nohighlight">\(N\)</span>. With this approximation, we can write the DSSF as</p>
+<p>Before setting up the calculation using MPS, we are going to simplify the DSSF expression in <a class="reference internal" href="#equation-eq-dsf-2">(9.1)</a>. Firstly, we are only interested in the diagonal components <span class="math notranslate nohighlight">\(S^{\alpha\alpha}\)</span>. Furthermore, due to the symmetry of the Hamiltonian, we can consider only <span class="math notranslate nohighlight">\(S^{zz}\)</span>. Then we can use an approximation that the system is translation invariant. We ideally would like to compute the DSSF for an infinite translation invariant system, but instead our MPS code will use a (large) finite system size <span class="math notranslate nohighlight">\(N\)</span>. This approximation gets better as we increase <span class="math notranslate nohighlight">\(N\)</span>. With this approximation, we can write the DSSF as</p>
 <div class="math notranslate nohighlight" id="equation-eq-dsf-translation-invariant">
-<span class="eqno">(9.3)<a class="headerlink" href="#equation-eq-dsf-translation-invariant" title="Link to this equation">#</a></span>\[\begin{split}
+<span class="eqno">(9.2)<a class="headerlink" href="#equation-eq-dsf-translation-invariant" title="Link to this equation">#</a></span>\[\begin{split}
 \begin{aligned}
 S^{\alpha\alpha}(q, \omega) &amp;= \frac{1}{2\pi} e^{-iqN/2}\sum_{r} e^{iqr} \int_{-\infty}^{\infty} e^{i\omega t} \langle \psi_0 | S^\alpha_r(t) S^\alpha_{N/2}(0) | \psi_0 \rangle \;dt,\\
 &amp;= \frac{1}{2\pi} \sum_{r=-N/2}^{N/2-1} e^{iqr} \int_{-\infty}^{\infty} e^{i\omega t} \langle \psi_0 | S^\alpha_{r+N/2}(t) S^\alpha_{N/2}(0) | \psi_0 \rangle \;dt,
@@ -444,13 +445,13 @@ S^{\alpha\alpha}(q, \omega) &amp;= \frac{1}{2\pi} e^{-iqN/2}\sum_{r} e^{iqr} \in
 \end{aligned}
 \end{split}\]</div>
 <p>In the second line, we flipped the integral limits, and sent <span class="math notranslate nohighlight">\(t\rightarrow -t\)</span>. In the third line, we used the fact that <span class="math notranslate nohighlight">\(\langle S^\alpha_{j}(-t) S^\alpha_{k}(0) \rangle = \langle S^\alpha_{k}(0) S^\alpha_{j}(-t) \rangle^* = \langle S^\alpha_{k}(t) S^\alpha_{j}(0) \rangle^*\)</span>. Then in the fourth line we again use the translation invariance to shift the indices, along with the fact that we sum over all <span class="math notranslate nohighlight">\(r\)</span> and so can flip the sign of <span class="math notranslate nohighlight">\(r\)</span>. The final line simply follows from <span class="math notranslate nohighlight">\(2\text{Re}(z) = z + z^*\)</span>. We therefore get the integral</p>
-<div class="math notranslate nohighlight" id="equation-eq-dsf-final">
-<span class="eqno">(9.7)<a class="headerlink" href="#equation-eq-dsf-final" title="Link to this equation">#</a></span>\[
+<div class="math notranslate nohighlight">
+\[
 S^{\alpha\alpha}(q, \omega) = \frac{1}{2\pi} \sum_{r} e^{iqr} \int_{0}^{\infty} 2\text{Re}\left[e^{i\omega t} \langle \psi_0 | S^\alpha_{r+N/2}(t) S^\alpha_{N/2}(0) | \psi_0 \rangle\right] \;dt.
 \]</div>
 <p>Finally, we replace the integral by a sum over discrete time steps <span class="math notranslate nohighlight">\(\Delta t\)</span> from our simulation to get</p>
 <div class="math notranslate nohighlight" id="equation-eq-dsf-final">
-<span class="eqno">(9.7)<a class="headerlink" href="#equation-eq-dsf-final" title="Link to this equation">#</a></span>\[
+<span class="eqno">(9.3)<a class="headerlink" href="#equation-eq-dsf-final" title="Link to this equation">#</a></span>\[
 S^{\alpha\alpha}(q, \omega) \approx 2\sum_{r=-N/2}^{N/2-1} \sum_{m=0}^{M} e^{iqr} \text{Re}\left[e^{i\omega m \Delta t} \langle \psi_0 | S^\alpha_{r+N/2}(t) S^\alpha_{N/2}(0) | \psi_0 \rangle\right]
 \]</div>
 <section id="removing-gibbs-oscillations">
@@ -463,13 +464,13 @@ S^{\alpha\alpha}(q, \omega) \approx 2\sum_{r=-N/2}^{N/2-1} \sum_{m=0}^{M} e^{iqr
 </figure>
 <p>In replacing the integral over time with a finite sum over discrete time steps, we have introduced two sources of error. The first is due to the finite time step <span class="math notranslate nohighlight">\(\Delta t\)</span>, and the second is due to the finite time window <span class="math notranslate nohighlight">\(t = M\Delta t\)</span>. The finite time step error can be reduced by decreasing <span class="math notranslate nohighlight">\(\Delta t\)</span>. The finite time window introduces a sharp cutoff to the integral. This sharp cutoff can introduce Gibbs oscillations, as can be seen in <a class="reference internal" href="#fig-gibbs"><span class="std std-numref">Fig. 9.2</span></a>. To remove these oscillations, we can use a window function to introduce a smooth cutoff to the integral. There are many options for window functions. We will use a simple cosine squared window function (shown in <a class="reference internal" href="#fig-gibbs"><span class="std std-numref">Fig. 9.2</span></a>)</p>
 <div class="math notranslate nohighlight" id="equation-eq-window">
-<span class="eqno">(9.6)<a class="headerlink" href="#equation-eq-window" title="Link to this equation">#</a></span>\[
+<span class="eqno">(9.4)<a class="headerlink" href="#equation-eq-window" title="Link to this equation">#</a></span>\[
 g(m) = \cos^2\left(\frac{\pi m}{2M}\right),
 \]</div>
 <p>where the argument is chosen such that it is zero at <span class="math notranslate nohighlight">\(t=M\Delta t\)</span>. As we can see in <a class="reference internal" href="#fig-gibbs"><span class="std std-numref">Fig. 9.2</span></a>, the finite time window introduces oscillations in the Fourier transform of the correlator. By taking the Fourier transform of the windowed correlator, we can see that the oscillations are removed and the signal is smoothed.</p>
 <p>We can now write the final expression for the DSSF as</p>
-<div class="math notranslate nohighlight" id="equation-eq-dsf-final">
-<span class="eqno">(9.7)<a class="headerlink" href="#equation-eq-dsf-final" title="Link to this equation">#</a></span>\[
+<div class="math notranslate nohighlight">
+\[
 S^{\alpha\alpha}(q, \omega) \approx 2\sum_{r=-N/2}^{N/2-1} \sum_{m=0}^{M} e^{iqr} \text{Re}\left[e^{i\omega m \Delta t} \langle \psi_0 | S^\alpha_{r+N/2}(t) S^\alpha_{N/2}(0) | \psi_0 \rangle \right] g(m)
 \]</div>
 <p>where we have introduced the window function <span class="math notranslate nohighlight">\(g(m)\)</span> to smooth the correlator.</p>
@@ -544,6 +545,18 @@ C^{zz}_j(t) &amp;= \langle \psi_0 | e^{iHt} S^z_{j} e^{-iHt} S^z_{N/2} | \psi_0 
 </figure>
 <p>The second new operation is computing the overlap between two states. Since the states we computing the overlap between are different states, we cannot take advantage of the canonical form, and therefore there is also no need to move the centre.</p>
 </section>
+</section>
+<hr class="docutils" />
+<section id="references">
+<h2><span class="section-number">9.4. </span>References<a class="headerlink" href="#references" title="Link to this heading">#</a></h2>
+<div class="docutils container" id="id3">
+<div role="list" class="citation-list">
+<div class="citation" id="id11" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">LTC+13</a><span class="fn-bracket">]</span></span>
+<p>B. Lake, D. A. Tennant, J.-S. Caux, T. Barthel, U. Schollwöck, S. E. Nagler, and C. D. Frost. Multispinon continua at zero and finite temperature in a near-ideal heisenberg chain. <em>Phys. Rev. Lett.</em>, 111:137205, Sep 2013. URL: <a class="reference external" href="https://link.aps.org/doi/10.1103/PhysRevLett.111.137205">https://link.aps.org/doi/10.1103/PhysRevLett.111.137205</a>, <a class="reference external" href="https://doi.org/10.1103/PhysRevLett.111.137205">doi:10.1103/PhysRevLett.111.137205</a>.</p>
+</div>
+</div>
+</div>
 </section>
 </section>
 
@@ -622,6 +635,7 @@ C^{zz}_j(t) &amp;= \langle \psi_0 | e^{iHt} S^z_{j} e^{-iHt} S^z_{N/2} | \psi_0 
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#computing-the-overlap">9.3.2. Computing the overlap</a></li>
 </ul>
 </li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#references">9.4. References</a></li>
 </ul>
   </nav></div>
 
