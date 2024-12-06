@@ -13,7 +13,9 @@ I hope you have enjoyed this crash course into the basics of MPS. Naturally, the
 
 ## Developing your code further
 
-The purpose of this course was to walk you through the basics of MPS by writing your own code. I feel like this is the best way to learn the topic if you are planning to use them as a numerical method. Beyond this, I would definitely recommend the use of a library like `tenpy` or `iTensor` for more advanced calculations. However, if you are interested in developing your own code further, here are a few ideas:
+The purpose of this course was to walk you through the basics of MPS by writing your own code. I feel like this is the best way to learn the topic if you are planning to use them as a numerical method. Beyond this, I would definitely recommend the use of a library like `tenpy` or `iTensor` for more advanced calculations. In fact, it would be a very valuable exercise to try and reproduce the results of this course using one of these libraries. They are set up such that you can achieve the same results with far fewer lines of code (and much faster).
+
+If you are interested in developing your own code further, here are a few ideas:
 
 - **Iterative Eigensolver**: The biggest bottleneck in the DMRG algorithm is solving the local eigenproblem. The code we wrote can be sped up significantly by using an iterative eigensolver such as the Davidson algorithm. This is a relatively simple algorithm. By using very few iterations in the eigensolver, you can afford to do more sweeps in the DMRG algorithm, to get a comparable accuracy with sufficiently smaller computational cost.
 
