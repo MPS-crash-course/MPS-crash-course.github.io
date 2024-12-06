@@ -34,7 +34,7 @@
     <link rel="stylesheet" type="text/css" href="../../_static/styles/sphinx-book-theme.css?v=a3416100" />
     <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css?v=13237357" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css?v=be8a1c11" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css?v=4fa983c6" />
     <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
   
@@ -190,6 +190,7 @@
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">Week 4</span></p>
 <ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="../week4/dsf.html">9. Bringing It All Together</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../week4/beyond.html">10. Beyond This Course</a></li>
 </ul>
 
     </div>
@@ -392,7 +393,7 @@
                   
   <section class="tex2jax_ignore mathjax_ignore" id="density-matrix-renormalization-group-dmrg">
 <h1><span class="section-number">8. </span>Density Matrix Renormalization Group (DMRG)<a class="headerlink" href="#density-matrix-renormalization-group-dmrg" title="Link to this heading">#</a></h1>
-<p>Now that we have introduced MPOs, we are in a position to discuss the Density Matrix Renormalization Group (DMRG) algorithm. DMRG is a numerical method for finding the ground state of a 1D quantum system. It was first introduced by Steven White in 1992 <span id="id1">[<a class="reference internal" href="#id9" title="Steven R. White. Density matrix formulation for quantum renormalization groups. Phys. Rev. Lett., 69:2863–2866, Nov 1992. URL: https://link.aps.org/doi/10.1103/PhysRevLett.69.2863, doi:10.1103/PhysRevLett.69.2863.">Whi92</a>]</span> and has since become one of the most powerful methods for studying 1D quantum systems. The algorithm is iterative and involves sweeping through the system, updating the tensors in the MPS representation. We will explain a variant of the DMRG algorithm that uses a two-site update. This is the simplest variant of DMRG since it naturally allows the bond dimension to grow as we sweep through the system. There is also a one-site update variant, which we will not discuss in this course.</p>
+<p>Now that we have introduced MPOs, we are in a position to discuss the Density Matrix Renormalization Group (DMRG) algorithm. DMRG is a numerical method for finding the ground state of a 1D quantum system. It was first introduced by Steven White in 1992 <span id="id1">[<a class="reference internal" href="#id11" title="Steven R. White. Density matrix formulation for quantum renormalization groups. Phys. Rev. Lett., 69:2863–2866, Nov 1992. URL: https://link.aps.org/doi/10.1103/PhysRevLett.69.2863, doi:10.1103/PhysRevLett.69.2863.">Whi92</a>]</span> and has since become one of the most powerful methods for studying 1D quantum systems. The algorithm is iterative and involves sweeping through the system, updating the tensors in the MPS representation. We will explain a variant of the DMRG algorithm that uses a two-site update. This is the simplest variant of DMRG since it naturally allows the bond dimension to grow as we sweep through the system. There is also a one-site update variant, which we will not discuss in this course.</p>
 <p>The basis of the DMRG algorithm is to locally update the tensors in the MPS representation in order to minimise <span class="math notranslate nohighlight">\(\langle \psi | H |\psi\rangle\)</span>. This is done by considering two sites at a time and finding the ground state for an effective Hamiltonian on these two sites. The process is summarised in <a class="reference internal" href="#fig-dmrg-blocks"><span class="std std-numref">Fig. 8.1</span></a>. Let us consider updating the tensors on site <span class="math notranslate nohighlight">\(n\)</span> and <span class="math notranslate nohighlight">\(n+1\)</span>. We can split the computation of the energy in to several parts. First, after moving the centre to site <span class="math notranslate nohighlight">\(n\)</span>, we can contract all the tensors to the left of site <span class="math notranslate nohighlight">\(n\)</span>, to construct a rank-3 tensor <span class="math notranslate nohighlight">\(L^{[n-1]}\)</span>, which we refer to as the left environment. Similarly, we can construct the right environment <span class="math notranslate nohighlight">\(R^{[n+2]}\)</span> by contracting all tensors to the right of site <span class="math notranslate nohighlight">\(n+1\)</span>. In between the left and right environments, we have the tensors from the MPO, the MPS and its conjugate on site <span class="math notranslate nohighlight">\(n\)</span> and <span class="math notranslate nohighlight">\(n+1\)</span>. We can further combine the tensors from the MPS into <span class="math notranslate nohighlight">\(\Theta\)</span>, as shown in <a class="reference internal" href="#fig-dmrg-blocks"><span class="std std-numref">Fig. 8.1</span></a>. The goal is then to update the tensor <span class="math notranslate nohighlight">\(\Theta\)</span> in order to minimise the value from contracting the entire diagram.</p>
 <figure class="align-center" id="fig-dmrg-blocks">
 <a class="reference internal image-reference" href="../../_images/dmrg_blocks.jpeg"><img alt="../../_images/dmrg_blocks.jpeg" src="../../_images/dmrg_blocks.jpeg" style="width: 100%;" /></a>
@@ -579,7 +580,7 @@
 <h2><span class="section-number">8.2. </span>References<a class="headerlink" href="#references" title="Link to this heading">#</a></h2>
 <div class="docutils container" id="id2">
 <div role="list" class="citation-list">
-<div class="citation" id="id9" role="doc-biblioentry">
+<div class="citation" id="id11" role="doc-biblioentry">
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">Whi92</a><span class="fn-bracket">]</span></span>
 <p>Steven R. White. Density matrix formulation for quantum renormalization groups. <em>Phys. Rev. Lett.</em>, 69:2863–2866, Nov 1992. URL: <a class="reference external" href="https://link.aps.org/doi/10.1103/PhysRevLett.69.2863">https://link.aps.org/doi/10.1103/PhysRevLett.69.2863</a>, <a class="reference external" href="https://doi.org/10.1103/PhysRevLett.69.2863">doi:10.1103/PhysRevLett.69.2863</a>.</p>
 </div>

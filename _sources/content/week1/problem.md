@@ -32,7 +32,7 @@ This data reveals that the model is gapless, and has a very distinct dispersion 
 The specific quantity that we want to compute is called the *dynamical spin structure factor (DSSF)*. This is the quantity that can be measured in inelastic neutron scattering experiments. The components of the DSSF are given by
 
 $$
-S^{\alpha,\beta}(q, \omega) = \sum_{j,k} e^{iq(j-k)} \int_{-\infty}^{\infty} e^{i\omega t} \langle S^\alpha_j(t) S^\beta_k(0) \rangle dt.
+S^{\alpha,\beta}(q, \omega) = \frac{1}{2\pi N}\sum_{j,k} e^{iq(j-k)} \int_{-\infty}^{\infty} e^{i\omega t} \langle S^\alpha_j(t) S^\beta_k(0) \rangle dt.
 $$ (eq:dsf)
 
 The actual quantity that is measured in experiments is the cross-section for the outgoing neutrons, which is related to the dynamical structure factor but also includes simple momentum polarization and magnetic form factors. These details go beyond the scope of this course. In fact, due to symmetries of the model, we will only be concerned with the $S^{zz}(q, \omega)$ component.
@@ -51,7 +51,7 @@ While we will go into the details of this calculation in week 4, our goal can th
 
 By the end of the course you should be able to produce data similar to that shown in {numref}`fig:mpsfinal` using your own code:
 
-```{figure} images/AFH_MPS_final.png
+```{figure} images/dssf_100_16.jpg
 ---
 name: fig:mpsfinal
 width: 66%

@@ -34,7 +34,7 @@
     <link rel="stylesheet" type="text/css" href="../../_static/styles/sphinx-book-theme.css?v=a3416100" />
     <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css?v=13237357" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css?v=be8a1c11" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css?v=4fa983c6" />
     <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
   
@@ -60,9 +60,12 @@
     <script async="async" src="../../_static/sphinx-thebe.js?v=c100c467"></script>
     <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
     <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'content/week4/dsf';</script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="10. Beyond This Course" href="beyond.html" />
     <link rel="prev" title="8. Density Matrix Renormalization Group (DMRG)" href="../week3/dmrg.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
@@ -187,6 +190,7 @@
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">Week 4</span></p>
 <ul class="current nav bd-sidenav">
 <li class="toctree-l1 current active"><a class="current reference internal" href="#">9. Bringing It All Together</a></li>
+<li class="toctree-l1"><a class="reference internal" href="beyond.html">10. Beyond This Course</a></li>
 </ul>
 
     </div>
@@ -351,7 +355,9 @@
 <button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
     <i class="fa-solid fa-magnifying-glass fa-lg"></i>
 </button>
-
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
 </div></div>
       
     </div>
@@ -367,6 +373,25 @@
     <div id="print-main-content">
         <div id="jb-print-toc">
             
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dynamical-spin-structure-factor">9.1. Dynamical Spin Structure Factor</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#simplifying-the-dssf">9.2. Simplifying the DSSF</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#removing-gibbs-oscillations">9.2.1. Removing Gibbs oscillations</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setting-up-the-calculation">9.3. Setting up the calculation</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#applying-an-operator-to-a-state">9.3.1. Applying an operator to a state</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#computing-the-overlap">9.3.2. Computing the overlap</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#putting-it-all-together">9.4. Putting it all together</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#references">9.5. References</a></li>
+</ul>
+            </nav>
         </div>
     </div>
 </div>
@@ -378,7 +403,336 @@
                   
   <section class="tex2jax_ignore mathjax_ignore" id="bringing-it-all-together">
 <h1><span class="section-number">9. </span>Bringing It All Together<a class="headerlink" href="#bringing-it-all-together" title="Link to this heading">#</a></h1>
-<p>Watch this space!</p>
+<p>At this point we have learnt all the aspects of MPS necessary to tackle the problem we set out at the start: computing the dynamical spin structure factor for the antiferromagnetic Heisenberg model. We have learnt about the MPS representation of quantum states, the DMRG algorithm for finding ground states, and the TEBD for simulating time evolution. It is now time to bring all these elements together.</p>
+<section id="dynamical-spin-structure-factor">
+<h2><span class="section-number">9.1. </span>Dynamical Spin Structure Factor<a class="headerlink" href="#dynamical-spin-structure-factor" title="Link to this heading">#</a></h2>
+<p>Let us restate the problem that we are tackling with our MPS code. We want to compute the <em>dynamical spin structure factor</em> (DSSF)</p>
+<div class="math notranslate nohighlight" id="equation-eq-dsf-2">
+<span class="eqno">(9.1)<a class="headerlink" href="#equation-eq-dsf-2" title="Link to this equation">#</a></span>\[
+S^{\alpha\beta}(q, \omega) = \frac{1}{2\pi N}\sum_{j,k} e^{iq(j-k)} \int_{-\infty}^{\infty} e^{i\omega t} \langle \psi_0 | S^\alpha_j(t) S^\beta_k(0) | \psi_0 \rangle \;dt,
+\]</div>
+<p>for the antiferromagnetic Heisenberg (AFH) model described by the Hamiltonian</p>
+<div class="math notranslate nohighlight">
+\[
+H = J \sum_{i=1}^{N-1} \mathbf{S}_i \cdot \mathbf{S}_{i+1} = J \sum_{i=1}^{N-1} (S_i^x S_{i+1}^x + S_i^y S_{i+1}^y + S_i^z S_{i+1}^z).
+\]</div>
+<p>In the DSSF, the state <span class="math notranslate nohighlight">\(|\psi_0\rangle\)</span> is the ground state of the AFH model. The DSSF is directly related to what can be measured in inelastic neutron scattering experiments, and we want to use MPS methods to provide the theory predicitions corresponding to the experimental results shown in <a class="reference internal" href="#fig-lake2013-2"><span class="std std-numref">Fig. 9.1</span></a>.</p>
+<figure class="align-center" id="fig-lake2013-2">
+<a class="reference internal image-reference" href="../../_images/AFH_experiment.png"><img alt="../../_images/AFH_experiment.png" src="../../_images/AFH_experiment.png" style="width: 80%;" /></a>
+<figcaption>
+<p><span class="caption-number">Fig. 9.1 </span><span class="caption-text">Data from B. Lake <em>et al</em> <span id="id1">[<a class="reference internal" href="#id12" title="B. Lake, D. A. Tennant, J.-S. Caux, T. Barthel, U. Schollwöck, S. E. Nagler, and C. D. Frost. Multispinon continua at zero and finite temperature in a near-ideal heisenberg chain. Phys. Rev. Lett., 111:137205, Sep 2013. URL: https://link.aps.org/doi/10.1103/PhysRevLett.111.137205, doi:10.1103/PhysRevLett.111.137205.">LTC+13</a>]</span>. The left panel shows the experimental data for the dynamical structure factor of <span class="math notranslate nohighlight">\(\text{KCuF}_3\)</span>. The right panel shows the theoretical prediction for the Heisenberg model obtained using Bethe Ansatz.</span><a class="headerlink" href="#fig-lake2013-2" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</section>
+<section id="simplifying-the-dssf">
+<h2><span class="section-number">9.2. </span>Simplifying the DSSF<a class="headerlink" href="#simplifying-the-dssf" title="Link to this heading">#</a></h2>
+<p>Before setting up the calculation using MPS, we are going to simplify the DSSF expression in <a class="reference internal" href="#equation-eq-dsf-2">(9.1)</a>. Firstly, we are only interested in the diagonal components <span class="math notranslate nohighlight">\(S^{\alpha\alpha}\)</span>. Furthermore, due to the symmetry of the Hamiltonian, we can consider only <span class="math notranslate nohighlight">\(S^{zz}\)</span>. Then we can use an approximation that the system is translation invariant. We ideally would like to compute the DSSF for an infinite translation invariant system, but instead our MPS code will use a (large) finite system size <span class="math notranslate nohighlight">\(N\)</span>. This approximation gets better as we increase <span class="math notranslate nohighlight">\(N\)</span>. With this approximation, we can write the DSSF as</p>
+<div class="math notranslate nohighlight" id="equation-eq-dsf-translation-invariant">
+<span class="eqno">(9.2)<a class="headerlink" href="#equation-eq-dsf-translation-invariant" title="Link to this equation">#</a></span>\[\begin{split}
+\begin{aligned}
+S^{\alpha\alpha}(q, \omega) &amp;= \frac{1}{2\pi} e^{-iqN/2}\sum_{r} e^{iqr} \int_{-\infty}^{\infty} e^{i\omega t} \langle \psi_0 | S^\alpha_r(t) S^\alpha_{N/2}(0) | \psi_0 \rangle \;dt,\\
+&amp;= \frac{1}{2\pi} \sum_{r=-N/2}^{N/2-1} e^{iqr} \int_{-\infty}^{\infty} e^{i\omega t} \langle \psi_0 | S^\alpha_{r+N/2}(t) S^\alpha_{N/2}(0) | \psi_0 \rangle \;dt,
+\end{aligned}
+\end{split}\]</div>
+<p>where we have fixed the second spin at the centre of the system to minimise the finite size effects. Next we don’t want to have to compute the integral to negative times. We can rewrite the integral to get only one side of the limit. We can rewrite the integral as</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+&amp;\int_{0}^{\infty} e^{i\omega t} \langle \psi_0 | S^\alpha_{r-N/2}(t) S^\alpha_{N/2}(0) | \psi_0 \rangle + \int_{-\infty}^{0} e^{i\omega t}\langle \psi_0 | S^\alpha_{r+N/2}(t) S^\alpha_{N/2}(0) | \psi_0 \rangle \;dt \\
+&amp;= \int_{0}^{\infty} e^{i\omega t} \langle \psi_0 | S^\alpha_{r-N/2}(t) S^\alpha_{N/2}(0) | \psi_0 \rangle + \int_{0}^{\infty} e^{-i\omega t}\langle \psi_0 | S^\alpha_{r+N/2}(-t) S^\alpha_{N/2}(0) | \psi_0 \rangle \;dt \\
+&amp;= \int_{0}^{\infty} e^{i\omega t} \langle \psi_0 | S^\alpha_{r-N/2}(t) S^\alpha_{N/2}(0) | \psi_0 \rangle + \int_{0}^{\infty} \left(e^{i\omega t}\langle \psi_0 | S^\alpha_{N/2}(t) S^\alpha_{r+N/2}(0) | \psi_0 \rangle \right)^* \;dt \\
+&amp;= \int_{0}^{\infty} e^{i\omega t} \langle \psi_0 | S^\alpha_{r-N/2}(t) S^\alpha_{N/2}(0) | \psi_0 \rangle + \int_{0}^{\infty} \left(e^{i\omega t}\langle \psi_0 | S^\alpha_{r+N/2}(-t) S^\alpha_{N/2}(0)| \psi_0 \rangle \right)^* \;dt \\
+&amp;=\int_{0}^{\infty} 2\text{Re}\left[e^{i\omega t} \langle \psi_0 | S^\alpha_{r+N/2}(t) S^\alpha_{N/2}(0) | \psi_0 \rangle\right] \;dt.
+\end{aligned}
+\end{split}\]</div>
+<p>In the second line, we flipped the integral limits, and sent <span class="math notranslate nohighlight">\(t\rightarrow -t\)</span>. In the third line, we used the fact that <span class="math notranslate nohighlight">\(\langle S^\alpha_{j}(-t) S^\alpha_{k}(0) \rangle = \langle S^\alpha_{k}(0) S^\alpha_{j}(-t) \rangle^* = \langle S^\alpha_{k}(t) S^\alpha_{j}(0) \rangle^*\)</span>. Then in the fourth line we again use the translation invariance to shift the indices, along with the fact that we sum over all <span class="math notranslate nohighlight">\(r\)</span> and so can flip the sign of <span class="math notranslate nohighlight">\(r\)</span>. The final line simply follows from <span class="math notranslate nohighlight">\(2\text{Re}(z) = z + z^*\)</span>. We therefore get the integral</p>
+<div class="math notranslate nohighlight">
+\[
+S^{\alpha\alpha}(q, \omega) = \frac{1}{2\pi} \sum_{r} e^{iqr} \int_{0}^{\infty} 2\text{Re}\left[e^{i\omega t} \langle \psi_0 | S^\alpha_{r+N/2}(t) S^\alpha_{N/2}(0) | \psi_0 \rangle\right] \;dt.
+\]</div>
+<p>Finally, we replace the integral by a sum over discrete time steps <span class="math notranslate nohighlight">\(\Delta t\)</span> from our simulation to get</p>
+<div class="math notranslate nohighlight" id="equation-eq-dsf-final">
+<span class="eqno">(9.3)<a class="headerlink" href="#equation-eq-dsf-final" title="Link to this equation">#</a></span>\[
+S^{\alpha\alpha}(q, \omega) \approx 2 \Delta t\sum_{r=-N/2}^{N/2-1} \sum_{m=0}^{M} e^{iqr} \text{Re}\left[e^{i\omega m \Delta t} \langle \psi_0 | S^\alpha_{r+N/2}(t) S^\alpha_{N/2}(0) | \psi_0 \rangle\right]
+\]</div>
+<section id="removing-gibbs-oscillations">
+<h3><span class="section-number">9.2.1. </span>Removing Gibbs oscillations<a class="headerlink" href="#removing-gibbs-oscillations" title="Link to this heading">#</a></h3>
+<figure class="align-center" id="fig-gibbs">
+<a class="reference internal image-reference" href="../../_images/gibbs.jpg"><img alt="../../_images/gibbs.jpg" src="../../_images/gibbs.jpg" style="width: 85%;" /></a>
+<figcaption>
+<p><span class="caption-number">Fig. 9.2 </span><span class="caption-text">Removing Gibbs oscillations using a window function. Left shows the window function, a correlator, and the windowed correlator. The right shows the Fourier transform of the correlator and windowed correlator.</span><a class="headerlink" href="#fig-gibbs" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+<p>In replacing the integral over time with a finite sum over discrete time steps, we have introduced two sources of error. The first is due to the finite time step <span class="math notranslate nohighlight">\(\Delta t\)</span>, and the second is due to the finite time window <span class="math notranslate nohighlight">\(t = M\Delta t\)</span>. The finite time step error can be reduced by decreasing <span class="math notranslate nohighlight">\(\Delta t\)</span>. The finite time window introduces a sharp cutoff to the integral. This sharp cutoff can introduce Gibbs oscillations, as can be seen in <a class="reference internal" href="#fig-gibbs"><span class="std std-numref">Fig. 9.2</span></a>. To remove these oscillations, we can use a window function to introduce a smooth cutoff to the integral. There are many options for window functions. We will use a simple cosine squared window function (shown in <a class="reference internal" href="#fig-gibbs"><span class="std std-numref">Fig. 9.2</span></a>)</p>
+<div class="math notranslate nohighlight" id="equation-eq-window">
+<span class="eqno">(9.4)<a class="headerlink" href="#equation-eq-window" title="Link to this equation">#</a></span>\[
+g(m) = \cos^2\left(\frac{\pi m}{2M}\right),
+\]</div>
+<p>where the argument is chosen such that it is zero at <span class="math notranslate nohighlight">\(t=M\Delta t\)</span>. As we can see in <a class="reference internal" href="#fig-gibbs"><span class="std std-numref">Fig. 9.2</span></a>, the finite time window introduces oscillations in the Fourier transform of the correlator. By taking the Fourier transform of the windowed correlator, we can see that the oscillations are removed and the signal is smoothed.</p>
+<p>We can now write the final expression for the DSSF as</p>
+<div class="math notranslate nohighlight">
+\[
+S^{\alpha\alpha}(q, \omega) \approx 2\Delta t \sum_{r=-N/2}^{N/2-1} \sum_{m=0}^{M} e^{iqr} \text{Re}\left[e^{i\omega m \Delta t} \langle \psi_0 | S^\alpha_{r+N/2}(t) S^\alpha_{N/2}(0) | \psi_0 \rangle \right] g(m)
+\]</div>
+<p>where we have introduced the window function <span class="math notranslate nohighlight">\(g(m)\)</span> to smooth the correlator.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>It is a bit unfortunate that the window function weights our correlator such that the longest times have the least impact on the final result. Especially since the later times are the hardest to compute, so it feels like we are throwing away that hard work. In practice, it is common to use a simple extrapolation method to extend the results of the simulation to longer times. These extropolated results cannot be fully trusted, but since they are strongly suppressed by the window function, they do not have a large impact on the final result. The time steps that we put hard work into calculating will now have a larger impact on the final result.</p>
+<p>For simplicity, we won’t introduce any extrapolation methods in this course.</p>
+</div>
+</section>
+</section>
+<section id="setting-up-the-calculation">
+<h2><span class="section-number">9.3. </span>Setting up the calculation<a class="headerlink" href="#setting-up-the-calculation" title="Link to this heading">#</a></h2>
+<p>Now that we have figured out how to correctly compute the Fourier transform, all that remains is to use MPS to compute the correlation functions</p>
+<div class="math notranslate nohighlight">
+\[
+C^{zz}_j(t) = \langle \psi_0 | S^z_{j}(t) S^z_{N/2}(0) | \psi_0 \rangle.
+\]</div>
+<p>Again, it is worth the effort to manipulate this expression to simplify our calculation. First let us reveal the time evolution of the operators</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+C^{zz}_j(t) &amp;= \langle \psi_0 | e^{iHt} S^z_{j} e^{-iHt} S^z_{N/2} | \psi_0 \rangle, \\
+&amp;= e^{iE_0 t} \langle \psi_0 | S^z_{j} e^{-iHt} S^z_{N/2} | \psi_0 \rangle, \\
+&amp;= e^{iE_0 t} \left(\langle \psi_0 | S^z_{j} e^{-iHt/2}\right) \left( e^{-iHt/2} S^z_{N/2} | \psi_0 \rangle \right), \\
+&amp;= 4e^{iE_0 t} \left(\langle \psi_0 | \sigma^z_{j} e^{-iHt/2}\right) \left( e^{-iHt/2} \sigma^z_{N/2} | \psi_0 \rangle \right).
+\end{aligned}
+\end{split}\]</div>
+<p>In the second line, we have used the fact that <span class="math notranslate nohighlight">\(|\psi_0\rangle\)</span> is the ground state of <span class="math notranslate nohighlight">\(H\)</span>, i.e. it is an eigenstate with eigenvalue <span class="math notranslate nohighlight">\(E_0\)</span>. In the third line, we have split the time evolution into two parts. This allows us to write the correlator as the overlap between two states that have been evolved only to time <span class="math notranslate nohighlight">\(t/2\)</span>. This is useful because computing the time evolution for long times is costly due to the growth of entanglement, and so we can save some computational effort. Finally, we rewrite in terms of the Pauli operators <span class="math notranslate nohighlight">\(\sigma^z\)</span>, instead of the spin operators <span class="math notranslate nohighlight">\(S^z = \sigma^z\)</span>. This is because the Pauli operators are unitary, and so we can act with them on the MPS without changing the canonical form.</p>
+<div class="admonition-algorithm-computing-the-correlator admonition">
+<p class="admonition-title">Algorithm: Computing the correlator</p>
+<p>Let us now wrtie down the steps to compute the correlator <span class="math notranslate nohighlight">\(C^{zz}_j(t)\)</span>.</p>
+<ol class="arabic simple">
+<li><p>Compute the ground state <span class="math notranslate nohighlight">\(|\psi_0\rangle\)</span> of the AFH model using DMRG.</p></li>
+<li><p>Compute the state <span class="math notranslate nohighlight">\(|\psi_{N/2}\rangle = \sigma^Z_{N/2} |\psi_0\rangle\)</span>. and the state <span class="math notranslate nohighlight">\(|\psi_j\rangle = \sigma^Z_{j} |\psi_0\rangle\)</span>.</p></li>
+<li><p>Evolve the states using TEBD to time <span class="math notranslate nohighlight">\(t/2\)</span>. More explicitly, we evolve <span class="math notranslate nohighlight">\(|\psi_{N/2}(t/2)\rangle = e^{-iHt/2} |\psi_{N/2}\rangle\)</span> and <span class="math notranslate nohighlight">\(|\psi_j(t/2)\rangle = e^{iHt/2} |\psi_j\rangle\)</span>. Note that evolve “backwards” in time for <span class="math notranslate nohighlight">\(|\psi_{j}(t/2)\rangle\)</span>, which is done by setting <span class="math notranslate nohighlight">\(\Delta t \rightarrow -\Delta t\)</span> in the TEBD algorithm.</p></li>
+<li><p>Compute the overlap between <span class="math notranslate nohighlight">\(|\psi_{N/2}(t/2)\rangle\)</span> and <span class="math notranslate nohighlight">\(|\psi_j(t/2)\rangle\)</span> to get the correlator <span class="math notranslate nohighlight">\(C^{zz}_j(t)\)</span>. More precisely, compute <span class="math notranslate nohighlight">\(C^{zz}_j(t) = 4 e^{iE_0t}\langle \psi_{j}(t/2) | \psi_{N/2}(t/2) \rangle\)</span>.</p></li>
+</ol>
+<p>Note that when doing the time evolution we can evolve one of the two states at a time. That is, evolve <span class="math notranslate nohighlight">\(|\psi_{N/2}(t/2)\rangle\)</span> forward one step, and then compute the overlap. Then evolve <span class="math notranslate nohighlight">\(|\psi_j(t/2)\rangle\)</span> backwards one step, and then compute the overlap. This way we only need to do the evolution <span class="math notranslate nohighlight">\(M\)</span> times and not <span class="math notranslate nohighlight">\(2M\)</span> times.</p>
+</div>
+<p>To compute the correlator, there are two operations that we need to perform that we have not yet implemented: applying an operator to a state, and computing the overlap between two states. These are simple operations on the MPS that we will add to our code.</p>
+<section id="applying-an-operator-to-a-state">
+<h3><span class="section-number">9.3.1. </span>Applying an operator to a state<a class="headerlink" href="#applying-an-operator-to-a-state" title="Link to this heading">#</a></h3>
+<figure class="align-center" id="fig-apply-local">
+<a class="reference internal image-reference" href="../../_images/apply_local.jpeg"><img alt="../../_images/apply_local.jpeg" src="../../_images/apply_local.jpeg" style="width: 45%;" /></a>
+<figcaption>
+<p><span class="caption-number">Fig. 9.3 </span><span class="caption-text">Applying a local unitary to an MPS can be done with a single local contraction. The operator is applied to the physical index of the MPS.</span><a class="headerlink" href="#fig-apply-local" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+<p>The first new operation is acting on an MPS with a local operator. In our case we only need to act with the <span class="math notranslate nohighlight">\(\sigma^z\)</span> operator. This is local and unitary. Because the operator is unitary, it does not change the canonical form, meaning we can do this operation with a single local contraction without needing to move the centre. This operation is shown in <a class="reference internal" href="#fig-apply-local"><span class="std std-numref">Fig. 9.3</span></a>. Applying the operator only updates the single tensor it acts on and preserves the current canonical form of the MPS.</p>
+<div class="admonition-code-applying-an-operator-to-a-state admonition">
+<p class="admonition-title">Code: Applying an operator to a state</p>
+<p>Let us add a method to the MPS class to apply an operator to a state. This method will take a unitary operator and an index, and apply the operator to the tensor at that index. The method will act in place to update the MPS. My code follows the contraction shown in <a class="reference internal" href="#fig-apply-contraction"><span class="std std-numref">Fig. 9.4</span></a>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1">## file: src/mps.py</span>
+
+<span class="k">class</span> <span class="nc">MPS</span><span class="p">:</span>
+
+    <span class="c1">## PREVIOUS CODE OMITTED ##</span>
+
+    <span class="k">def</span> <span class="nf">applyOperator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">O</span><span class="p">,</span> <span class="n">site</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Apply the single site Unitary operator O to site i.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1">## YOUR CODE HERE ##</span>
+
+</pre></div>
+</div>
+<figure class="align-center" id="fig-apply-contraction">
+<a class="reference internal image-reference" href="../../_images/apply_contraction.jpeg"><img alt="../../_images/apply_contraction.jpeg" src="../../_images/apply_contraction.jpeg" style="width: 60%;" /></a>
+<figcaption>
+<p><span class="caption-number">Fig. 9.4 </span><span class="caption-text">Indexing for the local contraction of an operator applied to an MPS tensor.</span><a class="headerlink" href="#fig-apply-contraction" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</div>
+</section>
+<section id="computing-the-overlap">
+<h3><span class="section-number">9.3.2. </span>Computing the overlap<a class="headerlink" href="#computing-the-overlap" title="Link to this heading">#</a></h3>
+<figure class="align-center" id="fig-overlap">
+<a class="reference internal image-reference" href="../../_images/overlap.jpeg"><img alt="../../_images/overlap.jpeg" src="../../_images/overlap.jpeg" style="width: 75%;" /></a>
+<figcaption>
+<p><span class="caption-number">Fig. 9.5 </span><span class="caption-text">Tensor network diagram for the overlap between two MPS.</span><a class="headerlink" href="#fig-overlap" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+<p>The second new operation is computing the overlap between two states. Since the states we are computing the overlap between are different states, we cannot take advantage of the canonical form, and therefore there is also no need to move the centre.</p>
+<div class="admonition-code-computing-the-overlap admonition">
+<p class="admonition-title">Code: Computing the overlap</p>
+<p>Let’s add the function to compute overlaps between MPS. While this is not the only way to structure your code, I feel it most natural to call this function as <code class="docutils literal notranslate"><span class="pre">x</span> <span class="pre">=</span> <span class="pre">overlap(mps1,</span> <span class="pre">mps2)</span></code>, which would compute the overlap <span class="math notranslate nohighlight">\(\langle \text{mps1} | \text{mps2} \rangle\)</span>. I have therefore chosen to create a function in a separate file <code class="docutils literal notranslate"><span class="pre">overlap.py</span></code>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1">## file: src/overlap.py</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="k">def</span> <span class="nf">overlap</span><span class="p">(</span><span class="n">psi1</span><span class="p">,</span> <span class="n">psi2</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute the overlap between psi1 and psi2. Specifically, &lt;psi1 | psi2&gt;.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1">## YOUR CODE HERE ##</span>
+
+    <span class="k">return</span> <span class="n">overlap</span>
+</pre></div>
+</div>
+</div>
+</section>
+</section>
+<section id="putting-it-all-together">
+<h2><span class="section-number">9.4. </span>Putting it all together<a class="headerlink" href="#putting-it-all-together" title="Link to this heading">#</a></h2>
+<p>We now have all the elements we need to perform our computation. All that is left is to put all the elements together to perform our simulation. For this purpose I created a new file <code class="docutils literal notranslate"><span class="pre">src/dssf.py</span></code> where I will put all the code to perform the simulation. I chose to break the code into functions to simplify the scripts where I run and plot the results. For the final scripts, I chose to create a new folder called <code class="docutils literal notranslate"><span class="pre">run</span></code>. In this folder I also created a <code class="docutils literal notranslate"><span class="pre">data</span></code> folder. Since the simulation will take longer than our previous tests, it makes sense to save the data to file and then load it for plotting. That way we don’t need to repeat the computation each time.</p>
+<div class="admonition-code-putting-it-all-together admonition">
+<p class="admonition-title">Code: Putting it all together</p>
+<p>I think you should now be able to put this all together yourself. To help you out, let me show you how I structured my code (although feel free to do it your own way). I chose to break everything into functions.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1">## file: src/dssf.py</span>
+
+<span class="kn">from</span> <span class="nn">src.tebd</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">src.dmrg</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">src.overlap</span> <span class="kn">import</span> <span class="n">overlap</span>
+
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">pickle</span>
+<span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+
+<span class="k">def</span> <span class="nf">correlator</span><span class="p">(</span><span class="n">psi</span><span class="p">,</span> <span class="n">E_0</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">tMax</span><span class="p">,</span> <span class="n">chiMax</span><span class="p">,</span> <span class="n">tol</span><span class="p">,</span> <span class="n">entropy</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute the time evolution of the correlator &lt;psi0|Z_j(t) Z_N/2(0)|psi0&gt; using TEBD, for a single site j.</span>
+<span class="sd">    Includes flag to return the half-chain entropy at each time step.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">    psi (MPS): mps ground state</span>
+<span class="sd">    E_0 (float): ground state energy</span>
+<span class="sd">    j (int): site index</span>
+<span class="sd">    dt (float): time step</span>
+<span class="sd">    tMax (float): maximum time</span>
+<span class="sd">    chiMax (int): maximum bond dimension</span>
+<span class="sd">    tol (float): convergence tolerance</span>
+<span class="sd">    entropy (bool): flag to compute entropy</span>
+
+<span class="sd">    Writes date to file.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1">## YOUR CODE HERE ##</span>
+
+    <span class="k">if</span> <span class="n">entropy</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">t_list</span><span class="p">,</span> <span class="n">correlator_list</span><span class="p">,</span> <span class="n">entropy_list</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">t_list</span><span class="p">,</span> <span class="n">correlator_list</span>
+
+<span class="k">def</span> <span class="nf">computeCorrelator</span><span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">tMax</span><span class="p">,</span> <span class="n">chiMax</span><span class="p">,</span> <span class="n">tol</span><span class="p">,</span> <span class="n">entropy</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute the correlators &lt;Z_j(t) Z_N/2(0)&gt; for all sites j using TEBD.</span>
+<span class="sd">    Starts by computing the ground state using DMRG.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1">## YOUR CODE HERE ##</span>
+
+    <span class="c1"># save the correlator data to file using pickle</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;L&#39;</span><span class="p">:</span> <span class="n">L</span><span class="p">,</span> <span class="s1">&#39;t_list&#39;</span><span class="p">:</span> <span class="n">t_list</span><span class="p">,</span> <span class="s1">&#39;correlator&#39;</span><span class="p">:</span> <span class="n">correlator_array</span><span class="p">}</span>
+    <span class="k">if</span> <span class="n">entropy</span><span class="p">:</span>
+        <span class="n">data</span><span class="p">[</span><span class="s1">&#39;entropy&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">entropy_list</span>
+
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;data/correlator_L</span><span class="si">{</span><span class="n">L</span><span class="si">}</span><span class="s1">_chi</span><span class="si">{</span><span class="n">chiMax</span><span class="si">}</span><span class="s1">.pickle&#39;</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">handle</span><span class="p">:</span>
+        <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">handle</span><span class="p">,</span> <span class="n">protocol</span><span class="o">=</span><span class="n">pickle</span><span class="o">.</span><span class="n">HIGHEST_PROTOCOL</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">plot_dssf</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">omega</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Load the data from file and plot the dynamical structure factor.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;data/&#39;</span><span class="o">+</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">handle</span><span class="p">:</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">handle</span><span class="p">)</span>
+
+    <span class="n">L</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;L&#39;</span><span class="p">]</span>
+    <span class="n">t_list</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;t_list&#39;</span><span class="p">]</span>
+    <span class="n">correlator</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;correlator&#39;</span><span class="p">]</span>
+    <span class="n">n_sites</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">correlator</span><span class="p">)</span>
+
+    <span class="c1"># define the window function</span>
+    <span class="n">window_function</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">t_list</span><span class="o">/</span><span class="n">t_list</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
+
+    <span class="c1">## YOUR CODE HERE ##</span>
+
+    <span class="c1"># plot the DSSF</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">DSSF</span><span class="p">))</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">aspect</span><span class="o">=</span><span class="s1">&#39;auto&#39;</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;lower&#39;</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;magma_r&#39;</span><span class="p">,</span> <span class="n">extent</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">omega</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]])</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;k&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;$\omega$&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;0&#39;</span><span class="p">,</span> <span class="s1">&#39;$\pi$&#39;</span><span class="p">,</span> <span class="s1">&#39;$2\pi$&#39;</span><span class="p">])</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">clim</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">50</span><span class="p">])</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>You can then write two very short scripts to run and to plot.</p>
+<p>To run:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1">## file: run/dssf_run.py</span>
+
+<span class="kn">from</span> <span class="nn">fix_pathing</span> <span class="kn">import</span> <span class="n">root_dir</span>
+<span class="kn">from</span> <span class="nn">src.dssf</span> <span class="kn">import</span> <span class="n">computeCorrelator</span>
+
+<span class="n">L</span> <span class="o">=</span> <span class="mi">30</span>
+<span class="n">chiMax</span> <span class="o">=</span> <span class="mi">8</span>
+<span class="n">tol</span> <span class="o">=</span> <span class="mf">1e-14</span>
+
+<span class="n">dt</span> <span class="o">=</span> <span class="mf">0.2</span>
+<span class="n">tMax</span> <span class="o">=</span> <span class="mi">8</span>  <span class="c1">## should be approximately L/4. Don&#39;t want to hit the boundary.</span>
+
+<span class="n">computeCorrelator</span><span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">tMax</span><span class="p">,</span> <span class="n">chiMax</span><span class="p">,</span> <span class="n">tol</span><span class="p">,</span> <span class="n">entropy</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>To plot:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">fix_pathing</span> <span class="kn">import</span> <span class="n">root_dir</span>
+<span class="kn">from</span> <span class="nn">src.dssf</span> <span class="kn">import</span> <span class="n">plot_dssf</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="n">L</span> <span class="o">=</span> <span class="mi">30</span>
+<span class="n">chi</span> <span class="o">=</span> <span class="mi">8</span>
+
+<span class="n">filename</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;correlator_L</span><span class="si">{</span><span class="n">L</span><span class="si">}</span><span class="s1">_chi</span><span class="si">{</span><span class="n">chi</span><span class="si">}</span><span class="s1">.pickle&#39;</span>
+
+<span class="n">omega</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">L</span><span class="p">)</span>
+
+<span class="n">plot_dssf</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">omega</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>You may want to use these parameters as your starting point, but feel free to tweak them!</p>
+</div>
+<p>With the parameters as used in the code above, you should be able to reproduce the results shown in <a class="reference internal" href="#fig-dssf-small"><span class="std std-numref">Fig. 9.6</span></a>. To improve these results we can use a larger system size, and simulate to longer times. Since the system is critical, we will also need to increase the bond dimension to get accurate results.</p>
+<figure class="align-center" id="fig-dssf-small">
+<a class="reference internal image-reference" href="../../_images/dssf_small.jpg"><img alt="../../_images/dssf_small.jpg" src="../../_images/dssf_small.jpg" style="width: 60%;" /></a>
+<figcaption>
+<p><span class="caption-number">Fig. 9.6 </span><span class="caption-text">Dynamical Spin Structure Factor, computed with <span class="math notranslate nohighlight">\(L=30\)</span> sites and <span class="math notranslate nohighlight">\(\chi=8\)</span>, <span class="math notranslate nohighlight">\(dt=0.2\)</span> and <span class="math notranslate nohighlight">\(t_\text{max}=8\)</span>.</span><a class="headerlink" href="#fig-dssf-small" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+<p>By pushing the parameters to <span class="math notranslate nohighlight">\(L=100\)</span>, <span class="math notranslate nohighlight">\(\chi=16\)</span>, <span class="math notranslate nohighlight">\(dt=0.1\)</span> and <span class="math notranslate nohighlight">\(t_\text{max}=25\)</span>, we can reproduce the results shown in <a class="reference internal" href="#fig-dssf-100"><span class="std std-numref">Fig. 9.7</span></a>. This calculation is now well beyond naive exact numerics. While the qualitative behaviour was already visible in the <span class="math notranslate nohighlight">\(L=30\)</span> results, the larger system size and longer time evolution have allowed us to resolve the finer details of the DSSF. More precisely, running for longer times gives us a finer resolution in the frequency domain. To run for longer times we necessarily need to increase the system size in order to avoid finite size effects that would violate our translation invariance assumption. Increasing the system size also increases our resolution in quasi-momentum space. In these simulations I did not do a careful convergence study. This is something that you should do if you are interested in getting the most accurate results.</p>
+<figure class="align-center" id="fig-dssf-100">
+<a class="reference internal image-reference" href="../../_images/dssf_100_16.jpg"><img alt="../../_images/dssf_100_16.jpg" src="../../_images/dssf_100_16.jpg" style="width: 60%;" /></a>
+<figcaption>
+<p><span class="caption-number">Fig. 9.7 </span><span class="caption-text">Dynamical Spin Structure Factor, computed with <span class="math notranslate nohighlight">\(L=100\)</span> sites and <span class="math notranslate nohighlight">\(\chi=16\)</span>, <span class="math notranslate nohighlight">\(dt=0.1\)</span> and <span class="math notranslate nohighlight">\(t_\text{max}=25\)</span>.</span><a class="headerlink" href="#fig-dssf-100" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Because our tensors are dense, our calculations do not scale efficiently with the number of CPU cores used. Therefore, you will get comparable or better performance by running the code on one or two cores. You may find that when running your code it utilising all available cores. You can add the following lines of code to limit the number of threads used:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">os</span> <span class="kn">import</span> <span class="n">environ</span>
+<span class="n">environ</span><span class="p">[</span><span class="s1">&#39;OMP_NUM_THREADS&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;2&#39;</span>
+</pre></div>
+</div>
+<p>One way that we can take advantage of multiple cores is by noticing that the calulcations for <span class="math notranslate nohighlight">\(C_j(t)\)</span> are independent for each <span class="math notranslate nohighlight">\(j\)</span>. Therefore, we can parallelise the calculation of the correlators. This is a good exercise to try if you are interested in parallel programming.</p>
+</div>
+</section>
+<hr class="docutils" />
+<section id="references">
+<h2><span class="section-number">9.5. </span>References<a class="headerlink" href="#references" title="Link to this heading">#</a></h2>
+<div class="docutils container" id="id2">
+<div role="list" class="citation-list">
+<div class="citation" id="id12" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">LTC+13</a><span class="fn-bracket">]</span></span>
+<p>B. Lake, D. A. Tennant, J.-S. Caux, T. Barthel, U. Schollwöck, S. E. Nagler, and C. D. Frost. Multispinon continua at zero and finite temperature in a near-ideal heisenberg chain. <em>Phys. Rev. Lett.</em>, 111:137205, Sep 2013. URL: <a class="reference external" href="https://link.aps.org/doi/10.1103/PhysRevLett.111.137205">https://link.aps.org/doi/10.1103/PhysRevLett.111.137205</a>, <a class="reference external" href="https://doi.org/10.1103/PhysRevLett.111.137205">doi:10.1103/PhysRevLett.111.137205</a>.</p>
+</div>
+</div>
+</div>
+</section>
 </section>
 
     <script type="text/x-thebe-config">
@@ -420,12 +774,48 @@
         <p class="prev-next-title"><span class="section-number">8. </span>Density Matrix Renormalization Group (DMRG)</p>
       </div>
     </a>
+    <a class="right-next"
+       href="beyond.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title"><span class="section-number">10. </span>Beyond This Course</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
 </div>
                 </footer>
               
             </div>
             
             
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dynamical-spin-structure-factor">9.1. Dynamical Spin Structure Factor</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#simplifying-the-dssf">9.2. Simplifying the DSSF</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#removing-gibbs-oscillations">9.2.1. Removing Gibbs oscillations</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setting-up-the-calculation">9.3. Setting up the calculation</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#applying-an-operator-to-a-state">9.3.1. Applying an operator to a state</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#computing-the-overlap">9.3.2. Computing the overlap</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#putting-it-all-together">9.4. Putting it all together</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#references">9.5. References</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
               
             
           </div>
