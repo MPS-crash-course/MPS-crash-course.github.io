@@ -60,7 +60,7 @@ $$
 Finally, we replace the integral by a sum over discrete time steps $\Delta t$ from our simulation to get
 
 $$
-S^{\alpha\alpha}(q, \omega) \approx 2\sum_{r=-N/2}^{N/2-1} \sum_{m=0}^{M} e^{iqr} \text{Re}\left[e^{i\omega m \Delta t} \langle \psi_0 | S^\alpha_{r+N/2}(t) S^\alpha_{N/2}(0) | \psi_0 \rangle\right]
+S^{\alpha\alpha}(q, \omega) \approx 2 \Delta t\sum_{r=-N/2}^{N/2-1} \sum_{m=0}^{M} e^{iqr} \text{Re}\left[e^{i\omega m \Delta t} \langle \psi_0 | S^\alpha_{r+N/2}(t) S^\alpha_{N/2}(0) | \psi_0 \rangle\right]
 $$ (eq:dsf_final)
 
 ### Removing Gibbs oscillations
@@ -87,7 +87,7 @@ where the argument is chosen such that it is zero at $t=M\Delta t$. As we can se
 We can now write the final expression for the DSSF as
 
 $$
-S^{\alpha\alpha}(q, \omega) \approx 2\sum_{r=-N/2}^{N/2-1} \sum_{m=0}^{M} e^{iqr} \text{Re}\left[e^{i\omega m \Delta t} \langle \psi_0 | S^\alpha_{r+N/2}(t) S^\alpha_{N/2}(0) | \psi_0 \rangle \right] g(m)
+S^{\alpha\alpha}(q, \omega) \approx 2\Delta t \sum_{r=-N/2}^{N/2-1} \sum_{m=0}^{M} e^{iqr} \text{Re}\left[e^{i\omega m \Delta t} \langle \psi_0 | S^\alpha_{r+N/2}(t) S^\alpha_{N/2}(0) | \psi_0 \rangle \right] g(m)
 $$ 
 
 where we have introduced the window function $g(m)$ to smooth the correlator.
@@ -353,6 +353,17 @@ You may want to use these parameters as your starting point, but feel free to tw
 
 ````
 
+With the parameters as used in the code above, you should be able to reproduce the results shown in {numref}`fig:dssf_small`. To improve these results we can use a larger system size, and simulate to longer times. Since the system is critical, we will also need to increase the bond dimension to get accurate results. The results presented in {numref}`fig:mpsfinal` at the start were produced using $L=100$ and $\chi=32$.
+
+```{figure} images/dssf_small.jpg
+---
+name: fig:dssf_small
+width: 60%
+align: center
+---
+
+Dynamical Spin Structure Factor, computed with $L=30$ sites and $\chi=8$, $dt=0.2$ and $t_\text{max}=8$.
+``` 
 
 
 ---

@@ -388,7 +388,8 @@
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#computing-the-overlap">9.3.2. Computing the overlap</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#references">9.4. References</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#putting-it-all-together">9.4. Putting it all together</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#references">9.5. References</a></li>
 </ul>
             </nav>
         </div>
@@ -452,7 +453,7 @@ S^{\alpha\alpha}(q, \omega) = \frac{1}{2\pi} \sum_{r} e^{iqr} \int_{0}^{\infty} 
 <p>Finally, we replace the integral by a sum over discrete time steps <span class="math notranslate nohighlight">\(\Delta t\)</span> from our simulation to get</p>
 <div class="math notranslate nohighlight" id="equation-eq-dsf-final">
 <span class="eqno">(9.3)<a class="headerlink" href="#equation-eq-dsf-final" title="Link to this equation">#</a></span>\[
-S^{\alpha\alpha}(q, \omega) \approx 2\sum_{r=-N/2}^{N/2-1} \sum_{m=0}^{M} e^{iqr} \text{Re}\left[e^{i\omega m \Delta t} \langle \psi_0 | S^\alpha_{r+N/2}(t) S^\alpha_{N/2}(0) | \psi_0 \rangle\right]
+S^{\alpha\alpha}(q, \omega) \approx 2 \Delta t\sum_{r=-N/2}^{N/2-1} \sum_{m=0}^{M} e^{iqr} \text{Re}\left[e^{i\omega m \Delta t} \langle \psi_0 | S^\alpha_{r+N/2}(t) S^\alpha_{N/2}(0) | \psi_0 \rangle\right]
 \]</div>
 <section id="removing-gibbs-oscillations">
 <h3><span class="section-number">9.2.1. </span>Removing Gibbs oscillations<a class="headerlink" href="#removing-gibbs-oscillations" title="Link to this heading">#</a></h3>
@@ -471,7 +472,7 @@ g(m) = \cos^2\left(\frac{\pi m}{2M}\right),
 <p>We can now write the final expression for the DSSF as</p>
 <div class="math notranslate nohighlight">
 \[
-S^{\alpha\alpha}(q, \omega) \approx 2\sum_{r=-N/2}^{N/2-1} \sum_{m=0}^{M} e^{iqr} \text{Re}\left[e^{i\omega m \Delta t} \langle \psi_0 | S^\alpha_{r+N/2}(t) S^\alpha_{N/2}(0) | \psi_0 \rangle \right] g(m)
+S^{\alpha\alpha}(q, \omega) \approx 2\Delta t \sum_{r=-N/2}^{N/2-1} \sum_{m=0}^{M} e^{iqr} \text{Re}\left[e^{i\omega m \Delta t} \langle \psi_0 | S^\alpha_{r+N/2}(t) S^\alpha_{N/2}(0) | \psi_0 \rangle \right] g(m)
 \]</div>
 <p>where we have introduced the window function <span class="math notranslate nohighlight">\(g(m)\)</span> to smooth the correlator.</p>
 <div class="admonition note">
@@ -575,9 +576,138 @@ C^{zz}_j(t) &amp;= \langle \psi_0 | e^{iHt} S^z_{j} e^{-iHt} S^z_{N/2} | \psi_0 
 </div>
 </section>
 </section>
+<section id="putting-it-all-together">
+<h2><span class="section-number">9.4. </span>Putting it all together<a class="headerlink" href="#putting-it-all-together" title="Link to this heading">#</a></h2>
+<p>We now have all the elements we need to perform our computation. All that is left is to put all the elements together to perform our simulation. For this purpose I created a new file <code class="docutils literal notranslate"><span class="pre">src/dssf.py</span></code> where I will put all the code to perform the simulation. I chose to break the code into functions to simplify the scripts where I run and plot the results. For the final scripts, I chose to create a new folder called <code class="docutils literal notranslate"><span class="pre">run</span></code>. In this folder I also created a <code class="docutils literal notranslate"><span class="pre">data</span></code> folder. Since the simulation will take longer than our previous tests, it makes sense to save the data to file and then load it for plotting. That way we don’t need to repeat the computation each time.</p>
+<div class="admonition-code-putting-it-all-together admonition">
+<p class="admonition-title">Code: Putting it all together</p>
+<p>I think you should now be able to put this all together yourself. To help you out, let me show you how I structured my code (although feel free to do it your own way). I chose to break everything into functions.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1">## file: src/dssf.py</span>
+
+<span class="kn">from</span> <span class="nn">src.tebd</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">src.dmrg</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">src.overlap</span> <span class="kn">import</span> <span class="n">overlap</span>
+
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">pickle</span>
+<span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+
+<span class="k">def</span> <span class="nf">correlator</span><span class="p">(</span><span class="n">psi</span><span class="p">,</span> <span class="n">E_0</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">tMax</span><span class="p">,</span> <span class="n">chiMax</span><span class="p">,</span> <span class="n">tol</span><span class="p">,</span> <span class="n">entropy</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute the time evolution of the correlator &lt;psi0|Z_j(t) Z_N/2(0)|psi0&gt; using TEBD, for a single site j.</span>
+<span class="sd">    Includes flag to return the half-chain entropy at each time step.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">    psi (MPS): mps ground state</span>
+<span class="sd">    E_0 (float): ground state energy</span>
+<span class="sd">    j (int): site index</span>
+<span class="sd">    dt (float): time step</span>
+<span class="sd">    tMax (float): maximum time</span>
+<span class="sd">    chiMax (int): maximum bond dimension</span>
+<span class="sd">    tol (float): convergence tolerance</span>
+<span class="sd">    entropy (bool): flag to compute entropy</span>
+
+<span class="sd">    Writes date to file.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1">## YOUR CODE HERE ##</span>
+
+    <span class="k">if</span> <span class="n">entropy</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">t_list</span><span class="p">,</span> <span class="n">correlator_list</span><span class="p">,</span> <span class="n">entropy_list</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">t_list</span><span class="p">,</span> <span class="n">correlator_list</span>
+
+<span class="k">def</span> <span class="nf">computeCorrelator</span><span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">tMax</span><span class="p">,</span> <span class="n">chiMax</span><span class="p">,</span> <span class="n">tol</span><span class="p">,</span> <span class="n">entropy</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute the correlators &lt;Z_j(t) Z_N/2(0)&gt; for all sites j using TEBD.</span>
+<span class="sd">    Starts by computing the ground state using DMRG.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1">## YOUR CODE HERE ##</span>
+
+    <span class="c1"># save the correlator data to file using pickle</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;L&#39;</span><span class="p">:</span> <span class="n">L</span><span class="p">,</span> <span class="s1">&#39;t_list&#39;</span><span class="p">:</span> <span class="n">t_list</span><span class="p">,</span> <span class="s1">&#39;correlator&#39;</span><span class="p">:</span> <span class="n">correlator_array</span><span class="p">}</span>
+    <span class="k">if</span> <span class="n">entropy</span><span class="p">:</span>
+        <span class="n">data</span><span class="p">[</span><span class="s1">&#39;entropy&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">entropy_list</span>
+
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;data/correlator_L</span><span class="si">{</span><span class="n">L</span><span class="si">}</span><span class="s1">_chi</span><span class="si">{</span><span class="n">chiMax</span><span class="si">}</span><span class="s1">.pickle&#39;</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">handle</span><span class="p">:</span>
+        <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">handle</span><span class="p">,</span> <span class="n">protocol</span><span class="o">=</span><span class="n">pickle</span><span class="o">.</span><span class="n">HIGHEST_PROTOCOL</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">plot_dssf</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">omega</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Load the data from file and plot the dynamical structure factor.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;data/&#39;</span><span class="o">+</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">handle</span><span class="p">:</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">handle</span><span class="p">)</span>
+
+    <span class="n">L</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;L&#39;</span><span class="p">]</span>
+    <span class="n">t_list</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;t_list&#39;</span><span class="p">]</span>
+    <span class="n">correlator</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;correlator&#39;</span><span class="p">]</span>
+    <span class="n">n_sites</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">correlator</span><span class="p">)</span>
+
+    <span class="c1"># define the window function</span>
+    <span class="n">window_function</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">t_list</span><span class="o">/</span><span class="n">t_list</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
+
+    <span class="c1">## YOUR CODE HERE ##</span>
+
+    <span class="c1"># plot the DSSF</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">DSSF</span><span class="p">))</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">aspect</span><span class="o">=</span><span class="s1">&#39;auto&#39;</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;lower&#39;</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;magma_r&#39;</span><span class="p">,</span> <span class="n">extent</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">omega</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]])</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;k&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;$\omega$&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;0&#39;</span><span class="p">,</span> <span class="s1">&#39;$\pi$&#39;</span><span class="p">,</span> <span class="s1">&#39;$2\pi$&#39;</span><span class="p">])</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">clim</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">200</span><span class="p">])</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>You can then write two very short scripts to run and to plot.</p>
+<p>To run:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1">## file: run/dssf_run.py</span>
+
+<span class="kn">from</span> <span class="nn">fix_pathing</span> <span class="kn">import</span> <span class="n">root_dir</span>
+<span class="kn">from</span> <span class="nn">src.dssf</span> <span class="kn">import</span> <span class="n">computeCorrelator</span>
+
+<span class="n">L</span> <span class="o">=</span> <span class="mi">30</span>
+<span class="n">chiMax</span> <span class="o">=</span> <span class="mi">8</span>
+<span class="n">tol</span> <span class="o">=</span> <span class="mf">1e-14</span>
+
+<span class="n">dt</span> <span class="o">=</span> <span class="mf">0.2</span>
+<span class="n">tMax</span> <span class="o">=</span> <span class="mi">8</span>  <span class="c1">## should be approximately L/4. Don&#39;t want to hit the boundary.</span>
+
+<span class="n">computeCorrelator</span><span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">tMax</span><span class="p">,</span> <span class="n">chiMax</span><span class="p">,</span> <span class="n">tol</span><span class="p">,</span> <span class="n">entropy</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>To plot:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">fix_pathing</span> <span class="kn">import</span> <span class="n">root_dir</span>
+<span class="kn">from</span> <span class="nn">src.dssf</span> <span class="kn">import</span> <span class="n">plot_dssf</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="n">L</span> <span class="o">=</span> <span class="mi">30</span>
+<span class="n">chi</span> <span class="o">=</span> <span class="mi">8</span>
+
+<span class="n">filename</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;correlator_L</span><span class="si">{</span><span class="n">L</span><span class="si">}</span><span class="s1">_chi</span><span class="si">{</span><span class="n">chi</span><span class="si">}</span><span class="s1">.pickle&#39;</span>
+
+<span class="n">omega</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">L</span><span class="p">)</span>
+
+<span class="n">plot_dssf</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">omega</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>You may want to use these parameters as your starting point, but feel free to tweak them!</p>
+</div>
+<p>With the parameters as used in the code above, you should be able to reproduce the results shown in <a class="reference internal" href="#fig-dssf-small"><span class="std std-numref">Fig. 9.6</span></a>. To improve these results we can use a larger system size, and simulate to longer times. Since the system is critical, we will also need to increase the bond dimension to get accurate results. The results presented in <a class="reference internal" href="../week1/problem.html#fig-mpsfinal"><span class="std std-numref">Fig. 2.2</span></a> at the start were produced using <span class="math notranslate nohighlight">\(L=100\)</span> and <span class="math notranslate nohighlight">\(\chi=32\)</span>.</p>
+<figure class="align-center" id="fig-dssf-small">
+<a class="reference internal image-reference" href="../../_images/dssf_small.jpg"><img alt="../../_images/dssf_small.jpg" src="../../_images/dssf_small.jpg" style="width: 60%;" /></a>
+<figcaption>
+<p><span class="caption-number">Fig. 9.6 </span><span class="caption-text">Dynamical Spin Structure Factor, computed with <span class="math notranslate nohighlight">\(L=30\)</span> sites and <span class="math notranslate nohighlight">\(\chi=8\)</span>, <span class="math notranslate nohighlight">\(dt=0.2\)</span> and <span class="math notranslate nohighlight">\(t_\text{max}=8\)</span>.</span><a class="headerlink" href="#fig-dssf-small" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</section>
 <hr class="docutils" />
 <section id="references">
-<h2><span class="section-number">9.4. </span>References<a class="headerlink" href="#references" title="Link to this heading">#</a></h2>
+<h2><span class="section-number">9.5. </span>References<a class="headerlink" href="#references" title="Link to this heading">#</a></h2>
 <div class="docutils container" id="id2">
 <div role="list" class="citation-list">
 <div class="citation" id="id10" role="doc-biblioentry">
@@ -664,7 +794,8 @@ C^{zz}_j(t) &amp;= \langle \psi_0 | e^{iHt} S^z_{j} e^{-iHt} S^z_{N/2} | \psi_0 
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#computing-the-overlap">9.3.2. Computing the overlap</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#references">9.4. References</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#putting-it-all-together">9.4. Putting it all together</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#references">9.5. References</a></li>
 </ul>
   </nav></div>
 
