@@ -34,7 +34,7 @@
     <link rel="stylesheet" type="text/css" href="../../_static/styles/sphinx-book-theme.css?v=a3416100" />
     <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css?v=13237357" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css?v=be8a1c11" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css?v=4fa983c6" />
     <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
   
@@ -420,7 +420,7 @@ H = J \sum_{i=1}^{N-1} \mathbf{S}_i \cdot \mathbf{S}_{i+1} = J \sum_{i=1}^{N-1} 
 <figure class="align-center" id="fig-lake2013-2">
 <a class="reference internal image-reference" href="../../_images/AFH_experiment.png"><img alt="../../_images/AFH_experiment.png" src="../../_images/AFH_experiment.png" style="width: 80%;" /></a>
 <figcaption>
-<p><span class="caption-number">Fig. 9.1 </span><span class="caption-text">Data from B. Lake <em>et al</em> <span id="id1">[<a class="reference internal" href="#id10" title="B. Lake, D. A. Tennant, J.-S. Caux, T. Barthel, U. Schollwöck, S. E. Nagler, and C. D. Frost. Multispinon continua at zero and finite temperature in a near-ideal heisenberg chain. Phys. Rev. Lett., 111:137205, Sep 2013. URL: https://link.aps.org/doi/10.1103/PhysRevLett.111.137205, doi:10.1103/PhysRevLett.111.137205.">LTC+13</a>]</span>. The left panel shows the experimental data for the dynamical structure factor of <span class="math notranslate nohighlight">\(\text{KCuF}_3\)</span>. The right panel shows the theoretical prediction for the Heisenberg model obtained using Bethe Ansatz.</span><a class="headerlink" href="#fig-lake2013-2" title="Link to this image">#</a></p>
+<p><span class="caption-number">Fig. 9.1 </span><span class="caption-text">Data from B. Lake <em>et al</em> <span id="id1">[<a class="reference internal" href="#id12" title="B. Lake, D. A. Tennant, J.-S. Caux, T. Barthel, U. Schollwöck, S. E. Nagler, and C. D. Frost. Multispinon continua at zero and finite temperature in a near-ideal heisenberg chain. Phys. Rev. Lett., 111:137205, Sep 2013. URL: https://link.aps.org/doi/10.1103/PhysRevLett.111.137205, doi:10.1103/PhysRevLett.111.137205.">LTC+13</a>]</span>. The left panel shows the experimental data for the dynamical structure factor of <span class="math notranslate nohighlight">\(\text{KCuF}_3\)</span>. The right panel shows the theoretical prediction for the Heisenberg model obtained using Bethe Ansatz.</span><a class="headerlink" href="#fig-lake2013-2" title="Link to this image">#</a></p>
 </figcaption>
 </figure>
 </section>
@@ -657,7 +657,7 @@ C^{zz}_j(t) &amp;= \langle \psi_0 | e^{iHt} S^z_{j} e^{-iHt} S^z_{N/2} | \psi_0 
     <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;k&#39;</span><span class="p">)</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;$\omega$&#39;</span><span class="p">)</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;0&#39;</span><span class="p">,</span> <span class="s1">&#39;$\pi$&#39;</span><span class="p">,</span> <span class="s1">&#39;$2\pi$&#39;</span><span class="p">])</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">clim</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">200</span><span class="p">])</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">clim</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">50</span><span class="p">])</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">()</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
@@ -697,20 +697,36 @@ C^{zz}_j(t) &amp;= \langle \psi_0 | e^{iHt} S^z_{j} e^{-iHt} S^z_{N/2} | \psi_0 
 </div>
 <p>You may want to use these parameters as your starting point, but feel free to tweak them!</p>
 </div>
-<p>With the parameters as used in the code above, you should be able to reproduce the results shown in <a class="reference internal" href="#fig-dssf-small"><span class="std std-numref">Fig. 9.6</span></a>. To improve these results we can use a larger system size, and simulate to longer times. Since the system is critical, we will also need to increase the bond dimension to get accurate results. The results presented in <a class="reference internal" href="../week1/problem.html#fig-mpsfinal"><span class="std std-numref">Fig. 2.2</span></a> at the start were produced using <span class="math notranslate nohighlight">\(L=100\)</span> and <span class="math notranslate nohighlight">\(\chi=32\)</span>.</p>
+<p>With the parameters as used in the code above, you should be able to reproduce the results shown in <a class="reference internal" href="#fig-dssf-small"><span class="std std-numref">Fig. 9.6</span></a>. To improve these results we can use a larger system size, and simulate to longer times. Since the system is critical, we will also need to increase the bond dimension to get accurate results.</p>
 <figure class="align-center" id="fig-dssf-small">
 <a class="reference internal image-reference" href="../../_images/dssf_small.jpg"><img alt="../../_images/dssf_small.jpg" src="../../_images/dssf_small.jpg" style="width: 60%;" /></a>
 <figcaption>
 <p><span class="caption-number">Fig. 9.6 </span><span class="caption-text">Dynamical Spin Structure Factor, computed with <span class="math notranslate nohighlight">\(L=30\)</span> sites and <span class="math notranslate nohighlight">\(\chi=8\)</span>, <span class="math notranslate nohighlight">\(dt=0.2\)</span> and <span class="math notranslate nohighlight">\(t_\text{max}=8\)</span>.</span><a class="headerlink" href="#fig-dssf-small" title="Link to this image">#</a></p>
 </figcaption>
 </figure>
+<p>By pushing the parameters to <span class="math notranslate nohighlight">\(L=100\)</span>, <span class="math notranslate nohighlight">\(\chi=16\)</span>, <span class="math notranslate nohighlight">\(dt=0.1\)</span> and <span class="math notranslate nohighlight">\(t_\text{max}=25\)</span>, we can reproduce the results shown in <a class="reference internal" href="#fig-dssf-100"><span class="std std-numref">Fig. 9.7</span></a>. This calculation is now well beyond naive exact numerics. While the qualitative behaviour was already visible in the <span class="math notranslate nohighlight">\(L=30\)</span> results, the larger system size and longer time evolution have allowed us to resolve the finer details of the DSSF. More precisely, running for longer times gives us a finer resolution in the frequency domain. To run for longer times we necessarily need to increase the system size in order to avoid finite size effects that would violate our translation invariance assumption. Increasing the system size also increases our resolution in quasi-momentum space. In these simulations I did not do a careful convergence study. This is something that you should do if you are interested in getting the most accurate results.</p>
+<figure class="align-center" id="fig-dssf-100">
+<a class="reference internal image-reference" href="../../_images/dssf_100_16.jpg"><img alt="../../_images/dssf_100_16.jpg" src="../../_images/dssf_100_16.jpg" style="width: 60%;" /></a>
+<figcaption>
+<p><span class="caption-number">Fig. 9.7 </span><span class="caption-text">Dynamical Spin Structure Factor, computed with <span class="math notranslate nohighlight">\(L=100\)</span> sites and <span class="math notranslate nohighlight">\(\chi=16\)</span>, <span class="math notranslate nohighlight">\(dt=0.1\)</span> and <span class="math notranslate nohighlight">\(t_\text{max}=25\)</span>.</span><a class="headerlink" href="#fig-dssf-100" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Because our tensors are dense, our calculations do not scale efficiently with the number of CPU cores used. Therefore, you will get comparable or better performance by running the code on one or two cores. You may find that when running your code it utilising all available cores. You can add the following lines of code to limit the number of threads used:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">os</span> <span class="kn">import</span> <span class="n">environ</span>
+<span class="n">environ</span><span class="p">[</span><span class="s1">&#39;OMP_NUM_THREADS&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;2&#39;</span>
+</pre></div>
+</div>
+<p>One way that we can take advantage of multiple cores is by noticing that the calulcations for <span class="math notranslate nohighlight">\(C_j(t)\)</span> are independent for each <span class="math notranslate nohighlight">\(j\)</span>. Therefore, we can parallelise the calculation of the correlators. This is a good exercise to try if you are interested in parallel programming.</p>
+</div>
 </section>
 <hr class="docutils" />
 <section id="references">
 <h2><span class="section-number">9.5. </span>References<a class="headerlink" href="#references" title="Link to this heading">#</a></h2>
 <div class="docutils container" id="id2">
 <div role="list" class="citation-list">
-<div class="citation" id="id10" role="doc-biblioentry">
+<div class="citation" id="id12" role="doc-biblioentry">
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">LTC+13</a><span class="fn-bracket">]</span></span>
 <p>B. Lake, D. A. Tennant, J.-S. Caux, T. Barthel, U. Schollwöck, S. E. Nagler, and C. D. Frost. Multispinon continua at zero and finite temperature in a near-ideal heisenberg chain. <em>Phys. Rev. Lett.</em>, 111:137205, Sep 2013. URL: <a class="reference external" href="https://link.aps.org/doi/10.1103/PhysRevLett.111.137205">https://link.aps.org/doi/10.1103/PhysRevLett.111.137205</a>, <a class="reference external" href="https://doi.org/10.1103/PhysRevLett.111.137205">doi:10.1103/PhysRevLett.111.137205</a>.</p>
 </div>

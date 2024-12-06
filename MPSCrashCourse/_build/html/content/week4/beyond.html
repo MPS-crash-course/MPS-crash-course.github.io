@@ -352,7 +352,9 @@
 <button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
     <i class="fa-solid fa-magnifying-glass fa-lg"></i>
 </button>
-
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
 </div></div>
       
     </div>
@@ -368,6 +370,16 @@
     <div id="print-main-content">
         <div id="jb-print-toc">
             
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#developing-your-code-further">10.1. Developing your code further</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#feedback-on-the-course">10.2. Feedback on the course</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#references">10.3. References</a></li>
+</ul>
+            </nav>
         </div>
     </div>
 </div>
@@ -379,6 +391,57 @@
                   
   <section class="tex2jax_ignore mathjax_ignore" id="beyond-this-course">
 <h1><span class="section-number">10. </span>Beyond This Course<a class="headerlink" href="#beyond-this-course" title="Link to this heading">#</a></h1>
+<p>I hope you have enjoyed this crash course into the basics of MPS. Naturally, there is much more to learn about MPS, both in terms of numerical methods, but also as an analytical tool, and in the more general framework of tensor networks. Here are just a few resources to help you continue your journey:</p>
+<ul class="simple">
+<li><p><span id="id1">[<a class="reference internal" href="#id6" title="Johannes Hauschild and Frank Pollmann. Efficient numerical simulations with Tensor Networks: Tensor Network Python (TeNPy). SciPost Phys. Lect. Notes, pages 5, 2018. URL: https://scipost.org/10.21468/SciPostPhysLectNotes.5, doi:10.21468/SciPostPhysLectNotes.5.">HP18</a>]</span> is a great set of lecture notes that covers many of the topics we have discussed in this course, and more. In particular, it also discussed infinite generalisations of MPS, TEBD and DMRG. These lecture notes were the main inspiration for this course.</p></li>
+<li><p><span id="id2">[<a class="reference internal" href="#id8" title="J. Ignacio Cirac, David Pérez-Garc\'ıa, Norbert Schuch, and Frank Verstraete. Matrix product states and projected entangled pair states: concepts, symmetries, theorems. Rev. Mod. Phys., 93:045003, Dec 2021. URL: https://link.aps.org/doi/10.1103/RevModPhys.93.045003, doi:10.1103/RevModPhys.93.045003.">CPerezGarciaSV21</a>, <a class="reference internal" href="#id9" title="Román Orús. A practical introduction to tensor networks: matrix product states and projected entangled pair states. Annals of Physics, 349:117-158, 2014. URL: https://www.sciencedirect.com/science/article/pii/S0003491614001596, doi:https://doi.org/10.1016/j.aop.2014.06.013.">Oru14</a>, <a class="reference internal" href="#id10" title="Ulrich Schollwöck. The density-matrix renormalization group in the age of matrix product states. Annals of Physics, 326(1):96-192, 2011. January 2011 Special Issue. URL: https://www.sciencedirect.com/science/article/pii/S0003491610001752, doi:https://doi.org/10.1016/j.aop.2010.09.012.">Sch11</a>]</span>. These reviews are a great starting point for learning more about tensor networks and matrix product states. They cover a wide range of topics and are written by experts in the field.</p></li>
+<li><p><a class="reference external" href="https://tenpy.readthedocs.io/en/latest/">TeNPy</a> is the documentation for the <code class="docutils literal notranslate"><span class="pre">tenpy</span></code> library, which is a Python library for tensor network calculations.</p></li>
+<li><p><a class="reference external" href="https://itensor.org/">iTensor</a> is a Julia library for tensor network calculations.</p></li>
+</ul>
+<section id="developing-your-code-further">
+<h2><span class="section-number">10.1. </span>Developing your code further<a class="headerlink" href="#developing-your-code-further" title="Link to this heading">#</a></h2>
+<p>The purpose of this course was to walk you through the basics of MPS by writing your own code. I feel like this is the best way to learn the topic if you are planning to use them as a numerical method. Beyond this, I would definitely recommend the use of a library like <code class="docutils literal notranslate"><span class="pre">tenpy</span></code> or <code class="docutils literal notranslate"><span class="pre">iTensor</span></code> for more advanced calculations. However, if you are interested in developing your own code further, here are a few ideas:</p>
+<ul class="simple">
+<li><p><strong>Iterative Eigensolver</strong>: The biggest bottleneck in the DMRG algorithm is solving the local eigenproblem. The code we wrote can be sped up significantly by using an iterative eigensolver such as the Davidson algorithm. This is a relatively simple algorithm. By using very few iterations in the eigensolver, you can afford to do more sweeps in the DMRG algorithm, to get a comparable accuracy with sufficiently smaller computational cost.</p></li>
+<li><p><strong>Add convergence criteria</strong>: We manually controlled how many sweeps to do in the DMRG algorithm, but it is possible that we could have stopped earlier. You could add a convergence criterion to the code, such as checking when the change in the energy between sweeps is below a certain threshold.</p></li>
+<li><p><strong>Perform convergence tests</strong>: We didn’t test how the energy converged with the bond dimension. You could add this to your code to see how the energy changes as you increase the bond dimension for DMRG. For the time evolution you should track the entanglement entropy and plot this as a function of time for different bond dimensions.</p></li>
+<li><p><strong>Implement different Hamiltonian MPOs</strong>: We constructed the MPO for the Antiferromagnetic Heisenberg chain. However, this construction can easily be generalised to other models, e.g. the XXZ model or the Ising model with field. This will open up the possibility of finding the ground states of a wider range of models.</p></li>
+<li><p><strong>Implement a more general TEBD step</strong>: Our TEBD algorithm was hard coded for the AFH chain. You can generalise this for other Hamiltonians with two-body nearest neighbour Hamiltonians.</p></li>
+<li><p><strong>Implement other time evolution methods</strong>: The TEBD algorithm is just one way of performing time evolution. As we introduced it, it is limited to local nearest neighbour Hamiltonians. You could implement other methods, such as those based on MPOs, which allow you to simulate more general Hamiltonians, including long-range interactions. See e.g. <span id="id3">[<a class="reference internal" href="#id5" title="Michael P. Zaletel, Roger S. K. Mong, Christoph Karrasch, Joel E. Moore, and Frank Pollmann. Time-evolving a matrix product state with long-ranged interactions. Phys. Rev. B, 91:165112, Apr 2015. URL: https://link.aps.org/doi/10.1103/PhysRevB.91.165112, doi:10.1103/PhysRevB.91.165112.">ZMK+15</a>]</span>.</p></li>
+</ul>
+</section>
+<section id="feedback-on-the-course">
+<h2><span class="section-number">10.2. </span>Feedback on the course<a class="headerlink" href="#feedback-on-the-course" title="Link to this heading">#</a></h2>
+<p>I really hope you have enjoyed this course and that it will be useful for your future studies. This is the first time I have offered this course, but I now see that it could be a valuable resources for others and so I may turn this into a MPAGS course in the future. I would love to hear your feedback on the course, and any suggestions you have for improvements. Please feel free to email me at <a class="reference external" href="mailto:adam&#46;gammon-smith&#37;&#52;&#48;nottingham&#46;ac&#46;uk">adam<span>&#46;</span>gammon-smith<span>&#64;</span>nottingham<span>&#46;</span>ac<span>&#46;</span>uk</a> with any feedback you have.</p>
+</section>
+<hr class="docutils" />
+<section id="references">
+<h2><span class="section-number">10.3. </span>References<a class="headerlink" href="#references" title="Link to this heading">#</a></h2>
+<div class="docutils container" id="id4">
+<div role="list" class="citation-list">
+<div class="citation" id="id8" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">CPerezGarciaSV21</a><span class="fn-bracket">]</span></span>
+<p>J. Ignacio Cirac, David Pérez-Garc\'ıa, Norbert Schuch, and Frank Verstraete. Matrix product states and projected entangled pair states: concepts, symmetries, theorems. <em>Rev. Mod. Phys.</em>, 93:045003, Dec 2021. URL: <a class="reference external" href="https://link.aps.org/doi/10.1103/RevModPhys.93.045003">https://link.aps.org/doi/10.1103/RevModPhys.93.045003</a>, <a class="reference external" href="https://doi.org/10.1103/RevModPhys.93.045003">doi:10.1103/RevModPhys.93.045003</a>.</p>
+</div>
+<div class="citation" id="id6" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">HP18</a><span class="fn-bracket">]</span></span>
+<p>Johannes Hauschild and Frank Pollmann. Efficient numerical simulations with Tensor Networks: Tensor Network Python (TeNPy). <em>SciPost Phys. Lect. Notes</em>, pages 5, 2018. URL: <a class="reference external" href="https://scipost.org/10.21468/SciPostPhysLectNotes.5">https://scipost.org/10.21468/SciPostPhysLectNotes.5</a>, <a class="reference external" href="https://doi.org/10.21468/SciPostPhysLectNotes.5">doi:10.21468/SciPostPhysLectNotes.5</a>.</p>
+</div>
+<div class="citation" id="id9" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">Oru14</a><span class="fn-bracket">]</span></span>
+<p>Román Orús. A practical introduction to tensor networks: matrix product states and projected entangled pair states. <em>Annals of Physics</em>, 349:117–158, 2014. URL: <a class="reference external" href="https://www.sciencedirect.com/science/article/pii/S0003491614001596">https://www.sciencedirect.com/science/article/pii/S0003491614001596</a>, <a class="reference external" href="https://doi.org/https://doi.org/10.1016/j.aop.2014.06.013">doi:https://doi.org/10.1016/j.aop.2014.06.013</a>.</p>
+</div>
+<div class="citation" id="id10" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">Sch11</a><span class="fn-bracket">]</span></span>
+<p>Ulrich Schollwöck. The density-matrix renormalization group in the age of matrix product states. <em>Annals of Physics</em>, 326(1):96–192, 2011. January 2011 Special Issue. URL: <a class="reference external" href="https://www.sciencedirect.com/science/article/pii/S0003491610001752">https://www.sciencedirect.com/science/article/pii/S0003491610001752</a>, <a class="reference external" href="https://doi.org/https://doi.org/10.1016/j.aop.2010.09.012">doi:https://doi.org/10.1016/j.aop.2010.09.012</a>.</p>
+</div>
+<div class="citation" id="id5" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id3">ZMK+15</a><span class="fn-bracket">]</span></span>
+<p>Michael P. Zaletel, Roger S. K. Mong, Christoph Karrasch, Joel E. Moore, and Frank Pollmann. Time-evolving a matrix product state with long-ranged interactions. <em>Phys. Rev. B</em>, 91:165112, Apr 2015. URL: <a class="reference external" href="https://link.aps.org/doi/10.1103/PhysRevB.91.165112">https://link.aps.org/doi/10.1103/PhysRevB.91.165112</a>, <a class="reference external" href="https://doi.org/10.1103/PhysRevB.91.165112">doi:10.1103/PhysRevB.91.165112</a>.</p>
+</div>
+</div>
+</div>
+</section>
 </section>
 
     <script type="text/x-thebe-config">
@@ -426,6 +489,24 @@
             </div>
             
             
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#developing-your-code-further">10.1. Developing your code further</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#feedback-on-the-course">10.2. Feedback on the course</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#references">10.3. References</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
               
             
           </div>

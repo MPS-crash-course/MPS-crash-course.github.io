@@ -34,7 +34,7 @@
     <link rel="stylesheet" type="text/css" href="../../_static/styles/sphinx-book-theme.css?v=a3416100" />
     <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css?v=13237357" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css?v=be8a1c11" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css?v=4fa983c6" />
     <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
   
@@ -439,7 +439,7 @@
 <p><span class="caption-number">Fig. 7.3 </span><span class="caption-text">Finite State Machine representation of the Heisenberg Hamiltonian. The MPO tensors can be easily extracted from this diagram.</span><a class="headerlink" href="#fig-fsm" title="Link to this image">#</a></p>
 </figcaption>
 </figure>
-<p>All local Hamiltonians can be written <em>exactly</em> as an MPO with a finite bond dimension. In the case of the Heisenberg model, we can write it as an MPO with bond dimension 5. To construct the MPO representation of the Hamiltonian, we use a Finite State Machine (FSM) representation of the Hamiltonian, as shown in <a class="reference internal" href="#fig-fsm"><span class="std std-numref">Fig. 7.3</span></a>. See Ref. <span id="id1">[<a class="reference internal" href="#id3" title="Gregory M. Crosswhite and Dave Bacon. Finite automata for caching in matrix product algorithms. Phys. Rev. A, 78:012356, Jul 2008. URL: https://link.aps.org/doi/10.1103/PhysRevA.78.012356, doi:10.1103/PhysRevA.78.012356.">CB08</a>]</span> for more details of this construction. Ultimately, we end up with the following MPO tensors for the Heisenberg model:</p>
+<p>All local Hamiltonians can be written <em>exactly</em> as an MPO with a finite bond dimension. In the case of the Heisenberg model, we can write it as an MPO with bond dimension 5. To construct the MPO representation of the Hamiltonian, we use a Finite State Machine (FSM) representation of the Hamiltonian, as shown in <a class="reference internal" href="#fig-fsm"><span class="std std-numref">Fig. 7.3</span></a>. See Ref. <span id="id1">[<a class="reference internal" href="#id5" title="Gregory M. Crosswhite and Dave Bacon. Finite automata for caching in matrix product algorithms. Phys. Rev. A, 78:012356, Jul 2008. URL: https://link.aps.org/doi/10.1103/PhysRevA.78.012356, doi:10.1103/PhysRevA.78.012356.">CB08</a>]</span> for more details of this construction. Ultimately, we end up with the following MPO tensors for the Heisenberg model:</p>
 <div class="math notranslate nohighlight" id="equation-eq-mpo-heisenberg">
 <span class="eqno">(7.1)<a class="headerlink" href="#equation-eq-mpo-heisenberg" title="Link to this equation">#</a></span>\[\begin{split}
 W^{[n]} = \left(\begin{matrix}
@@ -556,7 +556,7 @@ W^{[n]} = \left(\begin{matrix}
 <h2><span class="section-number">7.3. </span>References<a class="headerlink" href="#references" title="Link to this heading">#</a></h2>
 <div class="docutils container" id="id2">
 <div role="list" class="citation-list">
-<div class="citation" id="id3" role="doc-biblioentry">
+<div class="citation" id="id5" role="doc-biblioentry">
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">CB08</a><span class="fn-bracket">]</span></span>
 <p>Gregory M. Crosswhite and Dave Bacon. Finite automata for caching in matrix product algorithms. <em>Phys. Rev. A</em>, 78:012356, Jul 2008. URL: <a class="reference external" href="https://link.aps.org/doi/10.1103/PhysRevA.78.012356">https://link.aps.org/doi/10.1103/PhysRevA.78.012356</a>, <a class="reference external" href="https://doi.org/10.1103/PhysRevA.78.012356">doi:10.1103/PhysRevA.78.012356</a>.</p>
 </div>

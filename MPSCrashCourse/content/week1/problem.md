@@ -51,7 +51,7 @@ While we will go into the details of this calculation in week 4, our goal can th
 
 By the end of the course you should be able to produce data similar to that shown in {numref}`fig:mpsfinal` using your own code:
 
-```{figure} images/AFH_MPS_final.png
+```{figure} images/dssf_100_16.jpg
 ---
 name: fig:mpsfinal
 width: 66%

@@ -309,7 +309,7 @@ def plot_dssf(filename, omega):
     plt.xlabel('k')
     plt.ylabel('$\omega$')
     plt.xticks([0, np.pi, 2*np.pi], ['0', '$\pi$', '$2\pi$'])
-    plt.clim([0,200])
+    plt.clim([0,50])
     plt.colorbar()
     plt.show()
 ```
@@ -353,7 +353,7 @@ You may want to use these parameters as your starting point, but feel free to tw
 
 ````
 
-With the parameters as used in the code above, you should be able to reproduce the results shown in {numref}`fig:dssf_small`. To improve these results we can use a larger system size, and simulate to longer times. Since the system is critical, we will also need to increase the bond dimension to get accurate results. The results presented in {numref}`fig:mpsfinal` at the start were produced using $L=100$ and $\chi=32$.
+With the parameters as used in the code above, you should be able to reproduce the results shown in {numref}`fig:dssf_small`. To improve these results we can use a larger system size, and simulate to longer times. Since the system is critical, we will also need to increase the bond dimension to get accurate results. 
 
 ```{figure} images/dssf_small.jpg
 ---
@@ -364,6 +364,32 @@ align: center
 
 Dynamical Spin Structure Factor, computed with $L=30$ sites and $\chi=8$, $dt=0.2$ and $t_\text{max}=8$.
 ``` 
+
+By pushing the parameters to $L=100$, $\chi=16$, $dt=0.1$ and $t_\text{max}=25$, we can reproduce the results shown in {numref}`fig:dssf_100`. This calculation is now well beyond naive exact numerics. While the qualitative behaviour was already visible in the $L=30$ results, the larger system size and longer time evolution have allowed us to resolve the finer details of the DSSF. More precisely, running for longer times gives us a finer resolution in the frequency domain. To run for longer times we necessarily need to increase the system size in order to avoid finite size effects that would violate our translation invariance assumption. Increasing the system size also increases our resolution in quasi-momentum space. In these simulations I did not do a careful convergence study. This is something that you should do if you are interested in getting the most accurate results.
+
+```{figure} images/dssf_100_16.jpg
+---
+name: fig:dssf_100
+width: 60%
+align: center
+---
+
+Dynamical Spin Structure Factor, computed with $L=100$ sites and $\chi=16$, $dt=0.1$ and $t_\text{max}=25$.
+``` 
+
+
+````{note}
+Because our tensors are dense, our calculations do not scale efficiently with the number of CPU cores used. Therefore, you will get comparable or better performance by running the code on one or two cores. You may find that when running your code it utilising all available cores. You can add the following lines of code to limit the number of threads used:
+
+```python
+from os import environ
+environ['OMP_NUM_THREADS'] = '2'
+```
+
+One way that we can take advantage of multiple cores is by noticing that the calulcations for $C_j(t)$ are independent for each $j$. Therefore, we can parallelise the calculation of the correlators. This is a good exercise to try if you are interested in parallel programming. 
+
+````
+
 
 
 ---
