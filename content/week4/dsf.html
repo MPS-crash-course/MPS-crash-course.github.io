@@ -34,7 +34,7 @@
     <link rel="stylesheet" type="text/css" href="../../_static/styles/sphinx-book-theme.css?v=a3416100" />
     <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css?v=13237357" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css?v=be8a1c11" />
     <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css?v=4fa983c6" />
     <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
   
@@ -659,7 +659,6 @@ C^{zz}_j(t) &amp;= \langle \psi_0 | e^{iHt} S^z_{j} e^{-iHt} S^z_{N/2} | \psi_0 
     <span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;0&#39;</span><span class="p">,</span> <span class="s1">&#39;$\pi$&#39;</span><span class="p">,</span> <span class="s1">&#39;$2\pi$&#39;</span><span class="p">])</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">clim</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">50</span><span class="p">])</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">()</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
 <p>You can then write two very short scripts to run and to plot.</p>
@@ -684,6 +683,7 @@ C^{zz}_j(t) &amp;= \langle \psi_0 | e^{iHt} S^z_{j} e^{-iHt} S^z_{N/2} | \psi_0 
 <span class="kn">from</span> <span class="nn">src.dssf</span> <span class="kn">import</span> <span class="n">plot_dssf</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
 
 <span class="n">L</span> <span class="o">=</span> <span class="mi">30</span>
 <span class="n">chi</span> <span class="o">=</span> <span class="mi">8</span>
@@ -693,9 +693,13 @@ C^{zz}_j(t) &amp;= \langle \psi_0 | e^{iHt} S^z_{j} e^{-iHt} S^z_{N/2} | \psi_0 
 <span class="n">omega</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">L</span><span class="p">)</span>
 
 <span class="n">plot_dssf</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">omega</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
-<p>You may want to use these parameters as your starting point, but feel free to tweak them!</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>You may want to use these parameters as your starting point, but feel free to tweak them!
+
+</pre></div>
+</div>
 </div>
 <p>With the parameters as used in the code above, you should be able to reproduce the results shown in <a class="reference internal" href="#fig-dssf-small"><span class="std std-numref">Fig. 9.6</span></a>. To improve these results we can use a larger system size, and simulate to longer times. Since the system is critical, we will also need to increase the bond dimension to get accurate results.</p>
 <figure class="align-center" id="fig-dssf-small">
@@ -706,9 +710,9 @@ C^{zz}_j(t) &amp;= \langle \psi_0 | e^{iHt} S^z_{j} e^{-iHt} S^z_{N/2} | \psi_0 
 </figure>
 <p>By pushing the parameters to <span class="math notranslate nohighlight">\(L=100\)</span>, <span class="math notranslate nohighlight">\(\chi=16\)</span>, <span class="math notranslate nohighlight">\(dt=0.1\)</span> and <span class="math notranslate nohighlight">\(t_\text{max}=25\)</span>, we can reproduce the results shown in <a class="reference internal" href="#fig-dssf-100"><span class="std std-numref">Fig. 9.7</span></a>. This calculation is now well beyond naive exact numerics. While the qualitative behaviour was already visible in the <span class="math notranslate nohighlight">\(L=30\)</span> results, the larger system size and longer time evolution have allowed us to resolve the finer details of the DSSF. More precisely, running for longer times gives us a finer resolution in the frequency domain. To run for longer times we necessarily need to increase the system size in order to avoid finite size effects that would violate our translation invariance assumption. Increasing the system size also increases our resolution in quasi-momentum space. In these simulations I did not do a careful convergence study. This is something that you should do if you are interested in getting the most accurate results.</p>
 <figure class="align-center" id="fig-dssf-100">
-<a class="reference internal image-reference" href="../../_images/dssf_100_16.jpg"><img alt="../../_images/dssf_100_16.jpg" src="../../_images/dssf_100_16.jpg" style="width: 60%;" /></a>
+<a class="reference internal image-reference" href="../../_images/dssf_L100_chi321.png"><img alt="../../_images/dssf_L100_chi321.png" src="../../_images/dssf_L100_chi321.png" style="width: 60%;" /></a>
 <figcaption>
-<p><span class="caption-number">Fig. 9.7 </span><span class="caption-text">Dynamical Spin Structure Factor, computed with <span class="math notranslate nohighlight">\(L=100\)</span> sites and <span class="math notranslate nohighlight">\(\chi=16\)</span>, <span class="math notranslate nohighlight">\(dt=0.1\)</span> and <span class="math notranslate nohighlight">\(t_\text{max}=25\)</span>.</span><a class="headerlink" href="#fig-dssf-100" title="Link to this image">#</a></p>
+<p><span class="caption-number">Fig. 9.7 </span><span class="caption-text">Dynamical Spin Structure Factor, computed with <span class="math notranslate nohighlight">\(L=100\)</span> sites and <span class="math notranslate nohighlight">\(\chi=32\)</span>, <span class="math notranslate nohighlight">\(dt=0.1\)</span> and <span class="math notranslate nohighlight">\(t_\text{max}=25\)</span>.</span><a class="headerlink" href="#fig-dssf-100" title="Link to this image">#</a></p>
 </figcaption>
 </figure>
 <div class="admonition note">

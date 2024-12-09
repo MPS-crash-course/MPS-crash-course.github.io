@@ -311,7 +311,6 @@ def plot_dssf(filename, omega):
     plt.xticks([0, np.pi, 2*np.pi], ['0', '$\pi$', '$2\pi$'])
     plt.clim([0,50])
     plt.colorbar()
-    plt.show()
 ```
 
 You can then write two very short scripts to run and to plot.
@@ -339,6 +338,7 @@ from fix_pathing import root_dir
 from src.dssf import plot_dssf
 
 import numpy as np
+from matplotlib import pyplot as plt
 
 L = 30
 chi = 8
@@ -348,6 +348,8 @@ filename = f'correlator_L{L}_chi{chi}.pickle'
 omega = np.linspace(0, 4, 2*L)
 
 plot_dssf(filename, omega)
+plt.show()
+```
 ```
 You may want to use these parameters as your starting point, but feel free to tweak them!
 
@@ -367,14 +369,14 @@ Dynamical Spin Structure Factor, computed with $L=30$ sites and $\chi=8$, $dt=0.
 
 By pushing the parameters to $L=100$, $\chi=16$, $dt=0.1$ and $t_\text{max}=25$, we can reproduce the results shown in {numref}`fig:dssf_100`. This calculation is now well beyond naive exact numerics. While the qualitative behaviour was already visible in the $L=30$ results, the larger system size and longer time evolution have allowed us to resolve the finer details of the DSSF. More precisely, running for longer times gives us a finer resolution in the frequency domain. To run for longer times we necessarily need to increase the system size in order to avoid finite size effects that would violate our translation invariance assumption. Increasing the system size also increases our resolution in quasi-momentum space. In these simulations I did not do a careful convergence study. This is something that you should do if you are interested in getting the most accurate results.
 
-```{figure} images/dssf_100_16.jpg
+```{figure} images/dssf_L100_chi32.png
 ---
 name: fig:dssf_100
 width: 60%
 align: center
 ---
 
-Dynamical Spin Structure Factor, computed with $L=100$ sites and $\chi=16$, $dt=0.1$ and $t_\text{max}=25$.
+Dynamical Spin Structure Factor, computed with $L=100$ sites and $\chi=32$, $dt=0.1$ and $t_\text{max}=25$.
 ``` 
 
 
